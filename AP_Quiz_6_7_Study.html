@@ -1,0 +1,916 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A&amp;P I — Quiz 6 &amp; 7 Multiple-Choice Study Tool</title>
+<style>
+  :root{
+    --bg:#f2f3f5; --card:#ffffff; --line:#d9dce1; --ink:#1a1c1f;
+    --accent:#2563eb; --accent-soft:#e8f0fe; --right:#dcfce7; --wrong:#fde2e2;
+    --right-ink:#14532d; --wrong-ink:#7f1d1d; --muted:#5c626d; --hintbg:#fff7e1; --hintline:#f5e4a8;
+  }
+  *{box-sizing:border-box}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+       max-width:860px;margin:0 auto;padding:22px 16px 90px;line-height:1.5;
+       background:var(--bg);color:var(--ink)}
+  h1{font-size:23px;margin:0 0 4px}
+  .sub{color:var(--muted);font-size:13px;margin:0 0 16px}
+  .tabs{display:flex;gap:8px;margin:16px 0 12px;flex-wrap:wrap}
+  .tab{flex:1;min-width:200px;padding:12px 14px;border:1px solid var(--line);
+       border-radius:12px;background:#fff;cursor:pointer;text-align:left;transition:.15s}
+  .tab:hover{border-color:var(--accent)}
+  .tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .tab small{display:block;font-weight:normal;opacity:.75;font-size:12px}
+  .toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+           background:#fff;border:1px solid var(--line);border-radius:12px;
+           padding:10px 12px;margin-bottom:14px;position:sticky;top:8px;z-index:5}
+  button{font-family:inherit;font-size:14px;padding:9px 13px;border-radius:8px;
+         border:1px solid var(--line);background:#fff;cursor:pointer}
+  button:hover{border-color:var(--accent);color:var(--accent)}
+  button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+  button.primary:hover{filter:brightness(1.06)}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  .badge{font-size:13px;font-weight:600;margin-left:auto;color:var(--muted);text-align:right}
+  .badge b{color:var(--ink)}
+  .hero{background:#fff;border:1px solid var(--line);border-radius:14px;padding:26px;text-align:center;margin-top:6px}
+  .hero p{color:var(--muted);max-width:520px;margin:10px auto 18px}
+  .hero .row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  .stat{display:flex;gap:16px;justify-content:center;margin-bottom:10px;flex-wrap:wrap}
+  .stat div{background:var(--accent-soft);border-radius:10px;padding:10px 16px;min-width:120px}
+  .stat b{display:block;font-size:22px;color:var(--accent)}
+  .stat span{font-size:12px;color:var(--muted)}
+  .card{background:var(--card);padding:16px 18px 14px;margin:12px 0;border-radius:12px;border:1px solid var(--line)}
+  .card .q{font-weight:600;margin-bottom:12px}
+  .q .num{color:var(--muted);font-weight:600;margin-right:6px}
+  .ptype{display:inline-block;font-size:10px;text-transform:uppercase;letter-spacing:.05em;
+         padding:2px 7px;border-radius:99px;background:#eef0f3;color:var(--muted);margin-left:8px;vertical-align:middle}
+  label{display:block;padding:8px 10px;margin:4px 0;border-radius:8px;cursor:pointer;border:1px solid transparent}
+  label:hover{background:var(--accent-soft)}
+  label.right{background:var(--right);color:var(--right-ink);border-color:#86efac}
+  label.wrong{background:var(--wrong);color:var(--wrong-ink);border-color:#fca5a5}
+  label.correct-mark{box-shadow:inset 0 0 0 2px #22c55e}
+  .hint-btn{font-size:12px;padding:5px 10px;margin-top:6px;background:none;border:1px dashed #d0b54a;color:#8a6d1d}
+  .hint-btn:hover{border-color:#8a6d1d;color:#6b540f}
+  .flag-btn{font-size:12px;padding:5px 10px;margin-top:6px;background:none;border:1px dashed #9aa7b4;color:#5b6673}
+  .flag-btn:hover{border-color:var(--accent);color:var(--accent)}
+  .flag-btn.on{background:var(--accent-soft);border:1px solid var(--accent);color:var(--accent);font-weight:600}
+  .hint{display:none;margin:8px 0 0;padding:10px 12px;border-radius:8px;
+        background:var(--hintbg);border:1px solid var(--hintline);font-size:14px;color:#6b540f}
+  .hint.shown{display:block}
+  select{font-family:inherit;font-size:14px;padding:9px 10px;border-radius:8px;
+         border:1px solid var(--line);background:#fff;cursor:pointer;color:inherit}
+  select:hover{border-color:var(--accent)}
+  .summary{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px;margin-top:14px}
+  .summary h3{margin:0 0 4px}
+  .summary .big{font-size:30px;font-weight:700;color:var(--accent)}
+  .missed-item{background:#fffaf0;border:1px solid #efe0b8;border-radius:10px;padding:12px 14px;margin:10px 0}
+  .missed-item .mq{font-weight:600}
+  .missed-item .ans{color:var(--right-ink);margin-top:6px}
+  .missed-item .ans b{color:var(--right-ink)}
+  .tag{font-size:11px;color:var(--muted);font-style:italic}
+  .muted{color:var(--muted)}
+  .fb{margin-top:12px;padding:10px 12px;border-radius:8px;font-weight:600}
+  .fb.ok{background:var(--right);color:var(--right-ink);border:1px solid #86efac}
+  .fb.bad{background:var(--wrong);color:var(--wrong-ink);border:1px solid #fca5a5}
+  .fb small{display:block;font-weight:400;margin-top:4px;opacity:.9}
+  label.locked{cursor:default;opacity:.75}
+  .progress{height:6px;background:#e3e6ea;border-radius:99px;overflow:hidden;margin:2px 0 10px}
+  .progress i{display:block;height:100%;background:var(--accent);transition:width .25s}
+  .aids{display:none;margin-top:12px;padding:10px 12px;border-radius:10px;background:#eef5ff;border:1px solid #cfe1f7}
+  .aids.shown{display:block}
+  .aids-h{font-weight:700;font-size:12px;letter-spacing:.03em;text-transform:uppercase;color:#1e40af;margin-bottom:6px}
+  .aid{display:flex;gap:8px;margin:7px 0;font-size:14px;line-height:1.45}
+  .aid-k{flex:0 0 46px;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#1e40af;padding-top:3px}
+  .aid-v{flex:1}
+  .trapbox{margin-top:10px;padding:9px 11px;border-radius:8px;background:#fff8e6;border:1px solid #efdc9f;font-size:13.5px;color:#6b540f}
+  .aids-btn{font-size:12px;padding:6px 11px;margin-top:8px;background:none;border:1px dashed #7aa7e0;color:#1e40af;border-radius:8px}
+  .aids-btn:hover{border-color:#1e40af;color:#1e40af}
+  .review .ans{color:var(--right-ink);font-weight:700;margin-top:8px}
+  .toolbar label{display:inline-flex;align-items:center;gap:6px;padding:0;margin:0;border:0;border-radius:0;
+                 font-size:13px;color:var(--muted);cursor:pointer}
+  .toolbar label:hover{background:none}
+  @media print{ .toolbar,.tabs,.hint-btn,.aids-btn,.flag-btn{display:none!important} .hint,.aids{display:block!important} }
+</style>
+</head>
+<body>
+<h1>A&amp;P I — Quiz 6 &amp; 7 Multiple-Choice Study Tool</h1>
+<p class="sub">Test-bank study tool: <b>every question is multiple choice</b> — there are no fill-in-the-blank items. Questions come from the real Quiz 6 (both attempts) and Quiz 7 question banks, plus extra concept drills. Two ways to run them: a <b>round</b> (answer all, then check) or <b>retry mode</b> (one question at a time — a wrong answer keeps you on that same question until you get it right, then it moves on). <b>Anything you miss comes back with a memory hook, the trap to watch for, and the reasoning</b> — see <b>🧠 Missed review</b>, or tick <b>Show aids while answering</b> to see them on every question. And <b>🔖 Not sure — relook</b> under any question keeps it for review <b>even if you got it right</b>: a coin flip that landed is not knowing it, and the score can never tell the two apart. Marked questions join the same missed pool. The <b>🔀 Shuffle questions</b> box re-serves the same questions in a different order every session (and stops a 10-question session from being the same first ten forever), while <b>🔀 Shuffle choices</b> moves the options too, so the answer is not always the same letter. At the end of a session, <b>🔁 These N again, new order</b> reruns that exact batch reordered. Progress is saved in this browser.</p>
+
+<div class="tabs">
+  <button class="tab active" id="tab-q6" onclick="switchQuiz('q6')">
+    Quiz 6 <small>Integumentary System — 26 real quiz + 48 concept MCQs</small>
+  </button>
+  <button class="tab" id="tab-q7" onclick="switchQuiz('q7')">
+    Quiz 7 <small>Skeletal System — 20 real quiz + 30 concept MCQs</small>
+  </button>
+</div>
+
+<div class="toolbar">
+  <button id="btn-new" class="primary" onclick="start('mixed')">▶ Start</button>
+  <button id="btn-missed" onclick="start('missed')">🎯 Practice Missed</button>
+  <button id="btn-flagged" onclick="start('flagged')" title="Every question you marked unsure - correct ones included, since those are the ones a score hides">🔖 Relook at marked</button>
+  <select id="modesel" onchange="setMode(this.value)" title="How the questions are run">
+    <option value="round">Round: answer all, then check</option>
+    <option value="drill">Retry mode: repeat until correct</option>
+  </select>
+  <select id="sizesel" onchange="setSize(this.value)" title="How many questions per session">
+    <option value="5">5 at a time</option>
+    <option value="10">10 at a time</option>
+    <option value="20">20 at a time</option>
+    <option value="all">Whole pool</option>
+  </select>
+  <select id="srcfilter" onchange="setFilter(this.value)" title="Which questions to draw from">
+    <option value="all">Every question</option>
+    <option value="real">Real quiz only</option>
+    <option value="concept">Concept drills only</option>
+  </select>
+  <button onclick="clearProgress()" title="Erase saved progress">Reset progress</button>
+  <button onclick="startReview()" title="Every question you have missed, with a memory hook and the trap to watch for">🧠 Missed review</button>
+  <label title="Show the memory hook and trap on every question before you answer">
+    <input type="checkbox" id="aidscb" onchange="setAidsAlways(this.checked)"> Show aids while answering
+  </label>
+  <label title="Serve the same questions in a different order each session - applies to the next session">
+    <input type="checkbox" id="shufqcb" onchange="setShuffleQ(this.checked)"> 🔀 Shuffle questions
+  </label>
+  <label title="Move the answer choices around too, so the right answer is not always the same letter - applies to the next session">
+    <input type="checkbox" id="shufccb" onchange="setShuffleChoices(this.checked)"> 🔀 Shuffle choices
+  </label>
+  <span class="badge" id="badge"></span>
+</div>
+
+<div id="content"></div>
+
+<script>
+/* ================= DATA ================= */
+
+
+const DATA = {
+
+q6: {
+  label: "Quiz 6 — Integumentary System",
+  mcq: [
+    /* ---------- Real Quiz 6 test bank (16 items, each attempt; 6 shared) ---------- */
+    {q:"Which is not a function of the integument?", opts:["Protection","Water loss prevention","Synthesis of cholecalciferol (vitamin D precursor)","Temperature regulation","No exceptions; all are functions of the integument"], correct:"No exceptions; all are functions of the integument", hint:"Every listed item really is an integument function, so the keyed answer is the no-exceptions option.", mnem:"Every listed item is a real job: protection, water seal, vitamin D, heat control. When the exam lists only genuine functions, the answer is 'no exceptions'.", trap:"Do not hunt for a fake function. If all the listed jobs are real, the trap is assuming one of them must be wrong.", src:"Quiz 6 · Attempt 1"},
+    {q:"Tactile (Merkel) cells are sensitive to ______", opts:["touch","heat","sound / vibration","light","cold"], correct:"touch", hint:"Merkel cells are the epidermis light-touch receptors.", mnem:"MERKEL = 'MERRY tickle' - light touch. Say it: Merkel tickles, Meissner tickles, Pacinian presses.", trap:"'Sound / vibration' belongs to deep receptors. Heat and cold are free nerve endings, not Merkel cells.", src:"Quiz 6 · Attempt 1"},
+    {q:"Thick skin contains ______", opts:["seven epidermal strata and lacks sweat glands","six epidermal strata and lacks sweat glands","four epidermal strata and lacks sebaceous glands","five epidermal strata and lacks sweat glands","five epidermal strata and lacks sebaceous glands"], correct:"five epidermal strata and lacks sebaceous glands", hint:"Thick skin has five strata, no hair follicles and no sebaceous glands — but it does have sweat glands. Read every option closely.", mnem:"Five strata, no SEBaceous glands, no hair - but it DOES sweat. Say: 'Five, bald and dry, still sweaty.'", trap:"Watch the near-twins. 'Five strata and lacks sweat glands' is wrong: thick skin is full of sweat glands. It lacks sebaceous glands.", src:"Quiz 6 · Attempt 1"},
+    {q:"What is not true about the Dermal Papillary layer?", opts:["contains Meissner corpuscles for touch sensation","blends with or is adjacent to the hypodermis","contains capillaries to support the epidermis","produces the epidermal ridges seen on the skin's surface"], correct:"blends with or is adjacent to the hypodermis", hint:"The papillary layer is the superficial dermis; it is the reticular layer that sits next to the hypodermis.", mnem:"PAPillary = the PEAK (top), sitting under the epidermis. The RETicular layer is the one that RETreats down to the hypodermis.", trap:"The two dermal layers are easy to swap. Papillary = superficial + areolar. Reticular = deep + dense irregular.", src:"Quiz 6 · Attempts 1 and 2"},
+    {q:"In good health, skin color results from a combination of  a: melanin   b: hemoglobin   c: bilirubin   d: carotene", opts:["a, c, d","a, b, c","a, b, d","a, d","b, c, d"], correct:"a, b, d", hint:"Melanin, hemoglobin and carotene are the normal contributors; bilirubin shows up only with jaundice.", mnem:"Healthy color = M, H, C: Melanin, Hemoglobin, Carotene. BILIRUBIN is the BAD one - it means jaundice.", trap:"Any answer option containing 'c: bilirubin' is wrong. A healthy person's skin color does not come from bilirubin.", src:"Quiz 6 · Attempt 1"},
+    {q:"For optimum wound healing, surgical incisions should be planned ______", opts:["with no regard for lines of cleavage","parallel to lines of cleavage","perpendicular to lines of cleavage","away from any lines of cleavage"], correct:"parallel to lines of cleavage", hint:"Cutting parallel to the collagen bundles means less pulling, so the incision heals with less scarring.", mnem:"Cut WITH the grain, like wood. Parallel to the cleavage lines = less pull = less scar.", trap:"'Perpendicular' sounds more precise, but it slices across the collagen bundles so the wound pulls open.", src:"Quiz 6 · Attempts 1 and 2"},
+    {q:"What is the composition of the subcutaneous layer?", opts:["Areolar and adipose connective tissue","Areolar connective tissue","Adipose connective tissue","Areolar connective tissue and dense irregular connective tissue","Dense irregular connective tissue"], correct:"Areolar and adipose connective tissue", hint:"The hypodermis is loose areolar connective tissue plus fat.", mnem:"Hypodermis = AREOLAR plus ADIPOSE: the loose connective tissue plus the fat. Two tissues, one layer.", trap:"Single-tissue options are half answers. If an option says only areolar, or only adipose, it is incomplete.", src:"Quiz 6 · Attempt 1"},
+    {q:"Why might someone become pale when they are exposed to a cold temperature?", opts:["Dehydration of the stratum corneum","Purely psychological reasons","Vasodilation has occurred","Vasoconstriction has occurred","Constriction of the dermal collagen and elastic fibers"], correct:"Vasoconstriction has occurred", hint:"Cold narrows the dermal blood vessels, so less red blood shows through the skin.", mnem:"COLD goes with CONSTRICT - both start with C. Blood stays deep, skin looks pale. Heat does the opposite: dilate, flush, red.", trap:"Do not pick vasodilation. That is what makes you red and flushed when you are hot.", src:"Quiz 6 · Attempt 1"},
+    {q:"The structure responsible for pulling on the follicle and causing goose bumps is the ______", opts:["external root sheath","arrector pili muscle","epithelial root sheath","internal root sheath","papilla"], correct:"arrector pili muscle", hint:"A tiny smooth muscle attached to each hair follicle.", mnem:"ARRECTOR PILI = 'a RECTOR pulls the PILI (hairs)'. A tiny muscle that RECTifies your hair.", trap:"The root sheaths and the papilla are hair structures too, but only the arrector pili is muscle, and only muscle can pull.", src:"Quiz 6 · Attempt 1"},
+
+    {q:"Nails are hard keratin structures formed from the stratum ______ of the epidermis.", opts:["lucidum","basale","granulosum","spinosum","corneum"], correct:"corneum", hint:"Hard keratin means the most superficial, keratin-packed layer.", mnem:"Nails are the same hard dead keratin as the skin's OUTERMOST layer. Outer layer = corneum.", trap:"The basale is the deepest living layer. Nothing down there is hard keratin.", src:"Quiz 6 · Attempt 1"},
+    {q:"The type of gland that secretes foul smelling sweat into a hair follicle, found in the axillary, anal, and genital regions, is the ______ sweat gland.", opts:["merocrine / eccrine","sebaceous","ceruminous","apocrine"], correct:"apocrine", hint:"Apocrine glands empty into hair follicles of the axillae and anogenital region.", mnem:"APOcrine = 'A Positive Odor'. Body odor, in hairy places, emptied into a hair follicle.", trap:"Eccrine and merocrine are the all-over cooling glands with their own pores. Apocrine is the smelly axilla and groin gland.", src:"Quiz 6 · Attempt 1"},
+    {q:"Cerumen wax is a secretion that ______", opts:["cools the body through water evaporation","lubricates the ear canal and traps debris before it reaches the eardrum","tends to cause acne on the skin of the face","lubricates vellus hairs and waterproofs the skin of the limbs","acts as a pheromone"], correct:"lubricates the ear canal and traps debris before it reaches the eardrum", hint:"The ceruminous glands protect the ear canal.", mnem:"CERUMEN = 'CARE-umen' - it CAREs for the ear canal by lubricating it and trapping debris.", trap:"Water evaporation is sweat's job, not earwax's. Cerumen lubricates and traps; it does not cool.", src:"Quiz 6 · Attempts 1 and 2"},
+    {q:"What changes are not expected with aging skin?", opts:["skin gets thinner and injures easier","wrinkles and crease lines develop where skin folds","wounds take longer to heal","thick skin regions get thicker due to epidermal overgrowth","collagen fibers decrease, elastic fibers become stiff"], correct:"thick skin regions get thicker due to epidermal overgrowth", hint:"Aging skin thins. Nothing gets thicker from epidermal overgrowth.", mnem:"AGING = THINNING. Collagen drops, skin sags, healing slows. Nothing in aging skin gets THICKER.", trap:"Read the question: it asks for what is NOT expected. Aging thins, so any option about thickening is the answer.", src:"Quiz 6 · Attempts 1 and 2"},
+    {q:"Sebaceous glands are not found ______.", opts:["on the face and scalp","palms and soles","the femoral and brachial regions","on the posterior regions"], correct:"palms and soles", hint:"Thick, hairless skin contains no sebaceous glands.", mnem:"Palms and soles are thick skin: no hair, so no sebaceous glands. 'No hair, no oil.'", trap:"Sebaceous glands exist everywhere there is hair - face, scalp, back, even the thigh. Only hairless thick skin has none.", src:"Quiz 6 · Attempts 1 and 2"},
+    {q:"The rule of nines system for evaluating burns of the skin is useful for ______", opts:["the age of the patient and the need for specialty care","estimating the depth of the burn","estimating the initial IV fluid requirements and the need for specialty care / transfer","the amount of pain to be expected and its management"], correct:"estimating the initial IV fluid requirements and the need for specialty care / transfer", hint:"Burned surface area drives the fluid resuscitation volume and the transfer decision.", mnem:"The rule of nines measures AREA, and area drives FLUIDS and TRANSFER. It never measures depth or pain.", trap:"'Estimating the depth of the burn' sounds right but is wrong. Depth is graded in degrees, not in nines.", src:"Quiz 6 · Attempt 1"},
+    {q:"Skin cancer is the ______ type of cancer, and due to sun exposure it occurs most frequently on the ______.", opts:["most common; hands and ears","third most common; hands and ears","most common; head and neck","third most common; head and neck"], correct:"most common; head and neck", hint:"Skin cancer is the most common cancer, and UV strikes the head and neck most often.", mnem:"SKIN cancer is the MOST common cancer, and the sun hits the HEAD and NECK first.", trap:"Hands and ears get sun too, but the keyed answer is head and neck. Also note 'most common', not 'third most common'.", src:"Quiz 6 · Attempts 1 and 2"},
+    {q:"When exposed to short periods of ultraviolet light, keratinocytes convert a steroid precursor into ______, a molecule that after a few more chemical adjustments becomes calcitriol and is crucial for regulation of calcium levels.", opts:["creatine","calcidiol","calcitonin","cholecalciferol","phosphorus"], correct:"cholecalciferol", hint:"UV plus keratinocytes makes cholecalciferol, also called vitamin D3.", mnem:"UV plus keratinocytes = CHOLEcalciferol. CHOLE = cholesterol (the steroid precursor); calciferol = vitamin D3. Calcitriol comes LATER, after liver and kidney finish the job.", trap:"CALCIDIOL is the step after cholecalciferol, CALCITONIN is a hormone that lowers blood calcium, CREATINE is a muscle molecule. Near-identical words, completely different jobs.", src:"Quiz 6 · Attempt 2"},
+    {q:"Keratinocytes are named for ______", opts:["their production of keratin","their production of cholecalciferol","their position within the epidermis","their resistance to keratin's drying effect","their production of keratin and melanin"], correct:"their production of keratin", hint:"The name states the job: they make keratin.", mnem:"The name is the job: KERATIN-o-cytes make KERATIN, just as melanocytes make melanin.", trap:"'Their position within the epidermis' sounds plausible, but cells are named for what they DO, not where they sit.", src:"Quiz 6 · Attempt 2"},
+    {q:"What is not true of thick skin?", opts:["B and C are not true","Contains sweat gland","Contains a stratum lucidum","Contains sebaceous glands","Contains hair follicles"], correct:"B and C are not true", hint:"Thick skin does contain sweat glands and a stratum lucidum, and it lacks sebaceous glands and hair follicles. The course keys this item to the literal lettered option, so read the option letters on the real quiz.", mnem:"Thick skin HAS sweat glands and a stratum lucidum; it LACKS sebaceous glands and hair follicles. Two of the statements are false, so the keyed answer points at both by letter.", trap:"This item is letter-dependent. On the real quiz, re-read exactly which option letters the 'B and C are not true' choice is pointing at before you answer.", src:"Quiz 6 · Attempt 2"},
+    {q:"Hypoxia (low blood oxygen levels) produces a bluish discoloration of the blood, skin, and mucous membranes called ______", opts:["blushing","cyanosis","jaundice","melanosis"], correct:"cyanosis", hint:"Cyan- means blue.", mnem:"CYan- means blue. CYANOSIS = 'CYAN Oasis' - blue skin from too little oxygen.", trap:"Jaundice is yellow, melanosis is brown, blushing is red. Only cyanosis is blue.", src:"Quiz 6 · Attempt 2"},
+    {q:"The subcutaneous layer is a clinically useful tissue layer. What is not a characteristic of this layer?", opts:["can swell or contract due to changes in body water levels","difficult to access with a needle","easy to implant medical devices into","consists of loose areolar / adipose tissue","an excellent blood supply"], correct:"difficult to access with a needle", hint:"It is easy to reach with a needle, which is why it is a common injection site.", mnem:"The hypodermis is the EASIEST layer to reach - that is exactly why insulin and vaccines go there. Easy needle, easy implants, great blood supply.", trap:"Every other option is true, so the false one is the answer: it is EASY, not difficult, to reach with a needle.", src:"Quiz 6 · Attempt 2"},
+    {q:"What changes in the skin reduce the loss of body heat?", opts:["vasoconstriction","vasodilation","vasoconstriction and sweat production","vasodilation and sweat production"], correct:"vasoconstriction", hint:"Vasoconstriction keeps warm blood away from the body surface.", mnem:"To KEEP heat: CONSTRICT the vessels and send blood deep. To LOSE heat: DILATE and sweat.", trap:"'Vasoconstriction and sweat production' is a contradiction - sweating cools you down. Constriction alone is the answer.", src:"Quiz 6 · Attempt 2"},
+    {q:"The part of the hair that extends beyond the skin surface is called the ______", opts:["bulb","papilla","alopecia","shaft","root"], correct:"shaft", hint:"The shaft is above the skin; the root stays embedded in the follicle.", mnem:"The hair is an arrow. SHAFT = the part you see, ROOT = the buried part, BULB = the base.", trap:"The root and the bulb both sit below the skin. Only the shaft pokes out.", src:"Quiz 6 · Attempt 2"},
+    {q:"Another name for the cuticle is the ______", opts:["nail root","hyponychium","nail matrix","eponychium"], correct:"eponychium", hint:"The eponychium is the cuticle at the base of the nail.", mnem:"EPONYCHIUM = 'EPOXY on the nail' - the cuticle. EPI = on top, ONYCH = nail.", trap:"The HYPOnychium (hypo = under) is at the free edge, and the matrix is where the nail grows. Only eponychium is the cuticle.", src:"Quiz 6 · Attempt 2"},
+    {q:"Except for hairless moles, humans have the most sweat glands and the least terminal hair of any mammal. The primary function of the excess sweat glands is ______", opts:["pheromone production after puberty","parasite resistance","sodium and water regulation","skin lubrication","thermoregulation"], correct:"thermoregulation", hint:"Human sweating is mainly about cooling the body.", mnem:"Humans are the sweatiest mammal so we can run and stay cool. The job is cooling, not pheromones.", trap:"'Sodium and water regulation' really does happen when you sweat, but the PRIMARY function being tested is thermoregulation.", src:"Quiz 6 · Attempt 2"},
+    {q:"Which type of thermal burn is painless and charred?", opts:["superficial, 1st degree","chemical burns","partial thickness, 2nd degree","full thickness, 3rd degree"], correct:"full thickness, 3rd degree", hint:"Third-degree burns destroy nerve endings, so they do not hurt.", mnem:"A 3rd-degree burn burned the NERVES too - no nerves, no pain, and charred skin.", trap:"Painless is the giveaway. Anything superficial or partial thickness still hurts.", src:"Quiz 6 · Attempt 2"},
+
+
+    /* ---------- Concept drills (formerly fill-in-the-blank cards, now 4-option MCQs) ---------- */
+    {q:"The cutaneous membrane has two layers. The superficial layer that resists mild trauma and pathogens is the ______, and the deeper layer that contains blood vessels and sweat glands is the ______.", opts:["epidermis; dermis","epidermis; hypodermis","dermis; hypodermis","stratum corneum; stratum basale"], correct:"epidermis; dermis", hint:"The hypodermis lies deep to the skin and is not part of the cutaneous membrane.", mnem:"Skin = EPIdermis + DERMIS. The hypodermis sits UNDER the skin, so it is not part of the cutaneous membrane.", trap:"Any option that pairs a skin layer with the hypodermis is a trap - the hypodermis is not one of the two layers of skin.", src:"Concept drill"},
+    {q:"If more than about 25 percent of the skin surface is lost, which lost function can quickly prove fatal?", opts:["Protection — loss of the water-impermeable barrier causes fatal fluid loss and infection","Thermoregulation","Cutaneous sensation","Vitamin D synthesis"], correct:"Protection — loss of the water-impermeable barrier causes fatal fluid loss and infection", hint:"Barrier loss leads to dehydration and infection.", mnem:"Lose the barrier, lose the water. Burn patients die of fluid loss and infection, not of being cold.", trap:"Thermoregulation and sensation are real skin functions, but they do not kill you within days. The water barrier does.", src:"Concept drill"},
+    {q:"By which two processes does the integumentary system affect body temperature?", opts:["Sweating (evaporation) and adjusting cutaneous blood flow","Keratin production and melanin production","Sebum production and nail growth","Vitamin D synthesis and calcium absorption"], correct:"Sweating (evaporation) and adjusting cutaneous blood flow", hint:"Sweat plus vasodilation and vasoconstriction.", mnem:"Two knobs: SWEAT (evaporative cooling) and VESSELS (dilate to dump heat, constrict to keep it).", trap:"Keratin and melanin are about protection, not heat. Sebum and nail growth have nothing to do with temperature.", src:"Concept drill"},
+    {q:"Which three processes occur in the epidermis?", opts:["Keratin production, melanin production, and vitamin D synthesis","Blood cell production, collagen synthesis, and fat storage","Sweat production, sebum production, and hair growth","Antibody production, oxygen transport, and calcium storage"], correct:"Keratin production, melanin production, and vitamin D synthesis", hint:"Keratin, melanin, vitamin D.", mnem:"K-M-D: Keratin (waterproofing), Melanin (UV shield), vitamin D (calcium). All three are made in the epidermis.", trap:"Sweat and sebum come from glands in the DERMIS, and blood cells come from bone marrow - none of those are epidermal.", src:"Concept drill"},
+    {q:"What two processes occur in the dermis?", opts:["Nourishing the avascular epidermis and sensory reception","Keratinization and desquamation","Melanin synthesis and vitamin D3 formation","Hair and nail formation"], correct:"Nourishing the avascular epidermis and sensory reception", hint:"The dermis feeds the epidermis and houses the receptors.", mnem:"The dermis is the SUPPLY and SENSE layer: vessels feed the avascular epidermis, nerves report the outside world.", trap:"Keratinization happens in the epidermis, and hair and nails are epidermal derivatives - the dermis does not make them.", src:"Concept drill"},
+    {q:"Which four cell types reside in the epidermis?", opts:["Keratinocytes, melanocytes, dendritic (Langerhans) cells, and tactile (Merkel) cells","Osteocytes, chondrocytes, adipocytes, and fibroblasts","Fibroblasts, mast cells, macrophages, and plasma cells","Neurons, glial cells, Schwann cells, and satellite cells"], correct:"Keratinocytes, melanocytes, dendritic (Langerhans) cells, and tactile (Merkel) cells", hint:"K, M, D, T.", mnem:"KMDT: Keratinocytes, Melanocytes, Dendritic (Langerhans), Tactile (Merkel). Say it out loud three times.", trap:"Fibroblasts, mast cells and macrophages live in the DERMIS. Osteocytes and chondrocytes are not in skin at all.", src:"Concept drill"},
+    {q:"Which epidermal cell type is related to the immune system?", opts:["Dendritic (Langerhans) cells","Keratinocytes","Melanocytes","Tactile (Merkel) cells"], correct:"Dendritic (Langerhans) cells", hint:"They present antigens to immune cells.", mnem:"LANGERHANS = 'LONG-armed guards' - dendritic cells reach out and grab antigens.", trap:"Melanocytes protect you from UV light, not from germs. Merkel cells sense touch.", src:"Concept drill"},
+    {q:"Which list gives the epidermal strata in the correct order from superficial to deep?", opts:["Stratum corneum, stratum lucidum, stratum granulosum, stratum spinosum, stratum basale","Stratum basale, stratum spinosum, stratum granulosum, stratum lucidum, stratum corneum","Stratum corneum, stratum granulosum, stratum lucidum, stratum spinosum, stratum basale","Stratum lucidum, stratum corneum, stratum granulosum, stratum spinosum, stratum basale"], correct:"Stratum corneum, stratum lucidum, stratum granulosum, stratum spinosum, stratum basale", hint:"Corneum, lucidum, granulosum, spinosum, basale.", mnem:"Come Let's Get Some Beers: Corneum, Lucidum, Granulosum, Spinosum, Basale.", trap:"Watch the direction. Superficial to deep means corneum FIRST. The reverse list is the deep-to-superficial order.", src:"Concept drill"},
+
+    {q:"Which epidermal layer is present in thick skin but absent from thin skin?", opts:["Stratum lucidum","Stratum basale","Stratum granulosum","Stratum spinosum"], correct:"Stratum lucidum", hint:"The clear layer, found only on the palms and soles.", mnem:"LUCIDUM is the CLEAR layer, only on palms and soles. 'Thick skin was LUCKy enough to get one extra layer.'", trap:"Basale, granulosum and spinosum exist in ALL skin. Only the lucidum is exclusive to thick skin.", src:"Concept drill"},
+    {q:"Where is thick skin found?", opts:["Palms of the hands and soles of the feet","The scalp and forehead","The back and abdomen","The elbows and knees"], correct:"Palms of the hands and soles of the feet", hint:"The gripping and weight-bearing surfaces.", mnem:"Thick skin lives where you GRIP and STAND: palms and soles - the only hairless places on the body.", trap:"The scalp and back have the thickest DERMIS, but that is not the same as thick skin, which means the extra epidermal layer.", src:"Concept drill"},
+    {q:"The hypodermis is also known as the ______ layer.", opts:["subcutaneous (superficial fascia)","reticular","papillary","stratum basale"], correct:"subcutaneous (superficial fascia)", hint:"Sub-cutaneous means below the skin.", mnem:"HYPO = under, DERMIS = skin. Sub-cutaneous means under the skin. Same layer, two names.", trap:"Papillary and reticular are the two DERMAL layers - neither is the hypodermis.", src:"Concept drill"},
+    {q:"Hypodermic (subcutaneous) injections are given into which region?", opts:["The hypodermis / subcutaneous layer","The reticular dermis","The papillary dermis","The stratum basale"], correct:"The hypodermis / subcutaneous layer", hint:"The fatty layer just below the dermis.", mnem:"Sub-cutaneous injection means literally into the sub-cutaneous layer. The name is the map.", trap:"The reticular dermis is thin and tough; the fatty hypodermis is the actual target for shots.", src:"Concept drill"},
+    {q:"Which two receptors detect fine (light) touch in the skin?", opts:["Tactile (Merkel) cells and Meissner's corpuscles","Lamellated (Pacinian) corpuscles and Ruffini endings","Nociceptors and thermoreceptors","Hair follicle receptors and free nerve endings"], correct:"Tactile (Merkel) cells and Meissner's corpuscles", hint:"Merkel plus Meissner.", mnem:"MERKEL and MEISSNER both start with M and both mean 'Mild touch'. PACinian = 'PACKED pressure' (deep).", trap:"Pacinian corpuscles are deep pressure and vibration, not light touch.", src:"Concept drill"},
+    {q:"Which receptor senses deep pressure and vibration?", opts:["Lamellated (Pacinian) corpuscles","Tactile (Merkel) cells","Meissner's corpuscles","Dendritic cells"], correct:"Lamellated (Pacinian) corpuscles", hint:"The onion-shaped deep-pressure receptor of the dermis.", mnem:"PACINIAN = 'a big PACKAGE of pressure and vibration' - the deep, onion-shaped receptor.", trap:"Merkel and Meissner are the shallow light-touch receptors. Deep pressure belongs to Pacinian.", src:"Concept drill"},
+    {q:"The papillary layer is the ______ dermal layer and is made of ______ connective tissue.", opts:["superficial; areolar","deep; dense irregular","superficial; dense irregular","deep; areolar"], correct:"superficial; areolar", hint:"Upper dermis equals papillary equals areolar connective tissue.", mnem:"PAPillary on top and AREOLAR (loose) - it has to be loose so vessels and receptors can sit right under the epidermis.", trap:"Dense irregular connective tissue is the RETicular layer, the deep one. Do not swap the two.", src:"Concept drill"},
+    {q:"The reticular layer is the ______ dermal layer and is made of ______ connective tissue.", opts:["deep; dense irregular","superficial; areolar","deep; areolar","superficial; dense irregular"], correct:"deep; dense irregular", hint:"Lower dermis equals reticular equals dense irregular connective tissue.", mnem:"RETicular = the ROPE net: DEEP and DENSE, woven from dense irregular connective tissue so it resists stretching every direction.", trap:"Areolar is the papillary layer. Any option pairing 'deep' with 'areolar' is wrong.", src:"Concept drill"},
+    {q:"Fingerprints are anatomically called ______", opts:["friction ridges","dermal papillae","cleavage lines","flexure lines"], correct:"friction ridges", hint:"They increase friction so you can grip things.", mnem:"FRICTION ridges exist to raise FRICTION for grip, which is why they sit on fingers and toes.", trap:"The dermal papillae create the ridges, but the ridge pattern itself is called friction ridges.", src:"Concept drill"},
+    {q:"Which layer of the dermis produces the ridges seen in a fingerprint?", opts:["The papillary layer, via the dermal papillae","The reticular layer","The hypodermis","The stratum corneum"], correct:"The papillary layer, via the dermal papillae", hint:"The pegs of the upper dermis create the ridge pattern.", mnem:"The papillae are the PEBBLES that push the epidermis up into ridges. Pebbles = papillary.", trap:"The reticular layer is too deep to shape the surface. It is the papillary layer that leaves the print.", src:"Concept drill"},
+    {q:"The main difference between the skin's stratified squamous epithelium and a mucous membrane is that skin is ______", opts:["keratinized (cornified)","mucous-producing","ciliated","simple rather than stratified"], correct:"keratinized (cornified)", hint:"Skin is dry and hardened; mucous membranes are not.", mnem:"Skin is DRY and waterproof because it is cornified. Mucous membranes stay wet.", trap:"Both are stratified squamous. The difference is keratin, not the number of layers.", src:"Concept drill"},
+    {q:"Vasodilation and flushing of the skin ______ heat from the body.", opts:["loses","gains","neither gains nor loses","traps"], correct:"loses", hint:"Flushing brings warm blood to the surface, which releases heat.", mnem:"FLUSH = DUMP heat. Red, hot, sweaty skin is radiating heat away from the body.", trap:"It is easy to flip this. Dilating brings warm blood to the surface, so heat is LOST, not gained.", src:"Concept drill"},
+    {q:"Which skin pigment increases with UV exposure?", opts:["Melanin","Carotene","Hemoglobin","Bilirubin"], correct:"Melanin", hint:"The brown pigment that tans and shields DNA.", mnem:"MELANIN = 'MELANoma's sunscreen'. Melanocytes ramp up melanin to shield your DNA from UV.", trap:"Carotene is yellow-orange from food, hemoglobin is red from blood, bilirubin means disease. Only melanin tans.", src:"Concept drill"},
+    {q:"The yellow-orange pigment that can build up in fair-skinned infants who eat a lot of carrots or squash is ______", opts:["carotene","melanin","hemoglobin","bilirubin"], correct:"carotene", hint:"Carrots contain carotene.", mnem:"CAROTene comes from CARROTS. Fair-skinned babies who eat lots of squash or carrots turn orange.", trap:"Jaundice is yellow too, but it comes from bilirubin and shows in the sclera first - a different pigment entirely.", src:"Concept drill"},
+    {q:"Yellowing of the sclera and skin caused by bile-duct obstruction or liver failure is called ______", opts:["jaundice","cyanosis","carotenemia","melanosis"], correct:"jaundice", hint:"Bilirubin builds up, so the eyes and skin turn yellow.", mnem:"JAUNDICE = 'JAUNdiced liver'. Bilirubin backs up, so the whites of the eyes turn yellow first.", trap:"Carotenemia turns the skin orange but spares the sclera. Bilirubin stains the sclera - the eyes are the tell.", src:"Concept drill"},
+    {q:"In which epidermal layer does UV exposure begin vitamin D3 synthesis?", opts:["Stratum basale","Stratum corneum","Stratum lucidum","Stratum granulosum"], correct:"Stratum basale", hint:"The deepest, living, dividing layer.", mnem:"The BASALE is the only living, dividing layer with a blood supply beneath it, so that is where the chemistry starts.", trap:"The corneum is dead and dry - it cannot run biochemistry.", src:"Concept drill"},
+    {q:"Vitamin D is important to homeostasis because it controls ______", opts:["calcium (and phosphate) absorption and bone metabolism","glucose uptake by cells","sodium reabsorption in the kidney","protein synthesis in muscle"], correct:"calcium (and phosphate) absorption and bone metabolism", hint:"It regulates the mineral that builds bone.", mnem:"Vitamin D is the CALCIUM DOORMAN at the intestine. Without it, calcium never gets in no matter how much you consume.", trap:"Insulin handles glucose and aldosterone handles sodium. Vitamin D is calcium and phosphate.", src:"Concept drill"},
+    {q:"Oxygen and nutrients reach the avascular epidermis from capillaries in the ______", opts:["dermis (papillary layer)","hypodermis","stratum basale","stratum corneum"], correct:"dermis (papillary layer)", hint:"The epidermis has no blood vessels of its own.", mnem:"The epidermis is AVASCULAR - it is a guest. Its food comes from the papillary dermis right beneath it.", trap:"The hypodermis has big vessels but sits too deep to feed the epidermis directly.", src:"Concept drill"},
+    {q:"The primary protein making up hair, nails, and the stratum corneum is ______", opts:["keratin","collagen","elastin","melanin"], correct:"keratin", hint:"The tough, fibrous, hardening protein.", mnem:"KERATIN = KERatin = hard. Hair, nails, horns and the stratum corneum are all keratin.", trap:"Collagen and elastin live in the DERMIS. Melanin is a pigment, not a structural protein.", src:"Concept drill"},
+    {q:"Which type of hair is fine and unpigmented?", opts:["Vellus hair","Terminal hair","Lanugo","Hair with alopecia"], correct:"Vellus hair", hint:"The peach fuzz hair.", mnem:"VELLUS = 'VELLVET' - the soft peach fuzz. Terminal hair is the thick pigmented stuff.", trap:"Lanugo is the fetal coat and alopecia is hair loss. Vellus is your everyday fine hair.", src:"Concept drill"},
+    {q:"What are the two types of sweat (sudoriferous) glands?", opts:["Eccrine (merocrine) and apocrine","Sebaceous and ceruminous","Mammary and ceruminous","Eccrine and sebaceous"], correct:"Eccrine (merocrine) and apocrine", hint:"Eccrine plus apocrine.", mnem:"E for Everywhere (cooling), A for Axilla (odor). Two types, two jobs.", trap:"Sebaceous glands make OIL, not sweat, so any option pairing eccrine with sebaceous is wrong.", src:"Concept drill"},
+    {q:"Which two sweat-related glands produce materials other than sweat?", opts:["Ceruminous glands (earwax) and mammary glands (milk)","Sebaceous and apocrine glands","Eccrine and merocrine glands","Lacrimal and salivary glands"], correct:"Ceruminous glands (earwax) and mammary glands (milk)", hint:"Earwax and milk both come from modified sweat glands.", mnem:"Modified sweat glands that changed careers: CERUMINous (earwax) and MAMMARY (milk).", trap:"Sebaceous glands are oil glands from a different family - they are not modified sweat glands.", src:"Concept drill"},
+    {q:"Which sweat gland type is the most numerous and most important?", opts:["Eccrine (merocrine) glands","Apocrine glands","Sebaceous glands","Ceruminous glands"], correct:"Eccrine (merocrine) glands", hint:"The widespread thermoregulatory glands.", mnem:"ECCRINE is everywhere and runs the whole body's cooling system. 'ECCRINE = Everyday Cooling.'", trap:"Apocrine is larger but far fewer and only in hairy regions. Most numerous and most important = eccrine.", src:"Concept drill"},
+    {q:"Which hormone stimulates increased sebaceous (oil) gland output?", opts:["Androgens such as testosterone","Estrogen","Insulin","Thyroxine"], correct:"Androgens such as testosterone", hint:"Male sex hormones drive oil production, which is why acne appears at puberty.", mnem:"ANDROgens = ANDRO = male = oil. That is why acne arrives at puberty.", trap:"Estrogen does the opposite. Insulin and thyroxine have nothing to do with sebum.", src:"Concept drill"},
+    {q:"In a hair follicle, the actively dividing growth region at the base of the bulb is the ______", opts:["hair matrix","hair root","arrector pili","external root sheath"], correct:"hair matrix", hint:"The matrix is where the hair is actually built.", mnem:"The MATRIX is the mother of the hair - the dividing region at the base of the bulb where hair is built.", trap:"The root and the sheath are structures, not the growth engine. The bulb and its matrix do the dividing.", src:"Concept drill"},
+    {q:"The whitish crescent at the proximal end of a nail is the ______", opts:["lunula","eponychium","hyponychium","nail root"], correct:"lunula", hint:"Luna means moon.", mnem:"LUNULA = LUNA = moon. The little moon at the base of the nail.", trap:"The eponychium is the cuticle and the hyponychium is under the free edge. Only the lunula is the white crescent.", src:"Concept drill"},
+    {q:"Besides thermal burns, what are two other ways to burn the skin?", opts:["Chemical and electrical burns","Friction and pressure injuries","Frostbite and hypothermia","Abrasions and lacerations"], correct:"Chemical and electrical burns", hint:"Radiation and sunburn also count.", mnem:"Burns come in four flavors: thermal, chemical, electrical and radiation. The two non-thermal ones are chemical and electrical.", trap:"Frostbite and abrasions are injuries, but they are not classified as burns.", src:"Concept drill"},
+    {q:"How can you tell a 2nd-degree (partial-thickness) burn from a 1st-degree (superficial) burn?", opts:["The 2nd-degree burn forms blisters","The 2nd-degree burn is painless","The 2nd-degree burn is dry and charred","The 2nd-degree burn involves only the epidermis"], correct:"The 2nd-degree burn forms blisters", hint:"1st degree is painful with no blisters; 2nd degree is painful with blisters.", mnem:"1st = red and painful. 2nd = red, painful AND blistered. 3rd = charred and painless. Blisters mark the crossing into the dermis.", trap:"Pain does not separate 1st from 2nd - both hurt. Blisters do.", src:"Concept drill"},
+    {q:"Which degree of burn puts the patient at greatest risk of fluid loss?", opts:["3rd-degree (full-thickness)","1st-degree","2nd-degree","All degrees carry the same risk"], correct:"3rd-degree (full-thickness)", hint:"The deepest burn loses the most fluid.", mnem:"Deeper burn = more fluid gone. Full thickness means the whole barrier is destroyed.", trap:"A 1st-degree burn barely loses fluid. The deeper the burn, the greater the fluid loss.", src:"Concept drill"},
+    {q:"Second-degree burns to both sides of both arms equal what percentage of body surface area?", opts:["18 percent","9 percent","27 percent","36 percent"], correct:"18 percent", hint:"Each whole arm is 9 percent, so 9 times 2 equals 18.", mnem:"Each whole arm = 9 percent, so two arms = 18. Learn the map: head 9, arm 9 each, leg 18 each, torso front 18, back 18, groin 1.", trap:"Do not double count. 'Both sides of both arms' simply means the two entire arms = 9 + 9 = 18.", src:"Concept drill"},
+    {q:"The most important environmental factor leading to skin cancer is ______", opts:["UV radiation (sun exposure)","Repeated chemical exposure","Viral infection","Chronic pressure"], correct:"UV radiation (sun exposure)", hint:"Sun exposure is the main driver.", mnem:"UV is the only carcinogen you can literally see. Sun exposure is the number one driver.", trap:"Chemicals and viruses can cause skin cancer, but the question asks for the MOST important environmental factor, which is UV.", src:"Concept drill"},
+    {q:"Which three types of skin cancer are associated with UV exposure?", opts:["Basal cell carcinoma, squamous cell carcinoma, and melanoma","Basal cell carcinoma, osteosarcoma, and melanoma","Squamous cell carcinoma, sarcoma, and lymphoma","Melanoma, leukemia, and basal cell carcinoma"], correct:"Basal cell carcinoma, squamous cell carcinoma, and melanoma", hint:"Basal cell, squamous cell, melanoma.", mnem:"B-S-M: Basal, Squamous, Melanoma. Know those three names cold.", trap:"Osteosarcoma, sarcoma and leukemia are not skin cancers.", src:"Concept drill"},
+
+    {q:"Which is the most common type of skin cancer?", opts:["Basal cell carcinoma","Melanoma","Kaposi sarcoma","Osteosarcoma"], correct:"Basal cell carcinoma", hint:"The most common and least dangerous of the three.", mnem:"BASAL cell carcinoma = BAse of the epidermis = the MOST common skin cancer, and the least deadly.", trap:"Melanoma is the deadliest but NOT the most common. Do not confuse common with dangerous.", src:"Concept drill"},
+    {q:"The most abundant cells of the epidermis are ______", opts:["keratinocytes","melanocytes","tactile cells","dendritic cells"], correct:"keratinocytes", hint:"The keratin makers dominate.", mnem:"Keratinocytes are the workhorses - about 90 percent of epidermal cells. The other three types are specialists.", trap:"Melanocytes get all the attention but are a small minority. Abundant = keratinocytes.", src:"Concept drill"},
+    {q:"Cyanosis is a bluish skin discoloration associated with ______", opts:["low oxygenation of hemoglobin","excess carotene","increased melanin","high blood calcium"], correct:"low oxygenation of hemoglobin", hint:"Blue skin from poorly oxygenated blood.", mnem:"Cyanosis is not a pigment problem, it is an OXYGEN problem. Hemoglobin without oxygen looks blue.", trap:"Carotene, melanin and calcium do not change hemoglobin's color. Only oxygen levels do.", src:"Concept drill"},
+    {q:"Cerumen (earwax) is produced by modified ______", opts:["sweat glands","sebaceous glands only","hair follicles","tactile cells"], correct:"sweat glands", hint:"Ceruminous glands are modified sweat glands.", mnem:"Ceruminous glands are STRUCTURALLY sweat glands that switched to making wax.", trap:"Sebaceous glands make oil, and a hair follicle is a structure, not a gland. Cerumen comes from modified SWEAT glands.", src:"Concept drill"},
+    {q:"A full-thickness burn that destroys the epidermis and the dermis is a ______", opts:["third-degree burn","first-degree burn","superficial abrasion","contusion"], correct:"third-degree burn", hint:"The epidermis plus the dermis are destroyed.", mnem:"Full thickness = all the way through the epidermis AND the dermis = third degree.", trap:"1st is epidermis only, 2nd reaches into the dermis, 3rd goes through both.", src:"Concept drill"},
+    {q:"Using the adult rule of nines, the head and neck account for approximately ______", opts:["9 percent","18 percent","27 percent","36 percent"], correct:"9 percent", hint:"Head and neck 9, each arm 9, each leg 18, front and back torso 18 each.", mnem:"Head and neck 9, each arm 9, each leg 18, front torso 18, back torso 18, groin 1. That adds to 100.", trap:"Do not say 18 for the head - that is a whole leg. Head and neck is 9.", src:"Concept drill"},
+    {q:"Lines of cleavage in the skin reflect the orientation of ______", opts:["collagen fibers in the dermis","hair follicles","sweat glands","epidermal ridges"], correct:"collagen fibers in the dermis", hint:"Surgeons cut parallel to these fiber bundles.", mnem:"Cleavage lines are the GRAIN of the dermis, set by the collagen fibers. Cut with the grain.", trap:"Hair follicles and sweat glands sit in the dermis but they do not create the lines.", src:"Concept drill"},
+    {q:"Which of the following is a function of the integumentary system?", opts:["Protection","Blood cell production","Calcium storage","Movement of bones"], correct:"Protection", hint:"Blood cell production, calcium storage and movement belong to other systems.", mnem:"Skin is the body's wall, so it PROTECTS. Blood cell production and calcium storage belong to bone, and movement to muscle.", trap:"Blood cell production and calcium storage sound like generic body functions, but they are skeletal system jobs.", src:"Concept drill"}
+  ]
+},
+
+q7: {
+  label: "Quiz 7 — Skeletal System",
+  mcq: [
+    /* ---------- Real Quiz 7 test bank (20 items) ---------- */
+    {q:"Which of the following is not a function of the skeletal system?", opts:["body support","protection of internal organs","hematopoiesis","energy production"], correct:"energy production", hint:"Bone supports, protects and makes blood cells; it does not make energy.", mnem:"Bone SUPPORTS, PROTECTS, MOVES, STORES minerals and MAKES blood cells. Energy production is the job of metabolism.", trap:"Hematopoiesis means blood cell production - that IS a skeletal function. Energy production is not.", src:"Quiz 7 · Bank"},
+    {q:"The proximal and distal ends of a long bone are called the ______", opts:["Metaphyses","Diaphyses","Epiphyseal plates","Epiphyses"], correct:"Epiphyses", hint:"Epi- means upon or at the end.", mnem:"EPIPHYSIS = 'EPI on top' (and at the bottom) = the ends. DIA = through = the shaft in the middle.", trap:"The metaphysis is the zone between them and the epiphyseal plate is the growth cartilage inside it. The ENDS are epiphyses.", src:"Quiz 7 · Bank"},
+    {q:"When classified by shape, carpal bones are examples of ______ bones.", opts:["irregular","sesamoid","short","flat"], correct:"short", hint:"Wrist bones are small and cube-like.", mnem:"Carpals and tarsals are SHORT: small, cube-like, built for gliding. 'Wrist and ankle = short and stable.'", trap:"The patella is sesamoid and the vertebrae are irregular. Carpal = short.", src:"Quiz 7 · Bank"},
+    {q:"The cells that secrete the organic bone matrix, osteoid, prior to laying down new bone are called ______", opts:["osteocytes","osteoblasts","osteons","osteoclasts"], correct:"osteoblasts", hint:"The suffix -blast means builder.", mnem:"BLAST = BUILD. OsteoBLAST builds OSTEOid. (CLAST = chew.)", trap:"Osteocytes are mature cells that MAINTAIN the matrix - they do not build new bone. Osteons are structures, not cells.", src:"Quiz 7 · Bank"},
+    {q:"The connective tissue layer covering the outer surface of all bones, though not present at any joint surface, is called the ______", opts:["endosteum","periosteum","lamellae","ligament"], correct:"periosteum", hint:"Peri- means around; it is the outer fibrous covering.", mnem:"PERI = around, OSTEUM = bone. Around the bone. ENDOsteum lines the inside.", trap:"A ligament connects bone to bone and lamellae are layers of matrix. The outer covering is the periosteum.", src:"Quiz 7 · Bank"},
+    {q:"The circular-shaped structural units of compact bone found in a long bone's diaphysis are called ______", opts:["Osteons","osteocytes","trabeculae","canaliculi"], correct:"Osteons", hint:"The Haversian system is the circular unit.", mnem:"OSTEON = the target-shaped unit with a central canal. Compact bone is built out of them.", trap:"Canaliculi are the tiny connecting channels and trabeculae are the struts of spongy bone. The circular unit is the osteon.", src:"Quiz 7 · Bank"},
+    {q:"Collagen fibers function to ______", opts:["provide the glue that binds the minerals together","resist compressive forces","trap water in the extracellular matrix","resist fracturing with twisting and stretching"], correct:"resist fracturing with twisting and stretching", hint:"Hydroxyapatite resists compression; collagen resists twisting and stretching.", mnem:"MINERAL resists COMPRESSION (pushing). COLLAGEN resists TWISTING and TENSION (pulling). Two materials, two strengths.", trap:"Compressive strength comes from hydroxyapatite, not collagen. Do not flip the pair.", src:"Quiz 7 · Bank"},
+    {q:"The cells responsible for longitudinal growth in long bones are the ______", opts:["Chondrocytes within the osteons","Osteoblasts within the periosteum","Chondrocytes in the epiphyseal plate","Osteoclasts within the epiphysis"], correct:"Chondrocytes in the epiphyseal plate", hint:"The growth plate is cartilage cells dividing.", mnem:"Length comes from CARTILAGE (chondrocytes) dividing in the growth plate. Width comes from bone added at the periosteum.", trap:"Osteoblasts in the periosteum add WIDTH, not length. Longitudinal growth is chondrocytes.", src:"Quiz 7 · Bank"},
+    {q:"Long bones are different from all other bones because they contain ______", opts:["compact bone","spongy bone","a marrow cavity","bone marrow"], correct:"a marrow cavity", hint:"Only long bones have a medullary (marrow) cavity.", mnem:"Only LONG bones have a MEDULLARY (marrow) cavity. Long bones are the hollow ones.", trap:"Compact bone, spongy bone and marrow are in EVERY bone. The cavity is what is unique to long bones.", src:"Quiz 7 · Bank"},
+    {q:"A patient presents with severe anemia (low red blood cell counts). The best site to access his blood-forming cells is the ______", opts:["periosteum","endosteum","red marrow","yellow marrow"], correct:"red marrow", hint:"Red marrow performs hematopoiesis.", mnem:"RED = BLOOD. Red marrow makes blood cells. YELLOW = FAT, and it makes nothing.", trap:"Yellow marrow is plentiful in adult long bones, but it is fat storage. Blood cells come from red marrow.", src:"Quiz 7 · Bank"},
+    {q:"The majority of the material and weight in osseous tissue is ______", opts:["the cells","the osteoid","the extra cellular matrix","the red marrow"], correct:"the extra cellular matrix", hint:"Most of bone's mass is the mineralized matrix, not cells.", mnem:"Bone is mostly MATRIX, not cells - about 2 percent cells and 98 percent matrix. That is why it feels like stone.", trap:"Cells, osteoid and marrow all sound substantial, but the extracellular matrix dominates the weight.", src:"Quiz 7 · Bank"},
+    {q:"Which bone-related cells are multi-nucleated and can digest or resorb bone tissue?", opts:["osteoblasts","osteoclasts","osteocytes","osteogenic cells"], correct:"osteoclasts", hint:"The suffix -clast means break down; they are macrophage-like.", mnem:"CLAST = CRASH. Osteoclasts crush bone, and they are big and multi-nucleated because digesting bone takes strength.", trap:"Osteoblasts build, osteocytes maintain, osteogenic cells are the stem cells. Only osteoclasts resorb bone.", src:"Quiz 7 · Bank"},
+
+    {q:"The patella bone is classified as a ______ type bone.", opts:["short","long","sesamoid","irregular"], correct:"sesamoid", hint:"The kneecap forms inside a tendon.", mnem:"SESAMOID = 'a SESAME seed in a bun' - a bone that forms inside a tendon. The patella is the biggest one.", trap:"The patella looks flat and shields the knee, but by classification it is sesamoid because it develops inside the quadriceps tendon.", src:"Quiz 7 · Bank"},
+    {q:"What is the central canal of the osteons filled with?", opts:["osteocytes","periosteum","extra cellular matrix","blood vessels and nerves"], correct:"blood vessels and nerves", hint:"It is the neurovascular canal.", mnem:"The central canal is the bone's circulation route: BLOOD VESSELS and NERVES. Bone is alive, so it needs both.", trap:"Osteocytes sit in lacunae AROUND the canal, not inside it. The canal itself carries vessels and nerves.", src:"Quiz 7 · Bank"},
+    {q:"Which type of ossification starts as islands of osteogenic cells producing spicules of bony tissue in embryonic and fetal dermal tissue?", opts:["endochondral","intramembranous","appositional","secondary"], correct:"intramembranous", hint:"Bone forms directly within a membrane, as in the flat skull bones.", mnem:"INTRA-MEMBRANOUS = 'bony islands INSIDE a MEMBRANE'. The flat skull bones and clavicles form this way.", trap:"Endochondral means 'inside cartilage', which is how long bones form. Spicules directly in mesenchyme is intramembranous.", src:"Quiz 7 · Bank"},
+    {q:"Which hormone is most important to bone growth in males after puberty?", opts:["thyroid","estrogen","testosterone","growth"], correct:"testosterone", hint:"The male sex hormone.", mnem:"After puberty, males grow because TESTOSTERONE surges. The male growth spurt is testosterone driven.", trap:"Growth hormone matters, but the keyed post-puberty male driver is testosterone. Estrogen is the corresponding female hormone.", src:"Quiz 7 · Bank"},
+    {q:"A condition in which a person's bones become weakened to the point of suffering spontaneous fractures is called ______", opts:["osteopenia","osteoporosis","osteomyelitis","osteitis"], correct:"osteoporosis", hint:"Osteo- plus porous means fragile, porous bone.", mnem:"OSTEO-POROSIS = bones full of PORES. Holes make them fragile. OsteoPENIA is the milder stage right before it.", trap:"Osteopenia is low bone mass but not yet fracture-prone, and osteomyelitis is an infection. Spontaneous fractures = osteoporosis.", src:"Quiz 7 · Bank"},
+    {q:"The type of ossification done by osteoblasts in the periosteum around all bones throughout life is called ______", opts:["Appositional","Intramembranous","Endochondral","Osteomalacia"], correct:"Appositional", hint:"New layers are added to the outside, which increases width.", mnem:"APPOSITIONAL = 'APPositional growth'. New bone is APPOSED (added) to the OUTSIDE surface, widening the bone.", trap:"Intramembranous and endochondral are the two developmental paths. Lifelong widening by the periosteum is appositional.", src:"Quiz 7 · Bank"},
+    {q:"This type of bone tissue found in the center of all bones, but not in the marrow cavity regions, is known as ______", opts:["compact or dense","osteons","epiphyseal","spongy or trabecular"], correct:"spongy or trabecular", hint:"Trabeculae fill the bone ends (epiphyses), not the shaft cavity.", mnem:"SPONGY bone fills the bone ENDS around the marrow cavity. If it is not in the cavity, it is trabecular.", trap:"Compact bone forms the outer shell and the wall of the shaft. The center and the ends are spongy.", src:"Quiz 7 · Bank"},
+    {q:"Parathyroid hormone (PTH) is secreted in response to ______", opts:["high blood calcium ion levels","high levels of vitamin D","low blood calcium ion levels","ingestion of calcium-rich foods"], correct:"low blood calcium ion levels", hint:"PTH raises calcium, so it is triggered when calcium is too low.", mnem:"PTH = 'Push Total calcium Higher'. It is released when calcium is LOW, and it pulls calcium out of bone into blood.", trap:"Do not flip it. Calcitonin answers HIGH calcium, PTH answers LOW calcium.", src:"Quiz 7 · Bank"},
+
+    /* ---------- Concept drills (formerly fill-in-the-blank cards, now 4-option MCQs) ---------- */
+    {q:"Which skeletal function is carried out by the skull and the rib cage?", opts:["Protection of internal organs","Mineral storage","Hematopoiesis","Leverage for movement"], correct:"Protection of internal organs", hint:"The skull shields the brain and the ribs shield the heart and lungs.", mnem:"The skull is a helmet and the ribs are a cage - pure protection. Support is a different skeletal function.", trap:"Support sounds right, but the skull and rib cage specifically exist to protect the brain, heart and lungs.", src:"Concept drill"},
+    {q:"Which list gives the five bone shape classifications?", opts:["Long, short, flat, irregular, and sesamoid","Long, short, round, flat, and sesamoid","Long, wide, flat, irregular, and sesamoid","Short, flat, irregular, sesamoid, and compact"], correct:"Long, short, flat, irregular, and sesamoid", hint:"Long, short, flat, irregular, sesamoid.", mnem:"LSFIS: Long, Short, Flat, Irregular, Sesamoid. 'Little Short Fat Iguanas Swim.'", trap:"'Round' and 'wide' are not classifications, and 'compact' describes bone texture, not shape.", src:"Concept drill"},
+    {q:"Which of the following is classified as a flat bone?", opts:["Sternum","Femur","Talus","Patella"], correct:"Sternum", hint:"Flat bones are broad and thin, like the sternum and cranial bones.", mnem:"FLAT = a pancake or a shield: STERNUM, ribs, scapula, skull, pelvis. Broad and thin.", trap:"The femur is long, the talus is short and the patella is sesamoid. Only the sternum is flat.", src:"Concept drill"},
+    {q:"The talus (ankle bone) is classified as a ______ bone.", opts:["short","long","flat","irregular"], correct:"short", hint:"Ankle and wrist bones are short bones.", mnem:"TARSALS and CARPALS are the SHORT bone family. The talus is a tarsal, so it is short.", trap:"It feels big and chunky in the ankle, but by classification it is a short bone.", src:"Concept drill"},
+    {q:"The first metacarpal is classified as a ______ bone.", opts:["long","short","flat","irregular"], correct:"long", hint:"The metacarpals are miniature long bones.", mnem:"METAcarpals and METAtarsals are miniature LONG bones: they have a shaft and two ends.", trap:"They are tiny, so it is tempting to call them short - but they have a real diaphysis and epiphyses, so they are long.", src:"Concept drill"},
+    {q:"The shaft of a long bone is called the ______", opts:["diaphysis","epiphysis","metaphysis","medullary cavity"], correct:"diaphysis", hint:"Shaft equals diaphysis; the ends are the epiphyses.", mnem:"DIA = through, so DIAPHYSIS = the tube you go THROUGH. The ends are the epiphyses.", trap:"The metaphysis is the flared zone beside the growth plate. The straight shaft is the diaphysis.", src:"Concept drill"},
+    {q:"Which region of a long bone contains the medullary cavity?", opts:["The diaphysis","The epiphysis","The epiphyseal plate","The periosteum"], correct:"The diaphysis", hint:"The hollow marrow space runs through the shaft.", mnem:"The marrow cavity runs down the middle of the SHAFT, so it lives in the diaphysis.", trap:"The epiphyses are packed with spongy bone, not a cavity. The cavity is in the shaft.", src:"Concept drill"},
+    {q:"The collagen component of bone gives it ______", opts:["flexibility and tensile strength","hardness and compressive strength","brittleness","mineral density"], correct:"flexibility and tensile strength", hint:"The protein resists twisting and stretching.", mnem:"Collagen is the body's ROPE: it resists PULLING (tension) and gives flexibility. Mineral gives hardness.", trap:"Hardness and compressive strength come from hydroxyapatite. Collagen gives the bend.", src:"Concept drill"},
+    {q:"Osteons, marrow cavities, and epiphyseal plates are found only in ______ bones.", opts:["long","short","flat","irregular"], correct:"long", hint:"These features are unique to long bones.", mnem:"These three features are the long-bone fingerprint. No other bone shape has all three.", trap:"Every bone has compact and spongy bone. Only long bones have osteons arranged into a diaphysis, a marrow cavity and epiphyseal plates.", src:"Concept drill"},
+    {q:"Red marrow functions in ______", opts:["hematopoiesis (blood cell production)","fat storage","mineral storage","cartilage growth"], correct:"hematopoiesis (blood cell production)", hint:"Red means blood-forming.", mnem:"HEMATO = blood, POIESIS = making. Red marrow MAKES BLOOD.", trap:"Fat storage is yellow marrow's job. Red marrow is the blood factory.", src:"Concept drill"},
+    {q:"Yellow marrow functions in ______", opts:["fat (lipid) storage","blood cell production","calcium storage","collagen synthesis"], correct:"fat (lipid) storage", hint:"Yellow means fat.", mnem:"YELLOW is the color of FAT. Yellow marrow stores lipids.", trap:"Do not swap the marrows. Red = blood cells, yellow = fat.", src:"Concept drill"},
+    {q:"Which statement best distinguishes the periosteum from the endosteum?", opts:["The periosteum covers the outer bone surface; the endosteum lines the marrow cavity and central canals","The periosteum lines the marrow cavity; the endosteum covers the outer surface","Both line the medullary cavity only","The periosteum is cartilage and the endosteum is bone"], correct:"The periosteum covers the outer bone surface; the endosteum lines the marrow cavity and central canals", hint:"Both are osteogenic: periosteum outside, endosteum inside.", mnem:"PERI = around (perimeter) = outside. ENDO = within (endoscopy) = inside.", trap:"Both layers are osteogenic, which makes them sound identical. The difference is position, outside versus inside.", src:"Concept drill"},
+    {q:"What percentage of the weight of osseous tissue is due to the cells?", opts:["About 2 percent","About 25 percent","About 50 percent","About 75 percent"], correct:"About 2 percent", hint:"Bone is almost entirely extracellular matrix.", mnem:"Bone is about 2 percent cells and 98 percent matrix. That is why it is strong as stone by weight.", trap:"Given how busy bone cells are, 25 or 50 percent feels plausible. The real figure is tiny - about 2 percent.", src:"Concept drill"},
+    {q:"Which bone cells live alone in lacunae?", opts:["Osteocytes","Osteoblasts","Osteoclasts","Osteogenic cells"], correct:"Osteocytes", hint:"Mature bone cells are trapped in lacunae.", mnem:"OsteoCYTES are the LODGERS - each one in its own little lacuna (a lacuna is a gap).", trap:"Lacunae are the gaps and canaliculi are the connecting tunnels. The cells that live in the gaps are osteocytes.", src:"Concept drill"},
+    {q:"Which bone cells are stimulated by calcitonin?", opts:["Osteoblasts (bone deposition)","Osteoclasts (bone resorption)","Osteocytes (matrix maintenance)","Chondrocytes (cartilage growth)"], correct:"Osteoblasts (bone deposition)", hint:"Calcitonin lowers blood calcium by promoting deposition.", mnem:"CALCITONIN = 'CALCI-TONIN, tones the calcium DOWN'. It lowers blood calcium by telling osteoBLASTS to build bone.", trap:"Remember the pairing: calcitonin = deposit = blasts. PTH = resorb = clasts.", src:"Concept drill"},
+    {q:"Which bone cells are stimulated by parathyroid hormone (PTH)?", opts:["Osteoclasts (bone resorption)","Osteoblasts (bone deposition)","Chondrocytes (cartilage growth)","Osteogenic cells (stem cell division)"], correct:"Osteoclasts (bone resorption)", hint:"PTH raises blood calcium by breaking bone down.", mnem:"PTH = 'Pull calcium out of bone.' It activates osteoCLASTS to eat bone and raise blood calcium.", trap:"This is the mirror image of calcitonin. PTH goes with clasts, calcitonin goes with blasts.", src:"Concept drill"},
+    {q:"Which bone cells are stimulated by vitamin D?", opts:["Osteoblasts and osteocytes","Osteoclasts only","Chondrocytes only","Osteogenic cells only"], correct:"Osteoblasts and osteocytes", hint:"Vitamin D promotes mineralization and calcium absorption.", mnem:"Vitamin D is the CALCIUM SUPPLIER, so it supports the BUILDING cells: blasts and cytes that mineralize bone.", trap:"PTH is the one that breaks bone down. Vitamin D raises calcium for building, so it favors blasts, not clasts.", src:"Concept drill"},
+    {q:"Which cells live in the periosteum?", opts:["Osteogenic (osteoprogenitor) cells and osteoblasts","Osteocytes only","Osteoclasts only","Chondrocytes only"], correct:"Osteogenic (osteoprogenitor) cells and osteoblasts", hint:"The stem cells and builders sit along the outer surface.", mnem:"The periosteum is the bone's growth nursery: OSTEOGENIC stem cells and OSTEOBLASTS sit there ready to make new bone.", trap:"Osteocytes live in lacunae inside the matrix, and osteoclasts sit in resorption pits - neither lives in the periosteum.", src:"Concept drill"},
+    {q:"What tiny channels connect lacunae together?", opts:["Canaliculi","Trabeculae","Osteons","Lamellae"], correct:"Canaliculi", hint:"Tiny channels link the lacunae.", mnem:"CANALiculi = little CANALS. They are the plumbing between lacunae so nutrients can reach every osteocyte.", trap:"Trabeculae are struts of spongy bone, lamellae are layers and osteons are whole units. The tiny connecting channels are canaliculi.", src:"Concept drill"},
+    {q:"What is true about the closure of a person's epiphyseal plates?", opts:["Maximum adult length has been reached, so longitudinal growth stops","Width growth stops","Red marrow turns into yellow marrow","The periosteum disappears"], correct:"Maximum adult length has been reached, so longitudinal growth stops", hint:"Once the plates close, growth in length is finished.", mnem:"Closed plate = growth in LENGTH is over. Once that cartilage is gone, you cannot get taller.", trap:"Width growth continues for life through appositional growth. Only LENGTH stops.", src:"Concept drill"},
+    {q:"In compact bone, the rings of matrix that surround the central canal are called ______", opts:["concentric lamellae","interstitial lamellae","circumferential lamellae","trabeculae"], correct:"concentric lamellae", hint:"Concentric means they circle the canal.", mnem:"CONCENTRIC = the circles that CONVERGE on the center, wrapping the canal like tree rings.", trap:"Interstitial lamellae are the leftovers BETWEEN osteons, and circumferential lamellae run around the whole shaft.", src:"Concept drill"},
+    {q:"The remnants of old osteons found between newer osteons are called ______", opts:["interstitial lamellae","concentric lamellae","circumferential lamellae","canaliculi"], correct:"interstitial lamellae", hint:"Interstitial means filling the spaces between.", mnem:"INTERSTITIAL = in the INTERSTICES, the gaps between things. Old bone left between new osteons.", trap:"Concentric wraps the canal while interstitial fills the space between neighbouring osteons.", src:"Concept drill"},
+    {q:"Which lamellae run around the entire outer and inner circumference of the diaphysis?", opts:["Circumferential lamellae","Concentric lamellae","Interstitial lamellae","Trabeculae"], correct:"Circumferential lamellae", hint:"Circum- means around the whole shaft.", mnem:"CIRCUM = around, as in circumference. They ring the whole shaft, inside and out.", trap:"Concentric wraps a single canal; circumferential surrounds the entire diaphysis.", src:"Concept drill"},
+
+    {q:"What theoretical effect does calcitonin have on serum calcium in land animals?", opts:["Lowers serum calcium (negligible in adult humans)","Raises serum calcium","Has no effect in any animal","Increases calcium absorption from the gut"], correct:"Lowers serum calcium (negligible in adult humans)", hint:"Calcitonin decreases blood calcium.", mnem:"CALCITONIN = 'CALCI TONED DOWN'. It lowers blood calcium, though in adult humans the effect is negligible - think of it as the growing-child hormone.", trap:"PTH raises calcium and calcitonin lowers it. Also do not overstate it: in adult humans the effect is negligible.", src:"Concept drill"},
+    {q:"What is the effect of parathyroid hormone (PTH) on human serum calcium levels?", opts:["Raises (increases) serum calcium","Lowers serum calcium","Has no effect at all","Increases urinary calcium only"], correct:"Raises (increases) serum calcium", hint:"PTH increases blood calcium.", mnem:"PTH = 'PUMP the calcium up'. It is the main calcium-raising hormone in humans.", trap:"Do not tag PTH with lowering calcium. PTH is the calcium mobilizer.", src:"Concept drill"},
+    {q:"The primary role of vitamin D appears to be ______", opts:["promoting calcium (and phosphate) absorption from the intestine","lowering blood calcium","stimulating osteoclasts directly","producing red blood cells"], correct:"promoting calcium (and phosphate) absorption from the intestine", hint:"It increases intestinal absorption of the bone minerals.", mnem:"Vitamin D works at the GUT DOOR: it lets calcium in from your food.", trap:"PTH acts on bone and kidney. Vitamin D's headline job is intestinal absorption.", src:"Concept drill"},
+    {q:"Which hormone commonly becomes deficient in post-menopausal women, leading to osteopenia?", opts:["Estrogen","Testosterone","Calcitonin","Growth hormone"], correct:"Estrogen", hint:"The female sex hormone protects bone density.", mnem:"Menopause = ESTROGEN falls = bone loss. Estrogen is bone's protector in women.", trap:"Testosterone is the male counterpart. Post-menopausal osteopenia is an estrogen story.", src:"Concept drill"},
+    {q:"Which hormone, if deficient in men, leads to osteoporosis?", opts:["Testosterone","Estrogen","Parathyroid hormone","Insulin"], correct:"Testosterone", hint:"The male sex hormone.", mnem:"In men, TESTOSTERONE keeps bone dense. Low testosterone = brittle bone.", trap:"Men do carry some estrogen, but the keyed male hormone for bone density is testosterone.", src:"Concept drill"},
+    {q:"What is the effect of inactivity on general bone density?", opts:["It decreases bone density (bone loss / atrophy)","It increases bone density","It has no effect on bone","It converts compact bone into spongy bone"], correct:"It decreases bone density (bone loss / atrophy)", hint:"Bone adapts to stress, so use it or lose it.", mnem:"USE IT OR LOSE IT. Bone is laid down along lines of stress, so no load means no bone. That is why astronauts and bedridden patients lose mass.", trap:"Exercise does not convert compact bone into spongy bone. It maintains or raises density; inactivity lowers it.", src:"Concept drill"},
+    {q:"The mineral (hydroxyapatite) component of bone gives it ______", opts:["hardness and compressive strength","flexibility and tensile strength","elasticity","water retention"], correct:"hardness and compressive strength", hint:"The mineral resists compression.", mnem:"HYDROXYAPATITE is the MINERAL. Minerals are HARD and resist PUSHING (compression). Collagen resists pulling.", trap:"Flexibility and tensile strength come from collagen, not from mineral. Do not flip the pair.", src:"Concept drill"}
+  ]
+}
+};
+
+/* ================= STATE & STORAGE ================= */
+
+const LS_KEY = 'ap_study_stats_mcq_v1';
+let current = 'q6';
+let filter = 'all';        // 'all' | 'real' | 'concept'
+let mode = 'round';        // 'round' | 'drill'
+let sessionSize = 5;       // 5 | 10 | 20 | 'all'
+let round = null;          // { key, mode, items:[...], checked }
+let drill = null;          // { items, i, attempts, done, results:[...] }
+let aidsAlways = false;    // show the memory hook before answering
+let review = null;         // { items:[...] } while the missed-review screen is open
+/* Boss, 2026-09-23: "I do also want to practice the same questions in a different
+   order". Questions shuffle by default - and that is not only a preference: with
+   more shaky items than the session size, a fixed order served the same first N
+   every time and the tail of the list never came up at all. Choices shuffle
+   separately and are off by default, because the correct answer's letter is fixed
+   in the bank, so drilling the same item twice teaches "it was D" unless the
+   options move with it. */
+let shuffleQ = true;
+let shuffleChoices = false;
+let lastBatch = [];        // the ids of the session just run, for "same questions, new order"
+
+function shuffled(src){
+  const a = src.slice();
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const t=a[i]; a[i]=a[j]; a[j]=t; }
+  return a;
+}
+
+/* Every item in DATA is multiple choice - there are no fill-in-the-blank items. */
+function pool(key){
+  return DATA[key].mcq.map((x,i) => Object.assign({}, x, {
+    key: key, id: 'q' + i, real: x.src.indexOf('Concept') !== 0
+  }));
+}
+
+function visible(key){
+  const items = pool(key);
+  if(filter === 'real')    return items.filter(x => x.real);
+  if(filter === 'concept') return items.filter(x => !x.real);
+  return items;
+}
+
+function loadStats(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)) || {}; }catch(e){ return {}; } }
+function saveStats(s){ try{ localStorage.setItem(LS_KEY, JSON.stringify(s)); }catch(e){} }
+
+function bump(id, correct){
+  const s = loadStats();
+  const q = s[current] = s[current] || {};
+  const e = q[id] = q[id] || {m:0,c:0,t:0};
+  e.t++;
+  if(correct) e.c++; else e.m++;
+  saveStats(s);
+  return e;
+}
+
+/* Boss, 2026-09-23: "let me mark questions I'm unsure about even if they're not
+   correct so I can go back and review". A mark cannot be derived from the score:
+   a guess that landed looks identical to knowing it, so the miss count can never
+   see it. The flag is therefore its own field, and marked items join the missed
+   pool rather than living in a separate list - one place to relook, not two. */
+function flagIds(){
+  const s = loadStats(); const q = s[current] || {};
+  return Object.keys(q).filter(id => q[id].f).sort();
+}
+
+function isFlagged(id){
+  const s = loadStats(); const q = s[current] || {};
+  return !!(q[id] && q[id].f);
+}
+
+/* Repaints just the button, never the round: re-rendering would throw away the
+   radio answers already picked in it, and the mark has to be reachable while the
+   question is still on screen. */
+function toggleFlag(id, btn){
+  const s = loadStats();
+  const q = s[current] = s[current] || {};
+  const e = q[id] = q[id] || {m:0,c:0,t:0};
+  e.f = e.f ? 0 : 1;
+  saveStats(s);
+  paintFlagBtn(btn, !!e.f);
+  updateBadge();
+}
+
+function missedIds(){
+  const s = loadStats(); const q = s[current] || {};
+  return Object.keys(q).filter(id => q[id].m > 0 || q[id].f)
+    .sort((a,b)=>(q[b].m - q[a].m) || ((q[b].t - q[b].c) - (q[a].t - q[a].c)));
+}
+
+function quizStats(){
+  const s = loadStats(); const q = s[current] || {};
+  let attempted = 0;
+  Object.keys(q).forEach(id => { if(q[id].t > 0) attempted++; });
+  return { attempted: attempted, total: visible(current).length, shaky: missedIds().length,
+           flagged: flagIds().length };
+}
+
+function sizeNum(){ return sessionSize === 'all' ? Infinity : sessionSize; }
+
+function withChoiceOrder(item){
+  if(!shuffleChoices) return item;
+  // A copy: the session owns its own option order, and DATA stays pristine.
+  const copy = Object.assign({}, item);
+  copy.opts = shuffled(item.opts);
+  return copy;
+}
+
+/* Draws the session's questions: the missed set when asked (empty if there is
+   nothing to retry), otherwise a random slice of the visible pool. */
+function sample(source){
+  const items = visible(current);
+  let picks;
+  if(source === 'missed'){
+    const byId = {};
+    items.forEach(x => byId[x.id] = x);
+    const ids = shuffleQ ? shuffled(missedIds()) : missedIds();
+    picks = ids.map(id => byId[id]).filter(Boolean).slice(0, sizeNum());
+  } else if(source === 'flagged'){
+    // Only what he marked unsure - the correct-but-guessed ones live nowhere else.
+    const marked = {};
+    flagIds().forEach(id => marked[id] = true);
+    const only = items.filter(x => marked[x.id]);
+    picks = (shuffleQ ? shuffled(only) : only).slice(0, sizeNum());
+  } else {
+    picks = (shuffleQ ? shuffled(items) : items).slice(0, sizeNum());
+  }
+  return picks.map(withChoiceOrder);
+}
+
+/* ================= RENDER ================= */
+
+function switchQuiz(key){
+  current = key;
+  round = null; drill = null; review = null;
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.id === 'tab-' + key));
+  render();
+}
+
+function setFilter(v){
+  filter = v;
+  round = null; drill = null; review = null;
+  render();
+}
+
+function setMode(v){
+  mode = v;
+  round = null; drill = null;      // the review screen stays put: mode does not change its content
+  render();
+}
+
+function setSize(v){
+  sessionSize = (v === 'all') ? 'all' : parseInt(v, 10);
+  round = null; drill = null;      // the review screen stays put: size does not change its content
+  render();
+}
+
+/* Order settings apply to the NEXT session rather than re-rendering the current
+   one: re-rendering an in-flight round would throw away the answers already
+   picked in it. The checkbox is its own feedback until then. */
+function setShuffleQ(v){ shuffleQ = !!v; }
+function setShuffleChoices(v){ shuffleChoices = !!v; }
+
+/* Single entry point used by the toolbar buttons; honours the selected mode. */
+function start(source){ if(mode === 'drill') startDrill(source); else startRound(source); }
+
+function render(){
+  updateBadge();
+  if(review){ renderReview(); return; }
+  if(drill){ renderDrill(); return; }
+  if(!round){ renderHome(); return; }
+  renderRound();
+}
+
+function filterLabel(){
+  if(filter === 'real') return 'real quiz questions only';
+  if(filter === 'concept') return 'concept drills only';
+  return 'all questions';
+}
+
+function sizeLabel(){ return sessionSize === 'all' ? 'the whole pool' : sessionSize + ' questions'; }
+
+function orderLabel(){
+  if(!shuffleQ) return 'fixed order';
+  return shuffleChoices ? 'shuffled order + choices' : 'shuffled order';
+}
+
+function modeLabel(){
+  return mode === 'drill'
+    ? 'Retry mode: repeat each question until you get it right'
+    : 'Round: answer all, then check';
+}
+
+function renderHome(){
+  const r = document.getElementById('content');
+  const st = quizStats();
+  const missed = st.shaky;
+  const pick = Math.min(st.total, sizeNum());
+  const html = `<div class="hero">
+    <h2>${esc(DATA[current].label)}</h2>
+    <p>Multiple-choice only - there are no fill-in-the-blank items. Each session serves <b>${pick === Infinity ? 'every' : pick}</b> question(s) drawn from <b>${esc(filterLabel())}</b>.</p>
+    <p style="margin-top:-4px"><b>${esc(modeLabel())}</b>${mode === 'drill' ? ' - a wrong answer keeps you on that same question, so you cannot move on until you get it right.' : '.'}</p>
+    <div class="stat">
+      <div><b>${st.total}</b><span>questions in this pool</span></div>
+      <div><b>${st.attempted}</b><span>attempted so far</span></div>
+      <div><b>${missed}</b><span>still shaky (missed or marked)</span></div>
+      <div><b>${st.flagged}</b><span>marked "not sure"</span></div>
+    </div>
+    <div class="row">
+      <button class="primary" onclick="start('mixed')">${mode === 'drill' ? '🔁' : '▶'} Start - ${esc(sizeLabel())}</button>
+      <button onclick="start('missed')" ${missed ? '' : 'disabled'}>🎯 Practice missed (${missed})</button>
+      <button onclick="start('flagged')" ${st.flagged ? '' : 'disabled'}>🔖 Relook at marked (${st.flagged})</button>
+      <button onclick="startReview()" ${missed ? '' : 'disabled'}>🧠 Memory aids (${missed})</button>
+    </div>
+  </div>`;
+  r.innerHTML = html;
+}
+
+function renderRound(){
+  const r = document.getElementById('content');
+  const roundLabel = round.mode === 'flagged' ? '🔖 Relooking at what you marked unsure'
+    : (round.mode === 'missed' ? '🎯 Practicing your missed questions'
+    : (round.mode === 'repeat' ? '🔁 The same questions again, reordered' : '▶ Random round'));
+  let html = `<div class="muted" style="margin:4px 0 2px">${roundLabel} · ${esc(filterLabel())} · ${round.items.length} questions · ${orderLabel()}</div>`;
+  html += round.items.map((item, i) => itemHTML(item, i)).join('');
+  html += `<button class="primary" id="checkbtn" onclick="checkRound()" style="margin-top:10px">✔ Check Round</button>
+           <button onclick="cancelRound()" style="margin-top:10px">Cancel</button>`;
+  r.innerHTML = html;
+}
+
+/* The mark has to be reachable while the question is on screen - that is the
+   whole request. It sits under the item next to the hint so it reads as part of
+   the question, and it never re-renders (see toggleFlag). */
+function flagButtonHTML(id, domId){
+  const on = isFlagged(id);
+  return `<button class="flag-btn${on ? ' on' : ''}" id="flag_${domId}"`
+    + ` onclick="toggleFlag('${id}', this)"`
+    + ` title="Keep this for review even if you got it right - a guess that landed is not knowing it">`
+    + `${on ? '🔖 Marked for review' : '🔖 Not sure - relook'}</button>`;
+}
+
+function paintFlagBtn(btn, on){
+  try{
+    if(!btn) return;
+    btn.classList.toggle('on', !!on);
+    btn.textContent = on ? '🔖 Marked for review' : '🔖 Not sure - relook';
+  }catch(e){}
+}
+
+function itemHTML(item, i){
+  const num = `<span class="num">${i+1}.</span>`;
+  const opts = item.opts.map((o, j) =>
+    `<label><input type="radio" name="mcq_${i}" value="${j}"> <b>${String.fromCharCode(65+j)}.</b> ${esc(o)}</label>`).join('');
+  const hint = aidsAlways ? '' :
+    `<button class="hint-btn" onclick="toggleHint(${i})">💡 Hint</button>
+    <div class="hint" id="hint_${i}">${esc(item.hint)}</div>`;
+  return `<div class="card" id="it_${i}">
+    <div class="q">${num}${esc(item.q)}<span class="ptype">${esc(item.src)}</span></div>
+    ${opts}
+    ${hint}
+    ${flagButtonHTML(item.id, i)}
+    ${aidsAlways ? aidHTML(item, true) : ''}
+  </div>`;
+}
+
+function toggleHint(i){
+  document.getElementById('hint_' + i).classList.toggle('shown');
+}
+
+/* ================= MEMORY AIDS ================= */
+
+/* Every question carries a memory hook (mnem), the trap to watch for, and the
+   reasoning (hint). build them once here, reuse everywhere. */
+function aidHTML(item, open, id){
+  return `<div class="aids${open ? ' shown' : ''}"${id ? ` id="${id}"` : ''}>
+    <div class="aids-h">🧠 How to remember this</div>
+    <div class="aid"><span class="aid-k">Hook</span><span class="aid-v">${esc(item.mnem)}</span></div>
+    ${item.trap ? `<div class="aid"><span class="aid-k">Trap</span><span class="aid-v">${esc(item.trap)}</span></div>` : ''}
+    <div class="aid"><span class="aid-k">Why</span><span class="aid-v">${esc(item.hint)}</span></div>
+  </div>`;
+}
+
+function toggleAids(id){
+  const el = document.getElementById(id);
+  if(el) el.classList.toggle('shown');
+}
+
+/* Keep the answers the user has already picked when the view is re-rendered. */
+function snapRound(){
+  const out = {};
+  if(!round) return out;
+  round.items.forEach((it, i) => {
+    const sel = document.querySelector('input[name="mcq_' + i + '"]:checked');
+    if(sel) out[i] = sel.value;
+  });
+  return out;
+}
+function restoreRound(snap){
+  Object.keys(snap).forEach(i => {
+    const el = document.querySelector('input[name="mcq_' + i + '"][value="' + snap[i] + '"]');
+    if(el) el.checked = true;
+  });
+}
+function snapDrill(){
+  const sel = document.querySelector('input[name="drill_opt"]:checked');
+  return sel ? sel.value : null;
+}
+function restoreDrill(v){
+  if(v === null) return;
+  const el = document.querySelector('input[name="drill_opt"][value="' + v + '"]');
+  if(el) el.checked = true;
+}
+function setAidsAlways(v){
+  aidsAlways = v;
+  if(round && !round.checked){ const s = snapRound(); renderRound(); restoreRound(s); }
+  else if(drill && !drill.done){ const s = snapDrill(); renderDrill(); restoreDrill(s); }
+}
+
+/* ---- missed review: every shaky question with all three aids ---- */
+function startReview(){
+  const stats = loadStats()[current] || {};
+  const items = visible(current).filter(x => stats[x.id] && stats[x.id].m > 0);
+  items.sort((a, b) => (stats[b.id].m - stats[a.id].m) || (stats[b.id].t - stats[a.id].t));
+  review = { items: items };
+  round = null; drill = null;
+  render();
+  window.scrollTo(0,0);
+}
+function closeReview(){ review = null; render(); }
+
+function renderReview(){
+  const r = document.getElementById('content');
+  const n = review.items.length;
+  if(n === 0){
+    r.innerHTML = `<div class="summary"><h3>🧠 Nothing to remember yet</h3>
+      <p class="muted">Nothing has been missed and nothing is marked in <b>${esc(DATA[current].label)}</b> with <b>${esc(filterLabel())}</b> selected. Miss a question, or tick <b>🔖 Not sure - relook</b> under one you guessed at, and it will land here with a memory hook, the trap to watch out for, and the reasoning.</p>
+      <div class="row" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
+        <button class="primary" onclick="start('mixed')">▶ Start a session</button>
+        <button onclick="closeReview()">Back</button>
+      </div></div>`;
+    return;
+  }
+  const stats = loadStats()[current] || {};
+  let html = `<div class="summary"><h3>🧠 ${n} question${n === 1 ? '' : 's'} to remember</h3>
+    <p class="muted">Everything missed or marked in <b>${esc(DATA[current].label)}</b> (${esc(filterLabel())}), hardest first. Read the hook, then cover the answer and say it out loud before moving on.</p>
+    <div class="row" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">
+      <button class="primary" onclick="start('missed')">🎯 Drill these</button>
+      <button onclick="closeReview()">Back</button>
+    </div></div>`;
+  html += review.items.map((it, i) => {
+    const st = stats[it.id] || {m:0,c:0,t:0};
+    const tag = st.m ? `missed ${st.m} of ${st.t} attempt${st.t === 1 ? '' : 's'}` : 'marked not sure';
+    return `<div class="card review">
+      <div class="q"><span class="num">${i+1}.</span>${esc(it.q)}<span class="ptype">${esc(it.src)}</span>
+        <span class="tag">${tag}</span></div>
+      <div class="ans">✔ ${esc(it.correct)}</div>
+      ${aidHTML(it, true)}
+      ${flagButtonHTML(it.id, 'r' + i)}
+    </div>`;
+  }).join('');
+  r.innerHTML = html;
+  window.scrollTo(0,0);
+}
+
+/* ================= RETRY MODE (one question at a time) ================= */
+
+function startDrill(source){
+  const items = sample(source);
+  if(items.length === 0){
+    alert(source === 'flagged'
+      ? 'Nothing marked yet - tick "🔖 Not sure - relook" under any question, even one you got right.'
+      : 'No missed questions yet - take a normal session first.');
+    return;
+  }
+  drill = { items: items, i: 0, attempts: 0, done: false, results: [], mode: source };
+  lastBatch = items.map(x => x.id);
+  review = null;
+  render();
+  window.scrollTo(0,0);
+}
+
+function renderDrill(){
+  const r = document.getElementById('content');
+  const item = drill.items[drill.i];
+  const n = drill.items.length;
+  const pct = Math.round(drill.i / n * 100);
+  const opts = item.opts.map((o, j) =>
+    `<label><input type="radio" name="drill_opt" value="${j}"> <b>${String.fromCharCode(65+j)}.</b> ${esc(o)}</label>`).join('');
+  r.innerHTML = `<div class="muted" style="margin:6px 0 2px">
+      🔁 Question <b>${drill.i + 1}</b> of <b>${n}</b> · ${drill.mode === 'flagged' ? 'what you marked unsure' : (drill.mode === 'missed' ? 'your missed questions' : (drill.mode === 'repeat' ? 'the same questions, reordered' : esc(filterLabel())))} · ${orderLabel()}
+    </div>
+    <div class="progress"><i style="width:${pct}%"></i></div>
+    <div class="card" id="drillcard">
+      <div class="q">${esc(item.q)}<span class="ptype">${esc(item.src)}</span></div>
+      ${opts}
+      ${aidsAlways ? aidHTML(item, true) : ''}
+      <div id="drillfb"></div>
+      <button class="hint-btn" onclick="toggleHint(0)">💡 Hint</button>
+      <div class="hint" id="hint_0">${esc(item.hint)}</div>
+      ${flagButtonHTML(item.id, 'drill')}
+      <div id="drillact" style="margin-top:12px"></div>
+    </div>
+    <div class="row" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
+      <button class="primary" id="drillcheck" onclick="checkDrill()">✔ Check</button>
+      <button onclick="cancelDrill()">Cancel</button>
+    </div>`;
+}
+
+/* Wrong answer -> stay on the SAME question and try again.
+   Right answer  -> lock it in, show the explanation, reveal the Next button. */
+function checkDrill(){
+  if(!drill || drill.done) return;
+  const item = drill.items[drill.i];
+  const card = document.getElementById('drillcard');
+  const labels = card.querySelectorAll('label');
+  const sel = card.querySelector('input[name="drill_opt"]:checked');
+  const fb = document.getElementById('drillfb');
+  if(!sel){
+    fb.innerHTML = '<div class="fb bad">Pick an answer first.</div>';
+    return;
+  }
+  const picked = +sel.value;
+  const cIdx = item.opts.indexOf(item.correct);
+  const got = (picked === cIdx);
+  drill.attempts++;
+  labels.forEach(l => l.classList.remove('right','wrong','correct-mark'));
+
+  if(got){
+    labels[cIdx].classList.add('right','correct-mark');
+    if(drill.attempts === 1) bump(item.id, true);   // a later success is not a first-try win
+    drill.results.push({ id: item.id, attempts: drill.attempts, firstTry: drill.attempts === 1 });
+    drill.done = true;
+    fb.innerHTML = `<div class="fb ok">✓ Correct${drill.attempts === 1 ? ' on the first try!' : ' - you got it after ' + drill.attempts + ' tries.'}</div>
+      ${aidsAlways ? '' : aidHTML(item, true)}`;
+    labels.forEach(l => { l.classList.add('locked'); const inp = l.querySelector('input'); if(inp) inp.disabled = true; });
+    document.getElementById('drillcheck').style.display = 'none';
+    document.getElementById('drillact').innerHTML =
+      `<button class="primary" onclick="nextDrill()">${drill.i + 1 < drill.items.length ? 'Next question ▶' : 'See results ▶'}</button>`;
+  } else {
+    bump(item.id, false);                           // a wrong answer makes the question shaky
+    labels[picked].classList.add('wrong');
+    fb.innerHTML = `<div class="fb bad">✗ Not quite - try again. This question stays until you get it right.
+        <small>${drill.attempts} wrong ${drill.attempts === 1 ? 'try' : 'tries'} so far. Use the Hint button if you want more.</small></div>
+      ${item.trap ? `<div class="trapbox">⚠️ <b>Watch the trap:</b> ${esc(item.trap)}</div>` : ''}
+      <button class="aids-btn" onclick="toggleAids('drillaids')">🧠 How to remember this</button>
+      ${aidHTML(item, false, 'drillaids')}`;
+  }
+  updateBadge();
+}
+
+function nextDrill(){
+  if(!drill) return;
+  drill.i++;
+  drill.attempts = 0;
+  drill.done = false;
+  if(drill.i >= drill.items.length){ renderDrillSummary(); return; }
+  renderDrill();
+  window.scrollTo(0,0);
+}
+
+function renderDrillSummary(){
+  const d = drill;
+  drill = null;
+  const r = document.getElementById('content');
+  const firstTry = d.results.filter(x => x.firstTry).length;
+  const totalTries = d.results.reduce((a, x) => a + x.attempts, 0);
+  const needed = d.results.filter(x => !x.firstTry);
+  const byId = {};
+  pool(current).forEach(x => byId[x.id] = x);
+  const nQ = d.results.length;
+  let html = `<div class="summary"><h3>Retry session complete</h3>
+    <div class="big">${firstTry} / ${nQ} right on the first try</div>
+    <p class="muted">You needed ${totalTries} total attempt${totalTries === 1 ? '' : 's'} to clear all ${nQ} question${nQ === 1 ? '' : 's'}.</p>`;
+  if(needed.length === 0){
+    html += `<p class="muted">Every question right on the first attempt - outstanding. 🎉</p>`;
+  } else {
+    html += `<p class="muted">These took more than one try - the hint is included:</p>`;
+    html += needed.map(x => {
+      const it = byId[x.id];
+      return `<div class="missed-item">
+        <div class="mq">${esc(it.q)}</div>
+        <div class="ans">✔ <b>${esc(it.correct)}</b></div>
+        <div class="muted" style="font-size:13px;margin-top:4px">Took ${x.attempts} tries <span class="tag">(${esc(it.src)})</span></div>
+        ${aidHTML(it, true)}
+      </div>`;
+    }).join('');
+  }
+  html += `<div class="row" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
+      <button class="primary" onclick="repeatBatch()">🔁 These ${nQ} again, new order</button>
+      <button onclick="start('mixed')">🔁 Another retry session</button>
+      <button onclick="start('missed')">🎯 Retry missed</button>
+      ${needed.length ? '<button onclick="startReview()">🧠 Missed review</button>' : ''}
+    </div></div>`;
+  r.innerHTML = html;
+  window.scrollTo({top:0, behavior:'smooth'});
+  updateBadge();
+}
+
+function cancelDrill(){ drill = null; render(); }
+
+function checkRound(){
+  if(!round || round.checked) return;
+
+  let correct = 0;
+  const missed = [];
+
+  round.items.forEach((item, i) => {
+    const card = document.getElementById('it_' + i);
+    const labels = card.querySelectorAll('label');
+    labels.forEach(l => l.classList.remove('right','wrong','correct-mark'));
+    const cIdx = item.opts.indexOf(item.correct);
+    if(cIdx >= 0) labels[cIdx].classList.add('right','correct-mark');
+    const sel = card.querySelector(`input[name="mcq_${i}"]:checked`);
+    const ok = !!sel && (+sel.value === cIdx);
+    if(ok){
+      correct++;
+    } else {
+      if(sel) labels[+sel.value].classList.add('wrong');
+      missed.push({item: item, picked: sel ? item.opts[+sel.value] : null});
+    }
+    bump(item.id, ok);
+  });
+
+  round.checked = true;
+  const btn = document.getElementById('checkbtn');
+  if(btn) btn.style.display = 'none';
+
+  const r = document.getElementById('content');
+  const pct = Math.round(correct / round.items.length * 100);
+  let summary = `<div class="summary"><h3>Round result</h3>
+    <div class="big">${correct} / ${round.items.length} correct (${pct}%)</div>`;
+  if(missed.length === 0){
+    summary += `<p class="muted">Perfect - all correct! 🎉</p>`;
+  } else {
+    summary += `<p class="muted">Review these - the correct answer and the hint are included:</p>`;
+    summary += missed.map(m => {
+      const it = m.item;
+      const picked = m.picked ? esc(m.picked) : 'not answered';
+      return `<div class="missed-item">
+        <div class="mq">${esc(it.q)}</div>
+        <div class="ans">✔ <b>${esc(it.correct)}</b></div>
+        <div class="muted" style="font-size:13px;margin-top:4px">You chose: ${picked} <span class="tag">(${esc(it.src)})</span></div>
+        ${aidHTML(it, true)}
+      </div>`;
+    }).join('');
+  }
+  summary += `<div class="row" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
+      <button class="primary" onclick="repeatBatch()">🔁 These ${round.items.length} again, new order</button>
+      <button onclick="startRound('mixed')">▶ Next round</button>
+      <button onclick="startRound('missed')">🎯 Practice missed</button>
+      ${missed.length ? '<button onclick="startReview()">🧠 Missed review</button>' : ''}
+    </div></div>`;
+  r.insertAdjacentHTML('beforeend', summary);
+  window.scrollTo({top:0, behavior:'smooth'});
+  updateBadge();
+}
+
+function startRound(source){
+  round = { key: current, mode: source, items: sample(source), checked: false };
+  review = null;
+  if((source === 'missed' || source === 'flagged') && round.items.length === 0){
+    alert(source === 'flagged'
+      ? 'Nothing marked yet - tick "🔖 Not sure - relook" under any question, even one you got right.'
+      : 'No missed questions yet - take a normal round first.');
+    round = null; renderHome(); return;
+  }
+  lastBatch = round.items.map(x => x.id);
+  render();
+  window.scrollTo(0,0);
+}
+
+/* Boss, 2026-09-23 - "practice the same questions in a different order". The
+   shuffle boxes change what the next session draws; this re-serves the exact
+   batch he just finished, reordered, which is what makes a second pass at the
+   same ten questions possible instead of a fresh draw from the pool. */
+function repeatBatch(){
+  const byId = {};
+  pool(current).forEach(x => byId[x.id] = x);
+  const ids = shuffleQ ? shuffled(lastBatch) : lastBatch;
+  const items = ids.map(id => byId[id]).filter(Boolean).map(withChoiceOrder);
+  if(items.length === 0){ start('mixed'); return; }
+  review = null;
+  if(mode === 'drill'){
+    drill = { items: items, i: 0, attempts: 0, done: false, results: [], mode: 'repeat' };
+  } else {
+    round = { key: current, mode: 'repeat', items: items, checked: false };
+  }
+  render();
+  window.scrollTo(0,0);
+}
+
+function cancelRound(){ round = null; render(); }
+
+function clearProgress(){
+  if(confirm('Erase all saved progress (missed/correct counts) for this browser?')){
+    try{ localStorage.removeItem(LS_KEY); }catch(e){}
+    round = null; drill = null; review = null; render();
+  }
+}
+
+function updateBadge(){
+  const st = quizStats();
+  document.getElementById('badge').innerHTML =
+    `Attempted <b>${st.attempted}</b> · Shaky <b>${st.shaky}</b> · Marked <b>${st.flagged}</b>`;
+}
+
+function esc(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+/* init */
+document.getElementById('srcfilter').value = filter;
+document.getElementById('modesel').value = mode;
+document.getElementById('sizesel').value = String(sessionSize);
+document.getElementById('aidscb').checked = aidsAlways;
+document.getElementById('shufqcb').checked = shuffleQ;
+document.getElementById('shufccb').checked = shuffleChoices;
+render();
+</script>
+</body>
+</html>

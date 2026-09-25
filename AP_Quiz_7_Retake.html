@@ -1,0 +1,37 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>A&amp;P I — Quiz 7 Retake</title>
+<style>
+body{font-family:Arial,sans-serif;max-width:900px;margin:32px auto;padding:0 20px;line-height:1.45;background:#f7f7f8;color:#171717}
+.card{background:white;padding:20px;margin:16px 0;border-radius:12px;border:1px solid #ddd}
+label{display:block;padding:7px;margin:3px 0;border-radius:6px} label:hover{background:#f1f1f1}
+button{font-size:16px;padding:11px 18px;margin:10px 8px 10px 0;cursor:pointer}
+#score{font-size:22px;font-weight:bold;margin:18px 0} .right{background:#dcfce7} .wrong{background:#fee2e2}
+small{color:#555}
+</style></head><body>
+<h1>A&amp;P I — Quiz 7 Retake</h1>
+<p>Offline retake quiz. Select one answer per question, then click <b>Grade Quiz</b>.</p>
+<p><small>Rebuilt from the 20 Quiz 7 questions you supplied in this chat.</small></p>
+<div id="quiz"></div>
+<button onclick="grade()">Grade Quiz</button><button onclick="resetQuiz()">Retake / Reset</button>
+<div id="score"></div>
+<script>
+const qs=[{"q": "Which of the following is not a function of the skeletal system?", "opts": ["body support", "protection of internal organs", "hematopoiesis", "energy production"], "a": 3}, {"q": "The proximal and distal ends of a long bone are called the", "opts": ["Metaphyses", "Diaphyses", "Epiphyseal plates", "Epiphyses"], "a": 3}, {"q": "When classified by shape, carpal bones are examples of _____ bones.", "opts": ["irregular", "sesamoid", "short", "flat"], "a": 2}, {"q": "The cells that secrete the organic bone matrix, osteoid, prior to laying down new bone are called", "opts": ["osteocytes", "osteoblasts", "osteons", "osteoclasts"], "a": 1}, {"q": "The patella bone is classified as a _____ type bone.", "opts": ["short", "long", "sesamoid", "irregular"], "a": 2}, {"q": "The connective tissue layer covering the outer surface of all bones, though not present at any joint surface, is called the _____", "opts": ["endosteum", "periosteum", "lamellae", "ligament"], "a": 1}, {"q": "The circular-shaped structural units of compact bone found in a long bone’s diaphysis are called _____", "opts": ["Osteons", "osteocytes", "trabeculae", "canaliculi"], "a": 0}, {"q": "Collagen fibers function to ...", "opts": ["provide the glue that binds the minerals together", "resist compressive forces", "trap water in the extracellular matrix", "resist fracturing with twisting and stretching"], "a": 3}, {"q": "The cells responsible for longitudinal growth in long bones are the", "opts": ["Chondrocytes within the osteons", "Osteoblasts within the periosteum", "Chondrocytes in the epiphyseal plate", "Osteoclasts within the epiphysis"], "a": 2}, {"q": "Long bones are different from all other bones because they contain", "opts": ["compact bone", "spongy bone", "a marrow cavity", "bone marrow"], "a": 2}, {"q": "A patient presents with severe anemia (low red blood cell counts). The best site to access his blood-forming cells is the _____", "opts": ["periosteum", "endosteum", "red marrow", "yellow marrow"], "a": 2}, {"q": "The majority of the material and weight in osseous tissue is _____", "opts": ["the cells", "the osteoid", "the extracellular matrix", "the red marrow"], "a": 2}, {"q": "Which bone-related cells are multi-nucleated and can digest or resorb bone tissue?", "opts": ["osteoblasts", "osteoclasts", "osteocytes", "osteogenic cells"], "a": 1}, {"q": "What is the central canal of the osteons filled with?", "opts": ["osteocytes", "periosteum", "extracellular matrix", "blood vessels and nerves"], "a": 3}, {"q": "Which type of ossification starts as islands of osteogenic cells producing spicules of bony tissue in embryonic and fetal dermal tissue?", "opts": ["endochondral", "intramembranous", "appositional", "secondary"], "a": 1}, {"q": "Which hormone is most important to bone growth in males after puberty?", "opts": ["thyroid", "estrogen", "testosterone", "growth"], "a": 2}, {"q": "A condition in which a person’s bones become weakened to the point of suffering spontaneous fractures is called", "opts": ["osteopenia", "osteoporosis", "osteomyelitis", "osteitis"], "a": 1}, {"q": "The type of ossification done by osteoblasts in the periosteum around all bones throughout life is called:", "opts": ["Appositional", "Intramembranous", "Endochondral", "Osteomalacia"], "a": 0}, {"q": "Parathyroid hormone (PTH) is secreted in response to _____", "opts": ["high blood calcium ion levels", "high levels of vitamin D", "low blood calcium ion levels", "ingestion of calcium-rich foods"], "a": 2}, {"q": "This type of bone tissue found in the center of all bones, but not in the marrow cavity regions, is known as _____", "opts": ["compact or dense", "osteons", "epiphyseal", "spongy or trabecular"], "a": 3}];
+const root=document.getElementById('quiz');
+qs.forEach((x,i)=>{
+ let d=document.createElement('div'); d.className='card'; d.id='q'+i;
+ d.innerHTML=`<b>${i+1}. ${x.q}</b>`+x.opts.map((o,j)=>`<label><input type="radio" name="q${i}" value="${j}"> ${String.fromCharCode(65+j)}. ${o}</label>`).join('');
+ root.appendChild(d);
+});
+function grade(){
+ let score=0;
+ qs.forEach((x,i)=>{
+  let card=document.getElementById('q'+i); card.querySelectorAll('label').forEach(l=>l.classList.remove('right','wrong'));
+  let s=document.querySelector(`input[name=q${i}]:checked`);
+  card.querySelectorAll('label')[x.a].classList.add('right');
+  if(s){ if(+s.value===x.a) score++; else s.parentElement.classList.add('wrong'); }
+ });
+ document.getElementById('score').textContent=`Score: ${score} / ${qs.length} (${Math.round(score/qs.length*100)}%)`;
+ window.scrollTo(0,document.body.scrollHeight);
+}
+function resetQuiz(){document.querySelectorAll('input').forEach(x=>x.checked=false);document.querySelectorAll('label').forEach(l=>l.classList.remove('right','wrong'));document.getElementById('score').textContent='';window.scrollTo(0,0);}
+</script></body></html>
