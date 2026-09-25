@@ -443,10 +443,23 @@ function missedIds(){
 
 function quizStats(){
   const s = loadStats(); const q = s[current] || {};
-  let attempted = 0;
-  Object.keys(q).forEach(id => { if(q[id].t > 0) attempted++; });
-  return { attempted: attempted, total: visible(current).length, shaky: missedIds().length,
-           flagged: flagIds().length };
+  /* The counters describe the pool on screen. They used to be bank-wide, which
+     stopped being true the moment the attempt menu could scope the pool: the
+     panel said "5 shaky" over a pool of 16 that could only serve 3, and enabled
+     "Relook at marked (1)" to land on "Nothing marked yet". A number the drill
+     cannot honour is worse than no number. */
+  const inPool = {};
+  visible(current).forEach(x => inPool[x.id] = true);
+  let attempted = 0, shaky = 0, marked = 0;
+  Object.keys(q).forEach(id => {
+    if(!inPool[id]) return;
+    const e = q[id];
+    if(e.t > 0) attempted++;
+    if(e.m > 0 || e.f) shaky++;
+    if(e.f) marked++;
+  });
+  return { attempted: attempted, total: visible(current).length, shaky: shaky,
+           flagged: marked };
 }
 
 function sizeNum(){ return sessionSize === 'all' ? Infinity : sessionSize; }
@@ -725,7 +738,11 @@ function setAidsAlways(v){
 /* ---- missed review: every shaky question with all three aids ---- */
 function startReview(){
   const stats = loadStats()[current] || {};
-  const items = visible(current).filter(x => stats[x.id] && stats[x.id].m > 0);
+  /* Marked counts as shaky even with no miss behind it - "marked questions join
+     the missed pool" is the tool's own rule, and renderReview already draws the
+     "marked not sure" tag for a row that has no misses. Filtering on m > 0 alone
+     dropped exactly the guessed-but-correct items the screen exists for. */
+  const items = visible(current).filter(x => stats[x.id] && (stats[x.id].m > 0 || stats[x.id].f));
   items.sort((a, b) => (stats[b.id].m - stats[a.id].m) || (stats[b.id].t - stats[a.id].t));
   review = { items: items };
   round = null; drill = null;
