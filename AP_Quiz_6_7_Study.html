@@ -114,7 +114,7 @@
     <option value="round">Round: answer all, then check</option>
     <option value="drill">Retry mode: repeat until correct</option>
   </select>
-  <select id="sizesel" onchange="setSize(this.value)" title="How many questions per session">
+  <select id="sizesel" onchange="setSize(this.value)" title="How many questions a Start round draws. Practice missed / Relook at marked always serve the whole set.">
     <option value="5">5 at a time</option>
     <option value="10">10 at a time</option>
     <option value="20">20 at a time</option>
@@ -325,6 +325,15 @@ let review = null;         // { items:[...] } while the missed-review screen is 
 let shuffleQ = true;
 let shuffleChoices = false;
 let lastBatch = [];        // the ids of the session just run, for "same questions, new order"
+/* Boss, 2026-09-25: "if I go to a 10 practice attempt and practice missed, why is
+   it giving me the full 10. It should only give me the ones I missed from THAT
+   practice and then let me redo the full quiz from the original practice until I
+   get every question." So a round now remembers its own wrong answers, and the
+   full batch they came from. "Practice missed" used to draw the worst N of the
+   whole bank, so a 10-question round with 3 wrong handed back 10 questions he
+   had never missed - the one thing the button cannot mean. */
+let lastMissed = [];       // ids answered wrong in the most recent round (or needing >1 try in retry mode)
+let lastFullBatch = [];    // the full practice those misses came from, so a misses drill can go back to it
 
 function shuffled(src){
   const a = src.slice();
@@ -477,17 +486,28 @@ function withChoiceOrder(item){
 function sample(source){
   const items = visible(current);
   let picks;
-  if(source === 'missed'){
+  if(source === 'lastmissed'){
+    /* Exactly the wrong answers from the practice just run, mapped through the
+       bank rather than the filtered pool so the set cannot quietly shrink if a
+       menu moved - the button's count and the drill have to agree. Never cut to
+       the session size either: "the ones I missed" is a finite list he already
+       earned, not a fresh draw. */
+    const byId = {};
+    pool(current).forEach(x => byId[x.id] = x);
+    const ids = shuffleQ ? shuffled(lastMissed) : lastMissed.slice();
+    picks = ids.map(id => byId[id]).filter(Boolean);
+  } else if(source === 'missed'){
+    // Everything shaky in the pool, whole: the number on the button is served in full.
     const byId = {};
     items.forEach(x => byId[x.id] = x);
     const ids = shuffleQ ? shuffled(missedIds()) : missedIds();
-    picks = ids.map(id => byId[id]).filter(Boolean).slice(0, sizeNum());
+    picks = ids.map(id => byId[id]).filter(Boolean);
   } else if(source === 'flagged'){
     // Only what he marked unsure - the correct-but-guessed ones live nowhere else.
     const marked = {};
     flagIds().forEach(id => marked[id] = true);
     const only = items.filter(x => marked[x.id]);
-    picks = (shuffleQ ? shuffled(only) : only).slice(0, sizeNum());
+    picks = shuffleQ ? shuffled(only) : only;
   } else {
     picks = (shuffleQ ? shuffled(items) : items).slice(0, sizeNum());
   }
@@ -499,6 +519,9 @@ function sample(source){
 function switchQuiz(key){
   current = key;
   round = null; drill = null; review = null;
+  // Item ids restart at q0 in every bank, so a batch cannot be carried across a
+  // tab switch: q7's q0 is a different question from q6's q0.
+  lastBatch = []; lastMissed = []; lastFullBatch = [];
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.id === 'tab-' + key));
   render();
 }
@@ -639,7 +662,9 @@ function renderRound(){
   const r = document.getElementById('content');
   const roundLabel = round.mode === 'flagged' ? '🔖 Relooking at what you marked unsure'
     : (round.mode === 'missed' ? '🎯 Practicing your missed questions'
-    : (round.mode === 'repeat' ? '🔁 The same questions again, reordered' : '▶ Random round'));
+    : (round.mode === 'lastmissed' ? '🎯 The ones you missed in that practice'
+    : (round.mode === 'full' ? '🔁 That full practice again, reordered'
+    : (round.mode === 'repeat' ? '🔁 The same questions again, reordered' : '▶ Random round'))));
   let html = `<div class="muted" style="margin:4px 0 2px">${roundLabel} · ${esc(filterLabel())} · ${round.items.length} questions · ${orderLabel()}</div>`;
   html += round.items.map((item, i) => itemHTML(item, i)).join('');
   html += `<button class="primary" id="checkbtn" onclick="checkRound()" style="margin-top:10px">✔ Check Round</button>
@@ -794,11 +819,14 @@ function startDrill(source){
       ? 'Nothing marked yet - tick "🔖 Not sure - relook" under any question, even one you got right.'
       : (source === 'missed'
         ? 'No missed questions yet - take a normal session first.'
-        : 'Nothing in this pool with the question and attempt menus set the way they are. Widen one of them.'));
+        : (source === 'lastmissed'
+          ? 'Nothing outstanding from that practice - you answered all of it correctly.'
+          : 'Nothing in this pool with the question and attempt menus set the way they are. Widen one of them.')));
     return;
   }
   drill = { items: items, i: 0, attempts: 0, done: false, results: [], mode: source };
   lastBatch = items.map(x => x.id);
+  if(source === 'mixed' || source === 'repeat') lastFullBatch = lastBatch.slice();
   review = null;
   render();
   window.scrollTo(0,0);
@@ -812,7 +840,7 @@ function renderDrill(){
   const opts = item.opts.map((o, j) =>
     `<label><input type="radio" name="drill_opt" value="${j}"> <b>${String.fromCharCode(65+j)}.</b> ${esc(o)}</label>`).join('');
   r.innerHTML = `<div class="muted" style="margin:6px 0 2px">
-      🔁 Question <b>${drill.i + 1}</b> of <b>${n}</b> · ${drill.mode === 'flagged' ? 'what you marked unsure' : (drill.mode === 'missed' ? 'your missed questions' : (drill.mode === 'repeat' ? 'the same questions, reordered' : esc(filterLabel())))} · ${orderLabel()}
+      🔁 Question <b>${drill.i + 1}</b> of <b>${n}</b> · ${drill.mode === 'flagged' ? 'what you marked unsure' : (drill.mode === 'missed' ? 'your missed questions' : (drill.mode === 'lastmissed' ? 'the ones you missed in that practice' : (drill.mode === 'full' ? 'that full practice again, reordered' : (drill.mode === 'repeat' ? 'the same questions, reordered' : esc(filterLabel())))))} · ${orderLabel()}
     </div>
     <div class="progress"><i style="width:${pct}%"></i></div>
     <div class="card" id="drillcard">
@@ -890,6 +918,8 @@ function renderDrillSummary(){
   const firstTry = d.results.filter(x => x.firstTry).length;
   const totalTries = d.results.reduce((a, x) => a + x.attempts, 0);
   const needed = d.results.filter(x => !x.firstTry);
+  // Only the items this retry session actually tripped on.
+  lastMissed = needed.map(x => x.id);
   const byId = {};
   pool(current).forEach(x => byId[x.id] = x);
   const nQ = d.results.length;
@@ -910,12 +940,14 @@ function renderDrillSummary(){
       </div>`;
     }).join('');
   }
-  html += `<div class="row" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
-      <button class="primary" onclick="repeatBatch()">🔁 These ${nQ} again, new order</button>
-      <button onclick="start('mixed')">🔁 Another retry session</button>
-      <button onclick="start('missed')">🎯 Retry missed</button>
-      ${needed.length ? '<button onclick="startReview()">🧠 Missed review</button>' : ''}
-    </div></div>`;
+  let btns = `<button class="primary" onclick="repeatBatch()">🔁 These ${nQ} again, new order</button>`;
+  if(needed.length) btns += `<button onclick="start('lastmissed')">🎯 Retry the ${needed.length} you missed</button>`;
+  if(d.mode === 'lastmissed' && lastFullBatch.length > nQ){
+    btns += `<button onclick="redoFullBatch()">↩ Redo the full ${lastFullBatch.length} from that practice</button>`;
+  }
+  btns += `<button onclick="start('mixed')">🔁 Fresh retry session</button>`;
+  if(needed.length) btns += `<button onclick="startReview()">🧠 Missed review</button>`;
+  html += `<div class="row" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">${btns}</div></div>`;
   r.innerHTML = html;
   window.scrollTo({top:0, behavior:'smooth'});
   updateBadge();
@@ -946,6 +978,9 @@ function checkRound(){
     bump(item.id, ok);
   });
 
+  // What THIS round got wrong. That - and only that - is what the misses drill serves.
+  lastMissed = missed.map(m => m.item.id);
+
   round.checked = true;
   const btn = document.getElementById('checkbtn');
   if(btn) btn.style.display = 'none';
@@ -955,7 +990,10 @@ function checkRound(){
   let summary = `<div class="summary"><h3>Round result</h3>
     <div class="big">${correct} / ${round.items.length} correct (${pct}%)</div>`;
   if(missed.length === 0){
-    summary += `<p class="muted">Perfect - all correct! 🎉</p>`;
+    summary += `<p class="muted">${round.mode === 'full'
+      ? 'Every question from that practice is correct now - nothing left outstanding. 🎉'
+      : (round.mode === 'lastmissed' ? 'You cleared every one you missed from that practice. 🎉'
+      : 'Perfect - all correct! 🎉')}</p>`;
   } else {
     summary += `<p class="muted">Review these - the correct answer and the hint are included:</p>`;
     summary += missed.map(m => {
@@ -969,12 +1007,14 @@ function checkRound(){
       </div>`;
     }).join('');
   }
-  summary += `<div class="row" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
-      <button class="primary" onclick="repeatBatch()">🔁 These ${round.items.length} again, new order</button>
-      <button onclick="startRound('mixed')">▶ Next round</button>
-      <button onclick="startRound('missed')">🎯 Practice missed</button>
-      ${missed.length ? '<button onclick="startReview()">🧠 Missed review</button>' : ''}
-    </div></div>`;
+  let btns = `<button class="primary" onclick="repeatBatch()">🔁 These ${round.items.length} again, new order</button>`;
+  if(missed.length) btns += `<button onclick="startRound('lastmissed')">🎯 Practice the ${missed.length} you missed</button>`;
+  if(round.mode === 'lastmissed' && lastFullBatch.length > round.items.length){
+    btns += `<button onclick="redoFullBatch()">↩ Redo the full ${lastFullBatch.length} from that practice</button>`;
+  }
+  btns += `<button onclick="startRound('mixed')">▶ Fresh round</button>`;
+  if(missed.length) btns += `<button onclick="startReview()">🧠 Missed review</button>`;
+  summary += `<div class="row" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">${btns}</div></div>`;
   r.insertAdjacentHTML('beforeend', summary);
   window.scrollTo({top:0, behavior:'smooth'});
   updateBadge();
@@ -988,10 +1028,14 @@ function startRound(source){
       ? 'Nothing marked yet - tick "🔖 Not sure - relook" under any question, even one you got right.'
       : (source === 'missed'
         ? 'No missed questions yet - take a normal round first.'
-        : 'Nothing in this pool with the question and attempt menus set the way they are. Widen one of them.'));
+        : (source === 'lastmissed'
+          ? 'Nothing outstanding from that practice - you answered all of it correctly.'
+          : 'Nothing in this pool with the question and attempt menus set the way they are. Widen one of them.')));
     round = null; render(); return;
   }
   lastBatch = round.items.map(x => x.id);
+  // A fresh draw, or a redo of that same draw, is "the practice" the misses came from.
+  if(source === 'mixed' || source === 'repeat') lastFullBatch = lastBatch.slice();
   render();
   window.scrollTo(0,0);
 }
@@ -1011,6 +1055,28 @@ function repeatBatch(){
     drill = { items: items, i: 0, attempts: 0, done: false, results: [], mode: 'repeat' };
   } else {
     round = { key: current, mode: 'repeat', items: items, checked: false };
+  }
+  render();
+  window.scrollTo(0,0);
+}
+
+/* Boss, 2026-09-25: "then let me redo the full quiz from the original practice
+   until I get every question." A misses drill has to hand him back the batch
+   those misses came from - fix the three, then run the ten again, and loop
+   until a pass comes back clean. Distinct from repeatBatch(), which repeats
+   whatever was just served (the misses), so the two are not the same button. */
+function redoFullBatch(){
+  const byId = {};
+  pool(current).forEach(x => byId[x.id] = x);
+  const ids = shuffleQ ? shuffled(lastFullBatch) : lastFullBatch.slice();
+  const items = ids.map(id => byId[id]).filter(Boolean).map(withChoiceOrder);
+  if(items.length === 0){ start('mixed'); return; }
+  review = null;
+  lastBatch = items.map(x => x.id);
+  if(mode === 'drill'){
+    drill = { items: items, i: 0, attempts: 0, done: false, results: [], mode: 'full' };
+  } else {
+    round = { key: current, mode: 'full', items: items, checked: false };
   }
   render();
   window.scrollTo(0,0);
