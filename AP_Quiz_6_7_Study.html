@@ -95,7 +95,7 @@
 </head>
 <body>
 <h1>A&amp;P I — Quiz 6 &amp; 7 Multiple-Choice Study Tool</h1>
-<p class="sub">Test-bank study tool: <b>every question is multiple choice</b> — there are no fill-in-the-blank items. Questions come from the real Quiz 6 (both attempts) and Quiz 7 question banks, plus extra concept drills. Two ways to run them: a <b>round</b> (answer all, then check) or <b>retry mode</b> (one question at a time — a wrong answer keeps you on that same question until you get it right, then it moves on). <b>Anything you miss comes back with a memory hook, the trap to watch for, and the reasoning</b> — see <b>🧠 Missed review</b>, or tick <b>Show aids while answering</b> to see them on every question. And <b>🔖 Not sure — relook</b> under any question keeps it for review <b>even if you got it right</b>: a coin flip that landed is not knowing it, and the score can never tell the two apart. Marked questions join the same missed pool. The <b>🔀 Shuffle questions</b> box re-serves the same questions in a different order every session (and stops a 10-question session from being the same first ten forever), while <b>🔀 Shuffle choices</b> moves the options too, so the answer is not always the same letter. At the end of a session, <b>🔁 These N again, new order</b> reruns that exact batch reordered. Progress is saved in this browser.</p>
+<p class="sub">Test-bank study tool: <b>every question is multiple choice</b> — there are no fill-in-the-blank items. Questions come from the real Quiz 6 (both attempts) and Quiz 7 question banks, plus extra concept drills. Two ways to run them: a <b>round</b> (answer all, then check) or <b>retry mode</b> (one question at a time — a wrong answer keeps you on that same question until you get it right, then it moves on). <b>Anything you miss comes back with a memory hook, the trap to watch for, and the reasoning</b> — see <b>🧠 Missed review</b>, or tick <b>Show aids while answering</b> to see them on every question. And <b>🔖 Not sure — relook</b> under any question keeps it for review <b>even if you got it right</b>: a coin flip that landed is not knowing it, and the score can never tell the two apart. Marked questions join the same missed pool. The <b>🔀 Shuffle questions</b> box re-serves the same questions in a different order every session (and stops a 10-question session from being the same first ten forever), while <b>🔀 Shuffle choices</b> moves the options too, so the answer is not always the same letter. At the end of a session, <b>🔁 These N again, new order</b> reruns that exact batch reordered. It opens on the <b>real quiz questions</b>, because that is where the exam draws from — concept drills are still there under the question menu but they no longer come up by default — and the <b>attempt menu</b> narrows that further to one quiz attempt. Progress is saved in this browser.</p>
 
 <div class="tabs">
   <button class="tab active" id="tab-q6" onclick="switchQuiz('q6')">
@@ -125,6 +125,7 @@
     <option value="real">Real quiz only</option>
     <option value="concept">Concept drills only</option>
   </select>
+  <select id="attemptsel" onchange="setAttempt(this.value)" title="Narrow the real quiz questions to one quiz attempt"></select>
   <button onclick="clearProgress()" title="Erase saved progress">Reset progress</button>
   <button onclick="startReview()" title="Every question you have missed, with a memory hook and the trap to watch for">🧠 Missed review</button>
   <label title="Show the memory hook and trap on every question before you answer">
@@ -299,8 +300,15 @@ q7: {
 /* ================= STATE & STORAGE ================= */
 
 const LS_KEY = 'ap_study_stats_mcq_v1';
+const PREF_KEY = 'ap_study_prefs_mcq_v1';   // remembered menu choices, separate from progress
 let current = 'q6';
-let filter = 'all';        // 'all' | 'real' | 'concept'
+/* Boss, 2026-09-24: "I only need quiz questions from the quiz attempt. I don't
+   need to be tested on concepts. Most of the questions on the exam come from the
+   quizzes." So 'real' is the default rather than 'all': the drills stay in the
+   bank and stay reachable, but a fresh browser opens on the questions that
+   actually get examined, and the attempt menu scopes them to one attempt. */
+let filter = 'real';       // 'all' | 'real' | 'concept'
+let attemptFilter = 'any'; // 'any' | 'a1' | 'a2' | 'both' - only ever narrows real quiz items
 let mode = 'round';        // 'round' | 'drill'
 let sessionSize = 5;       // 5 | 10 | 20 | 'all'
 let round = null;          // { key, mode, items:[...], checked }
@@ -331,15 +339,63 @@ function pool(key){
   }));
 }
 
+/* Which quiz attempt an item came from. The bank carries it in src - "Quiz 6 ·
+   Attempt 1", "Quiz 6 · Attempt 2", "Quiz 6 · Attempts 1 and 2" - and the six
+   shared items really were on both, so they count for both. An item with no
+   attempt tag is a whole-bank question (every real Quiz 7 item is "Quiz 7 ·
+   Bank"), which is why a bank with no split must ignore the attempt menu
+   entirely rather than answer it with an empty pool. */
+function attemptOf(item){
+  const s = item.src;
+  if(/Attempts 1 and 2/i.test(s)) return 'both';
+  if(/Attempt 2/i.test(s))        return 'a2';
+  if(/Attempt 1/i.test(s))        return 'a1';
+  return 'any';
+}
+
+function attemptAvailable(key){
+  return pool(key).some(x => x.real && attemptOf(x) !== 'any');
+}
+
+/* A shared item really was on both attempts, so it belongs to either one: the
+   menu counts it in both, and this has to agree with that count. Asking for
+   "in both attempts" is deliberately narrower - only those six. */
+function attemptMatch(a){
+  if(attemptFilter === 'any') return true;
+  if(attemptFilter === 'both') return a === 'both';
+  return a === attemptFilter || a === 'both';
+}
+
 function visible(key){
   const items = pool(key);
-  if(filter === 'real')    return items.filter(x => x.real);
+  const split = attemptAvailable(key);   // a bank with no attempt tags cannot answer the menu
+  const keep = x => {
+    if(!x.real) return true;                       // drills are never attempt-scoped
+    const a = attemptOf(x);
+    if(a === 'any') return attemptFilter === 'any' || !split;
+    return attemptMatch(a);
+  };
+  if(filter === 'real')    return items.filter(x => x.real && keep(x));
   if(filter === 'concept') return items.filter(x => !x.real);
-  return items;
+  return items.filter(keep);
 }
 
 function loadStats(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)) || {}; }catch(e){ return {}; } }
 function saveStats(s){ try{ localStorage.setItem(LS_KEY, JSON.stringify(s)); }catch(e){} }
+
+/* The menu choices outlive a reload. They are kept apart from progress so
+   Reset progress erases what you got wrong, not what you were studying. */
+function loadPrefs(){
+  try{
+    const p = JSON.parse(localStorage.getItem(PREF_KEY)) || {};
+    if(p.filter === 'real' || p.filter === 'concept' || p.filter === 'all') filter = p.filter;
+    if(['any','a1','a2','both'].indexOf(p.attempt) >= 0) attemptFilter = p.attempt;
+    if(filter === 'concept') attemptFilter = 'any';
+  }catch(e){}
+}
+function savePrefs(){
+  try{ localStorage.setItem(PREF_KEY, JSON.stringify({ filter: filter, attempt: attemptFilter })); }catch(e){}
+}
 
 function bump(id, correct){
   const s = loadStats();
@@ -436,6 +492,51 @@ function switchQuiz(key){
 
 function setFilter(v){
   filter = v;
+  // An attempt split is a property of the quiz items, so it cannot apply to the
+  // drills: picking the drills clears the attempt choice rather than emptying the pool.
+  if(filter === 'concept') attemptFilter = 'any';
+  savePrefs();
+  round = null; drill = null; review = null;
+  render();
+}
+
+/* The attempt choices are built from the bank itself, counts included, so the
+   menu can never offer a filter that serves nothing. A quiz whose real items are
+   one bank with no attempt split (Quiz 7) says so and disables the menu. */
+function refreshAttemptSelect(){
+  const sel = document.getElementById('attemptsel');
+  if(!sel) return;
+  const real = pool(current).filter(x => x.real);
+  const c = { a1: 0, a2: 0, both: 0 };
+  real.forEach(x => {
+    const a = attemptOf(x);
+    if(a === 'both'){ c.a1++; c.a2++; c.both++; }
+    else if(a === 'a1') c.a1++;
+    else if(a === 'a2') c.a2++;
+  });
+  if(!attemptAvailable(current)){
+    sel.disabled = true;
+    sel.innerHTML = `<option value="${attemptFilter}">Quiz bank - no attempt split (${real.length})</option>`;
+    return;
+  }
+  sel.disabled = (filter === 'concept');
+  sel.innerHTML =
+    `<option value="any">All quiz questions (${real.length})</option>`
+    + `<option value="a1">Attempt 1 only (${c.a1})</option>`
+    + `<option value="a2">Attempt 2 only (${c.a2})</option>`
+    + `<option value="both">In both attempts (${c.both})</option>`;
+  sel.value = attemptFilter;
+}
+
+function setAttempt(v){
+  attemptFilter = v;
+  // Choosing an attempt is a statement about the quiz, so ask for the quiz.
+  if(attemptFilter !== 'any' && filter === 'concept'){
+    filter = 'real';
+    const f = document.getElementById('srcfilter');
+    if(f) f.value = 'real';
+  }
+  savePrefs();
   round = null; drill = null; review = null;
   render();
 }
@@ -463,6 +564,7 @@ function start(source){ if(mode === 'drill') startDrill(source); else startRound
 
 function render(){
   updateBadge();
+  refreshAttemptSelect();
   if(review){ renderReview(); return; }
   if(drill){ renderDrill(); return; }
   if(!round){ renderHome(); return; }
@@ -470,9 +572,16 @@ function render(){
 }
 
 function filterLabel(){
-  if(filter === 'real') return 'real quiz questions only';
-  if(filter === 'concept') return 'concept drills only';
-  return 'all questions';
+  const base = filter === 'real' ? 'real quiz questions only'
+    : (filter === 'concept' ? 'concept drills only' : 'all questions');
+  const a = attemptLabel();
+  return a ? base + ' · ' + a : base;
+}
+
+function attemptLabel(){
+  if(attemptFilter === 'any') return '';
+  if(attemptFilter === 'both') return 'in both attempts';
+  return attemptFilter === 'a1' ? 'attempt 1' : 'attempt 2';
 }
 
 function sizeLabel(){ return sessionSize === 'all' ? 'the whole pool' : sessionSize + ' questions'; }
@@ -666,7 +775,9 @@ function startDrill(source){
   if(items.length === 0){
     alert(source === 'flagged'
       ? 'Nothing marked yet - tick "🔖 Not sure - relook" under any question, even one you got right.'
-      : 'No missed questions yet - take a normal session first.');
+      : (source === 'missed'
+        ? 'No missed questions yet - take a normal session first.'
+        : 'Nothing in this pool with the question and attempt menus set the way they are. Widen one of them.'));
     return;
   }
   drill = { items: items, i: 0, attempts: 0, done: false, results: [], mode: source };
@@ -855,11 +966,13 @@ function checkRound(){
 function startRound(source){
   round = { key: current, mode: source, items: sample(source), checked: false };
   review = null;
-  if((source === 'missed' || source === 'flagged') && round.items.length === 0){
+  if(round.items.length === 0){
     alert(source === 'flagged'
       ? 'Nothing marked yet - tick "🔖 Not sure - relook" under any question, even one you got right.'
-      : 'No missed questions yet - take a normal round first.');
-    round = null; renderHome(); return;
+      : (source === 'missed'
+        ? 'No missed questions yet - take a normal round first.'
+        : 'Nothing in this pool with the question and attempt menus set the way they are. Widen one of them.'));
+    round = null; render(); return;
   }
   lastBatch = round.items.map(x => x.id);
   render();
@@ -904,6 +1017,7 @@ function updateBadge(){
 function esc(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 /* init */
+loadPrefs();
 document.getElementById('srcfilter').value = filter;
 document.getElementById('modesel').value = mode;
 document.getElementById('sizesel').value = String(sessionSize);
