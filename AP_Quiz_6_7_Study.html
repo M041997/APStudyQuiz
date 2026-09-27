@@ -95,7 +95,18 @@
 </head>
 <body>
 <h1>A&amp;P I — Quiz 6 &amp; 7 Multiple-Choice Study Tool</h1>
-<p class="sub">Test-bank study tool: <b>every question is multiple choice</b> — there are no fill-in-the-blank items. Questions come from the real Quiz 6 (both attempts) and Quiz 7 question banks, plus extra concept drills. Two ways to run them: a <b>round</b> (answer all, then check) or <b>retry mode</b> (one question at a time — a wrong answer keeps you on that same question until you get it right, then it moves on). <b>Anything you miss comes back with a memory hook, the trap to watch for, and the reasoning</b> — see <b>🧠 Missed review</b>, or tick <b>Show aids while answering</b> to see them on every question. And <b>🔖 Not sure — relook</b> under any question keeps it for review <b>even if you got it right</b>: a coin flip that landed is not knowing it, and the score can never tell the two apart. Marked questions join the same missed pool. The <b>🔀 Shuffle questions</b> box re-serves the same questions in a different order every session (and stops a 10-question session from being the same first ten forever), while <b>🔀 Shuffle choices</b> moves the options too, so the answer is not always the same letter. At the end of a session, <b>🔁 These N again, new order</b> reruns that exact batch reordered. It opens on the <b>real quiz questions</b>, because that is where the exam draws from — concept drills are still there under the question menu but they no longer come up by default — and the <b>attempt menu</b> narrows that further to one quiz attempt. Progress is saved in this browser.</p>
+<p class="sub">Test-bank study tool: <b>every question is multiple choice</b> — there are no fill-in-the-blank items. Questions come from the real Quiz 6 (both attempts) and Quiz 7 question banks, plus extra concept drills. Two ways to run them: a <b>round</b> (answer all, then check) or <b>retry mode</b> (one question at a time — a wrong answer keeps you on that same question until you get it right, then it moves on). <b>Anything you miss comes back with a memory hook, the trap to watch for, and the reasoning</b> — see <b>🧠 Missed review</b>, or tick <b>Show aids while answering</b> to see them on every question. And <b>☐ Retry only this one</b> under any question marks it for another pass <b>even if you got it right</b> — a coin flip that landed is not knowing it, and the score can never tell the two apart. Marked questions join the same missed pool, and a <b>🔁 Retry only these (N)</b> button — on the home screen, in the toolbar, and at the end of every session — re-serves exactly the marked questions, reshuffled, so the same handful can be looped as many times as you like. Nothing unticks itself on a right answer; untick a question, or hit <b>🧽 Clear retry marks</b>, when you are done with it. The <b>🔀 Shuffle questions</b> box re-serves the same questions in a different order every session (and stops a 10-question session from being the same first ten forever), while <b>🔀 Shuffle choices</b> moves the options too, so the answer is not always the same letter. At the end of a session, <b>🔁 These N again, new order</b> reruns that exact batch reordered. It opens on the <b>real quiz questions</b>, because that is where the exam draws from — concept drills are still there under the question menu but they no longer come up by default — and the <b>attempt menu</b> narrows that further to one quiz attempt. <b>🆕 New questions first</b> keeps you moving through the bank instead of circling it: a fresh round serves what this pool has not asked yet, so 10 at a time out of the 16-question attempt 1 is <b>10, then the last 6</b>, and the same questions only come back once every one of them has been asked — the round header always says how many are still unasked. <b>🔄 Start this pass over</b> resets that pass. And <b>📝 Retake the whole quiz</b> — on the home screen, in the toolbar, and at the end of every session — is the one-click version of "give me the entire real quiz" for the tab you are on: <b>all 26</b> of Quiz 6 (both attempts) or <b>all 20</b> of Quiz 7 in a single sitting, whatever the menus and the pass currently say, with nothing drawn for you and nothing held back; <b>Whole pool</b> in the session-size menu now means the same thing for whichever pool the menus describe. <b>Exam 2</b> is then its own tab, and it is deliberately not a third question bank: it pools <b>all 46 real questions from both quizzes</b> — Quiz 6's 26 (every attempt) plus Quiz 7's 20 — because the exam draws on both, so there is nothing to choose between; the attempt menu is switched off there, and <b>Retake the whole quiz (46)</b> runs the lot. Progress is saved in this browser.</p>
+
+<style>
+  .retakes{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:4px 0 0;font-size:14px;color:var(--muted)}
+  .retakes a{padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--accent);
+             text-decoration:none;font-weight:600}
+  .retakes a:hover,.retakes a:focus-visible{border-color:var(--accent)}
+</style>
+<div class="retakes">Full retakes, graded at the end:
+  <a href="AP_Quiz_6_Retake.html">📝 Quiz 6 retake (26)</a>
+  <a href="AP_Quiz_7_Retake.html">📝 Quiz 7 retake (20)</a>
+</div>
 
 <div class="tabs">
   <button class="tab active" id="tab-q6" onclick="switchQuiz('q6')">
@@ -104,17 +115,21 @@
   <button class="tab" id="tab-q7" onclick="switchQuiz('q7')">
     Quiz 7 <small>Skeletal System — 20 real quiz + 30 concept MCQs</small>
   </button>
+  <button class="tab" id="tab-exam2" onclick="switchQuiz('exam2')" title="Exam 2 draws on both quizzes, so this tab pools all 26 real Quiz 6 questions (both attempts) and all 20 real Quiz 7 questions into one 46-question bank. There is no attempt menu here: every one of them belongs.">
+    Exam 2 <small>Quiz 6 + 7 — all 46 real questions from both banks</small>
+  </button>
 </div>
 
 <div class="toolbar">
   <button id="btn-new" class="primary" onclick="start('mixed')">▶ Start</button>
   <button id="btn-missed" onclick="start('missed')">🎯 Practice Missed</button>
-  <button id="btn-flagged" onclick="start('flagged')" title="Every question you marked unsure - correct ones included, since those are the ones a score hides">🔖 Relook at marked</button>
+  <button id="btn-flagged" data-retry onclick="start('flagged')" title="Run only the questions you ticked Retry only this one - a correct one included, since a guess that landed is what a score hides. The same set comes back reshuffled every time, so you can loop it.">🔁 Retry only these</button>
+  <button id="btn-whole" onclick="retakeWholeQuiz()" title="Retake this tab's real quiz bank in full - Quiz 6 is all 26 questions across both attempts, Quiz 7 all 20 - in one sitting, whatever the menus and the pass currently say. Nothing is drawn for you and nothing is held back.">📝 Retake whole quiz</button>
   <select id="modesel" onchange="setMode(this.value)" title="How the questions are run">
     <option value="round">Round: answer all, then check</option>
     <option value="drill">Retry mode: repeat until correct</option>
   </select>
-  <select id="sizesel" onchange="setSize(this.value)" title="How many questions a Start round draws. Practice missed / Relook at marked always serve the whole set.">
+  <select id="sizesel" onchange="setSize(this.value)" title="How many questions a Start round draws. Practice missed / Retry only these always serve the whole set.">
     <option value="5">5 at a time</option>
     <option value="10">10 at a time</option>
     <option value="20">20 at a time</option>
@@ -130,6 +145,9 @@
   <button onclick="startReview()" title="Every question you have missed, with a memory hook and the trap to watch for">🧠 Missed review</button>
   <label title="Show the memory hook and trap on every question before you answer">
     <input type="checkbox" id="aidscb" onchange="setAidsAlways(this.checked)"> Show aids while answering
+  </label>
+  <label title="Each fresh round serves the questions this pool has not asked yet, so a 10-at-a-time round is followed by the rest - not by another random 10. Only when every question has been asked does it start a new pass. Untick for a pure random draw.">
+    <input type="checkbox" id="newfirstcb" onchange="setNewFirst(this.checked)"> 🆕 New questions first
   </label>
   <label title="Serve the same questions in a different order each session - applies to the next session">
     <input type="checkbox" id="shufqcb" onchange="setShuffleQ(this.checked)"> 🔀 Shuffle questions
@@ -297,10 +315,31 @@ q7: {
 }
 };
 
+/* Boss, 2026-09-25: "the exam 2 is only 50 questions so it HAS to be pulled
+   from both". Exam 2 is not a third question bank and must not become one: it
+   is the UNION of the two real banks, so it is composed from them here rather
+   than copied out of them. Copying would have to be retyped every time a
+   question is added to Quiz 6 or Quiz 7, and a study pool that silently drifts
+   from the two banks it claims to cover is worse than not having one.
+   It is its own DATA key, which is exactly what keeps the id space honest:
+   pool() names an item 'q' + its index, and both q6 and q7 start at q0, so a
+   merged pool has to be re-indexed rather than spliced - which is what a
+   separate key does for free.
+   The attempt split is switched off (noSplit). Exam 2 does not offer attempts
+   to choose between: every Quiz 6 item belongs whichever attempt it came from,
+   and the 20 Quiz 7 items carry no attempt tag at all. 26 + 20 = 46 unique
+   questions, and the two banks share none. */
+DATA.exam2 = {
+  label: "Exam 2 — Quiz 6 + Quiz 7 (every real question from both banks)",
+  noSplit: true,
+  mcq: DATA.q6.mcq.concat(DATA.q7.mcq).filter(x => x.src.indexOf('Concept') !== 0)
+};
+
 /* ================= STATE & STORAGE ================= */
 
 const LS_KEY = 'ap_study_stats_mcq_v1';
 const PREF_KEY = 'ap_study_prefs_mcq_v1';   // remembered menu choices, separate from progress
+const DECK_KEY = 'ap_study_served_mcq_v1';  // which questions each pass through a pool has already served
 let current = 'q6';
 /* Boss, 2026-09-24: "I only need quiz questions from the quiz attempt. I don't
    need to be tested on concepts. Most of the questions on the exam come from the
@@ -324,6 +363,17 @@ let review = null;         // { items:[...] } while the missed-review screen is 
    options move with it. */
 let shuffleQ = true;
 let shuffleChoices = false;
+/* Boss, 2026-09-25: "if I do a quiz of 10 and go to next round, does it give me
+   the next 10 ... or the last 6 or whatever questions remain? I don't want to
+   retake the same questions over and over." It used to be an independent random
+   slice every time: two 10-question rounds out of the 16-question attempt-1
+   bank overlapped by about half, so a question could sit unasked for many
+   rounds. Now the questions a pool has not served yet are dealt first, and only
+   when every one has been asked does the pass start over - 10, then the last 6,
+   then a fresh pass. The pass is kept per pool (bank + question menu + attempt
+   menu) in this browser, and the checkbox turns it back into a pure random draw. */
+let newFirst = true;
+let served = loadServed();   // { 'q6|real|a1': ['q3', 'q7', ...] } - asked in the current pass
 let lastBatch = [];        // the ids of the session just run, for "same questions, new order"
 /* Boss, 2026-09-25: "if I go to a 10 practice attempt and practice missed, why is
    it giving me the full 10. It should only give me the ones I missed from THAT
@@ -363,6 +413,10 @@ function attemptOf(item){
 }
 
 function attemptAvailable(key){
+  /* A bank can declare that it has no attempt split to offer. Exam 2 pools both
+     quizzes, so "which attempt" is not a question it can answer - every item
+     belongs, and the menu would only be able to hide Quiz 7 from it. */
+  if(DATA[key].noSplit) return false;
   return pool(key).some(x => x.real && attemptOf(x) !== 'any');
 }
 
@@ -380,6 +434,7 @@ function visible(key){
   const split = attemptAvailable(key);   // a bank with no attempt tags cannot answer the menu
   const keep = x => {
     if(!x.real) return true;                       // drills are never attempt-scoped
+    if(!split) return true;                        // ...and neither is a bank with no split to offer
     const a = attemptOf(x);
     if(a === 'any') return attemptFilter === 'any' || !split;
     return attemptMatch(a);
@@ -399,11 +454,12 @@ function loadPrefs(){
     const p = JSON.parse(localStorage.getItem(PREF_KEY)) || {};
     if(p.filter === 'real' || p.filter === 'concept' || p.filter === 'all') filter = p.filter;
     if(['any','a1','a2','both'].indexOf(p.attempt) >= 0) attemptFilter = p.attempt;
+    if(typeof p.newfirst === 'boolean') newFirst = p.newfirst;
     if(filter === 'concept') attemptFilter = 'any';
   }catch(e){}
 }
 function savePrefs(){
-  try{ localStorage.setItem(PREF_KEY, JSON.stringify({ filter: filter, attempt: attemptFilter })); }catch(e){}
+  try{ localStorage.setItem(PREF_KEY, JSON.stringify({ filter: filter, attempt: attemptFilter, newfirst: newFirst })); }catch(e){}
 }
 
 function bump(id, correct){
@@ -420,7 +476,11 @@ function bump(id, correct){
    correct so I can go back and review". A mark cannot be derived from the score:
    a guess that landed looks identical to knowing it, so the miss count can never
    see it. The flag is therefore its own field, and marked items join the missed
-   pool rather than living in a separate list - one place to relook, not two. */
+   pool rather than living in a separate list - one place to relook, not two.
+   Boss, 2026-09-25: "a 'Retry only these' button where I mark the questions and
+   then get retested on those and then can repeat it over and over." The single
+   mark is now named for what he reaches for - a retry selection - and the
+   button follows it everywhere a session can end. */
 function flagIds(){
   const s = loadStats(); const q = s[current] || {};
   return Object.keys(q).filter(id => q[id].f).sort();
@@ -442,6 +502,7 @@ function toggleFlag(id, btn){
   saveStats(s);
   paintFlagBtn(btn, !!e.f);
   updateBadge();
+  paintRetryButtons();
 }
 
 function missedIds(){
@@ -471,6 +532,47 @@ function quizStats(){
            flagged: marked };
 }
 
+/* Boss, 2026-09-25: "can I have a 'Retry only these' button where I mark the
+   questions and then get retested on those and then can repeat it over and
+   over." The mark was already the selection; what was missing was a button
+   that names it and a set that survives a pass, so the same handful of
+   questions can be looped instead of re-drawn from the bank. Nothing unmarks
+   itself on a right answer - the loop ends when he unticks a question or
+   clears the marks, which is the only way "over and over" can be true. The
+   button is painted from the live count rather than baked into whichever
+   screen built it, because the toolbar copy is never re-rendered. */
+function paintRetryButtons(){
+  const n = quizStats().flagged;
+  document.querySelectorAll('[data-retry]').forEach(b => {
+    b.textContent = '🔁 Retry only these (' + n + ')';
+    b.disabled = n === 0;
+  });
+}
+
+function paintMarkButtons(){
+  document.querySelectorAll('[data-mark]').forEach(b =>
+    paintFlagBtn(b, isFlagged(b.getAttribute('data-mark'))));
+}
+
+/* The way out of the loop. It unticks every retry mark in this bank, not only
+   the ones the current menus show, so a hidden mark cannot keep a stale count
+   alive. It repaints in place instead of re-rendering: a result list lives in
+   the page after checkRound()/renderDrillSummary() writes it, and a render
+   would drop it out from under him. */
+function clearRetryMarks(){
+  const s = loadStats();
+  const q = s[current] = s[current] || {};
+  const ids = Object.keys(q).filter(id => q[id].f);
+  const n = ids.length;
+  if(n === 0) return;
+  if(!confirm('Untick all ' + n + ' retry mark' + (n === 1 ? '' : 's') + ' in ' + DATA[current].label + '?')) return;
+  ids.forEach(id => { q[id].f = 0; });
+  saveStats(s);
+  updateBadge();
+  paintMarkButtons();
+  paintRetryButtons();
+}
+
 function sizeNum(){ return sessionSize === 'all' ? Infinity : sessionSize; }
 
 function withChoiceOrder(item){
@@ -481,8 +583,80 @@ function withChoiceOrder(item){
   return copy;
 }
 
+/* ============ WHICH QUESTIONS THIS POOL HAS ALREADY ASKED ============ */
+
+/* The pass is kept per pool, because the question menu and the attempt menu
+   change what "the next ones" means: attempt 1 has 16 questions of its own and
+   attempt 2 has a different 16, so one shared list would serve the wrong six.
+   Kept in its own storage key, so Reset progress is not the only way out. */
+function loadServed(){ try{ return JSON.parse(localStorage.getItem(DECK_KEY)) || {}; }catch(e){ return {}; } }
+function saveServed(s){ try{ localStorage.setItem(DECK_KEY, JSON.stringify(s)); }catch(e){} }
+
+/* A bank with no attempt split ignores the attempt menu, so its pass has to be
+   keyed without one: otherwise the same pool would carry two separate passes
+   depending on which attempt happened to be selected when it was last visited. */
+function poolKey(){
+  const att = attemptAvailable(current) ? attemptFilter : 'any';
+  return current + '|' + filter + '|' + att;
+}
+function servedIds(){ return served[poolKey()] || []; }
+
+/* What this pool has not served yet in the current pass. */
+function unseenItems(){
+  const seen = {};
+  servedIds().forEach(id => seen[id] = true);
+  return visible(current).filter(x => !seen[x.id]);
+}
+
+function markServed(picks, freshPass){
+  const key = poolKey();
+  const ids = freshPass ? [] : (served[key] || []).slice();
+  picks.forEach(x => { if(ids.indexOf(x.id) < 0) ids.push(x.id); });
+  if(ids.length === 0) delete served[key]; else served[key] = ids;
+  saveServed(served);
+}
+
+/* A fresh draw with new-first on deals what has not been asked yet. The last
+   draw of a pass is deliberately short - 10 then the remaining 6, never 10 then
+   10 with half of it repeats - and only an empty pass wraps to a new one. */
+/* Every question in the pool, in one sitting, pass or no pass. Shared by the
+   "Whole pool" session size and by the whole-quiz retake: when the ask is "all
+   of them", nothing may be held back for a later round - and serving every one
+   of them finishes the pass by definition, so the bookkeeping is left honest
+   rather than untouched. */
+function wholePool(items){
+  const all = shuffleQ ? shuffled(items) : items.slice();
+  markServed(all, true);
+  return all;
+}
+
+function freshDraw(items){
+  if(!newFirst) return (shuffleQ ? shuffled(items) : items).slice(0, sizeNum());
+  /* "Whole pool" has to mean the whole pool. It used to slice the draw down to
+     whatever this pass had not asked yet, which is not what the menu says, and
+     left the rest of the pool for a round the session size had already promised
+     to serve in full. */
+  if(sizeNum() === Infinity) return wholePool(items);
+  let unseen = unseenItems();
+  const wrapped = unseen.length === 0;
+  if(wrapped) unseen = items;
+  const picks = (shuffleQ ? shuffled(unseen) : unseen).slice(0, sizeNum());
+  markServed(picks, wrapped);
+  return picks;
+}
+
+/* Cancelling a round he never checked hands its questions back to the pass, so
+   looking and backing out does not burn six questions he never answered. */
+function deckUndoPoint(){ return { key: poolKey(), ids: servedIds().slice() }; }
+function deckRollback(u){
+  if(!u) return;
+  if(u.ids.length === 0) delete served[u.key]; else served[u.key] = u.ids;
+  saveServed(served);
+}
+function resetDeck(){ delete served[poolKey()]; saveServed(served); render(); }
+
 /* Draws the session's questions: the missed set when asked (empty if there is
-   nothing to retry), otherwise a random slice of the visible pool. */
+   nothing to retry), otherwise a fresh draw from the visible pool. */
 function sample(source){
   const items = visible(current);
   let picks;
@@ -503,13 +677,20 @@ function sample(source){
     const ids = shuffleQ ? shuffled(missedIds()) : missedIds();
     picks = ids.map(id => byId[id]).filter(Boolean);
   } else if(source === 'flagged'){
-    // Only what he marked unsure - the correct-but-guessed ones live nowhere else.
+    // Only what he marked for retry - the correct-but-guessed ones live nowhere else.
     const marked = {};
     flagIds().forEach(id => marked[id] = true);
     const only = items.filter(x => marked[x.id]);
     picks = shuffleQ ? shuffled(only) : only;
+  } else if(source === 'whole'){
+    /* Boss, 2026-09-25: "can I get an option to retake quiz 6 with all the
+       questions". A retake is not a draw: it serves the entire pool for this
+       tab in one session - both attempts, every question - because the whole
+       point of a retake is that nothing is chosen for you and nothing is held
+       back. */
+    picks = wholePool(items);
   } else {
-    picks = (shuffleQ ? shuffled(items) : items).slice(0, sizeNum());
+    picks = freshDraw(items);
   }
   return picks.map(withChoiceOrder);
 }
@@ -552,7 +733,8 @@ function refreshAttemptSelect(){
   });
   if(!attemptAvailable(current)){
     sel.disabled = true;
-    sel.innerHTML = `<option value="${attemptFilter}">Quiz bank - no attempt split (${real.length})</option>`;
+    const who = DATA[current].noSplit ? 'Both quizzes, no attempt split' : 'Quiz bank - no attempt split';
+    sel.innerHTML = `<option value="${attemptFilter}">${who} (${real.length})</option>`;
     return;
   }
   sel.disabled = (filter === 'concept');
@@ -594,17 +776,48 @@ function setSize(v){
    picked in it. The checkbox is its own feedback until then. */
 function setShuffleQ(v){ shuffleQ = !!v; }
 function setShuffleChoices(v){ shuffleChoices = !!v; }
+/* Like the shuffle boxes, this is its own feedback until the next draw: a round
+   already on screen keeps what it has, answers included. */
+function setNewFirst(v){ newFirst = !!v; savePrefs(); }
 
 /* Single entry point used by the toolbar buttons; honours the selected mode. */
 function start(source){ if(mode === 'drill') startDrill(source); else startRound(source); }
 
+/* How many real quiz questions this tab holds, whatever the menus currently say. */
+function realPoolCount(){ return pool(current).filter(x => x.real).length; }
+
+/* Boss, 2026-09-25: "can I get an option to retake quiz 6 with all the
+   questions". One button instead of three menus to line up: it points the
+   question menu at the real quiz bank and the attempt menu at both attempts
+   (Quiz 6 = 26, Quiz 7 = 20), sets the session to the whole pool, and serves
+   every one of them now - no ten at a time, and no pass holding the tail back
+   for a later round. It leaves the menus showing what it did, so the next
+   session is not a surprise. Grading, the badge, the misses drill and "Redo the
+   full N from that practice" all behave exactly as after any other round, so a
+   retake can be fixed and looped. */
+function retakeWholeQuiz(){
+  if(!realPoolCount()){ alert('This tab has no real quiz questions to retake.'); return; }
+  filter = 'real';
+  attemptFilter = 'any';
+  sessionSize = 'all';
+  const f = document.getElementById('srcfilter');  if(f) f.value = filter;
+  const a = document.getElementById('attemptsel'); if(a) a.value = attemptFilter;
+  const s = document.getElementById('sizesel');     if(s) s.value = 'all';
+  savePrefs();
+  round = null; drill = null; review = null;
+  start('whole');
+}
+
 function render(){
   updateBadge();
   refreshAttemptSelect();
-  if(review){ renderReview(); return; }
-  if(drill){ renderDrill(); return; }
-  if(!round){ renderHome(); return; }
-  renderRound();
+  if(review) renderReview();
+  else if(drill) renderDrill();
+  else if(!round) renderHome();
+  else renderRound();
+  // After the markup exists: the retry counts live on buttons, and the toolbar
+  // copy is never re-rendered, so it has to be painted from the live number.
+  paintRetryButtons();
 }
 
 function filterLabel(){
@@ -616,11 +829,35 @@ function filterLabel(){
 
 function attemptLabel(){
   if(attemptFilter === 'any') return '';
+  /* The attempt menu cannot narrow a bank that has no split, so it must not be
+     quoted as if it had: Exam 2 would otherwise read "attempt 1" while serving
+     all 46, and Quiz 7 has had the same silent mismatch all along. */
+  if(!attemptAvailable(current)) return '';
   if(attemptFilter === 'both') return 'in both attempts';
   return attemptFilter === 'a1' ? 'attempt 1' : 'attempt 2';
 }
 
 function sizeLabel(){ return sessionSize === 'all' ? 'the whole pool' : sessionSize + ' questions'; }
+
+/* The fresh-draw label says what is actually coming, which is the whole point of
+   new-first: "10 new questions", then "the last 6 unasked", then a new pass. */
+function nextDrawLabel(){
+  if(!newFirst) return sizeLabel();
+  const left = unseenItems().length;
+  if(left === 0) return 'a fresh pass of ' + sizeLabel();
+  const n = Math.min(left, sizeNum());
+  return n === left ? 'the last ' + n + ' unasked question' + (n === 1 ? '' : 's')
+                    : n + ' new questions';
+}
+
+/* The same thing for the end-of-session button. */
+function nextBtnLabel(){
+  const head = mode === 'drill' ? '🔁 Next retry set' : '▶ Next round';
+  if(!newFirst) return mode === 'drill' ? '🔁 Fresh retry session' : '▶ Fresh round';
+  const left = unseenItems().length;
+  if(left === 0) return head + ' (new pass)';
+  return head + ' - ' + Math.min(left, sizeNum()) + ' unasked';
+}
 
 function orderLabel(){
   if(!shuffleQ) return 'fixed order';
@@ -638,21 +875,27 @@ function renderHome(){
   const st = quizStats();
   const missed = st.shaky;
   const pick = Math.min(st.total, sizeNum());
+  const left = unseenItems().length;          // unasked in this pool during the current pass
+  const asked = servedIds().length;
   const html = `<div class="hero">
     <h2>${esc(DATA[current].label)}</h2>
     <p>Multiple-choice only - there are no fill-in-the-blank items. Each session serves <b>${pick === Infinity ? 'every' : pick}</b> question(s) drawn from <b>${esc(filterLabel())}</b>.</p>
     <p style="margin-top:-4px"><b>${esc(modeLabel())}</b>${mode === 'drill' ? ' - a wrong answer keeps you on that same question, so you cannot move on until you get it right.' : '.'}</p>
+    ${newFirst ? `<p style="margin-top:-4px">🆕 <b>New questions first</b> - a round serves what this pool has not asked yet, so 10 then 10 is 10 then the rest, not the same ten again. <b>${left}</b> of <b>${st.total}</b> still unasked${left === 0 ? ' - every question has been asked once, so the next round starts a new pass' : ''}.</p>` : ''}
     <div class="stat">
       <div><b>${st.total}</b><span>questions in this pool</span></div>
+      <div><b>${newFirst ? left : st.total}</b><span>${newFirst ? 'not asked yet this pass' : 'questions in this pool'}</span></div>
       <div><b>${st.attempted}</b><span>attempted so far</span></div>
-      <div><b>${missed}</b><span>still shaky (missed or marked)</span></div>
-      <div><b>${st.flagged}</b><span>marked "not sure"</span></div>
+      <div><b>${missed}</b><span>still shaky (missed or kept for retry)</span></div>
+      <div><b>${st.flagged}</b><span>kept for retry</span></div>
     </div>
     <div class="row">
-      <button class="primary" onclick="start('mixed')">${mode === 'drill' ? '🔁' : '▶'} Start - ${esc(sizeLabel())}</button>
+      <button class="primary" onclick="start('mixed')">${mode === 'drill' ? '🔁' : '▶'} Start - ${esc(nextDrawLabel())}</button>
+      <button onclick="retakeWholeQuiz()" title="Every real quiz question on this tab - both attempts, nothing drawn for you and nothing held back by the pass. Quiz 6 is all 26, Quiz 7 all 20.">📝 Retake the whole quiz (${realPoolCount()})</button>
       <button onclick="start('missed')" ${missed ? '' : 'disabled'}>🎯 Practice missed (${missed})</button>
-      <button onclick="start('flagged')" ${st.flagged ? '' : 'disabled'}>🔖 Relook at marked (${st.flagged})</button>
+      <button data-retry onclick="start('flagged')" ${st.flagged ? '' : 'disabled'}>🔁 Retry only these (${st.flagged})</button>
       <button onclick="startReview()" ${missed ? '' : 'disabled'}>🧠 Memory aids (${missed})</button>
+      ${newFirst && asked ? `<button onclick="resetDeck()" title="Forget which questions this pool has asked, so the next round deals the whole pool again from the top">🔄 Start this pass over</button>` : ''}
     </div>
   </div>`;
   r.innerHTML = html;
@@ -660,12 +903,13 @@ function renderHome(){
 
 function renderRound(){
   const r = document.getElementById('content');
-  const roundLabel = round.mode === 'flagged' ? '🔖 Relooking at what you marked unsure'
+  const roundLabel = round.mode === 'flagged' ? '🔁 Retrying only the questions you marked'
     : (round.mode === 'missed' ? '🎯 Practicing your missed questions'
     : (round.mode === 'lastmissed' ? '🎯 The ones you missed in that practice'
     : (round.mode === 'full' ? '🔁 That full practice again, reordered'
-    : (round.mode === 'repeat' ? '🔁 The same questions again, reordered' : '▶ Random round'))));
-  let html = `<div class="muted" style="margin:4px 0 2px">${roundLabel} · ${esc(filterLabel())} · ${round.items.length} questions · ${orderLabel()}</div>`;
+    : (round.mode === 'whole' ? '📝 Whole quiz retake - every question'
+    : (round.mode === 'repeat' ? '🔁 The same questions again, reordered' : '▶ Random round')))));
+  let html = `<div class="muted" style="margin:4px 0 2px">${roundLabel} · ${esc(filterLabel())} · ${round.items.length} questions · ${orderLabel()} ${round.deckNote || ''}</div>`;
   html += round.items.map((item, i) => itemHTML(item, i)).join('');
   html += `<button class="primary" id="checkbtn" onclick="checkRound()" style="margin-top:10px">✔ Check Round</button>
            <button onclick="cancelRound()" style="margin-top:10px">Cancel</button>`;
@@ -677,17 +921,17 @@ function renderRound(){
    the question, and it never re-renders (see toggleFlag). */
 function flagButtonHTML(id, domId){
   const on = isFlagged(id);
-  return `<button class="flag-btn${on ? ' on' : ''}" id="flag_${domId}"`
+  return `<button class="flag-btn${on ? ' on' : ''}" id="flag_${domId}" data-mark="${esc(id)}"`
     + ` onclick="toggleFlag('${id}', this)"`
-    + ` title="Keep this for review even if you got it right - a guess that landed is not knowing it">`
-    + `${on ? '🔖 Marked for review' : '🔖 Not sure - relook'}</button>`;
+    + ` title="Mark this one for another pass even if you got it right - a guess that landed is not knowing it. It comes back with Retry only these.">`
+    + `${on ? '☑ Kept for retry' : '☐ Retry only this one'}</button>`;
 }
 
 function paintFlagBtn(btn, on){
   try{
     if(!btn) return;
     btn.classList.toggle('on', !!on);
-    btn.textContent = on ? '🔖 Marked for review' : '🔖 Not sure - relook';
+    btn.textContent = on ? '☑ Kept for retry' : '☐ Retry only this one';
   }catch(e){}
 }
 
@@ -781,7 +1025,7 @@ function renderReview(){
   const n = review.items.length;
   if(n === 0){
     r.innerHTML = `<div class="summary"><h3>🧠 Nothing to remember yet</h3>
-      <p class="muted">Nothing has been missed and nothing is marked in <b>${esc(DATA[current].label)}</b> with <b>${esc(filterLabel())}</b> selected. Miss a question, or tick <b>🔖 Not sure - relook</b> under one you guessed at, and it will land here with a memory hook, the trap to watch out for, and the reasoning.</p>
+      <p class="muted">Nothing has been missed and nothing is kept for retry in <b>${esc(DATA[current].label)}</b> with <b>${esc(filterLabel())}</b> selected. Miss a question, or tick <b>☐ Retry only this one</b> under one you guessed at, and it will land here with a memory hook, the trap to watch out for, and the reasoning.</p>
       <div class="row" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
         <button class="primary" onclick="start('mixed')">▶ Start a session</button>
         <button onclick="closeReview()">Back</button>
@@ -790,14 +1034,16 @@ function renderReview(){
   }
   const stats = loadStats()[current] || {};
   let html = `<div class="summary"><h3>🧠 ${n} question${n === 1 ? '' : 's'} to remember</h3>
-    <p class="muted">Everything missed or marked in <b>${esc(DATA[current].label)}</b> (${esc(filterLabel())}), hardest first. Read the hook, then cover the answer and say it out loud before moving on.</p>
+    <p class="muted">Everything missed or kept for retry in <b>${esc(DATA[current].label)}</b> (${esc(filterLabel())}), hardest first. Read the hook, then cover the answer and say it out loud before moving on.</p>
     <div class="row" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">
       <button class="primary" onclick="start('missed')">🎯 Drill these</button>
+      ${quizStats().flagged ? `<button data-retry onclick="start('flagged')">🔁 Retry only these</button>
+      <button onclick="clearRetryMarks()">🧽 Clear retry marks</button>` : ''}
       <button onclick="closeReview()">Back</button>
     </div></div>`;
   html += review.items.map((it, i) => {
     const st = stats[it.id] || {m:0,c:0,t:0};
-    const tag = st.m ? `missed ${st.m} of ${st.t} attempt${st.t === 1 ? '' : 's'}` : 'marked not sure';
+    const tag = st.m ? `missed ${st.m} of ${st.t} attempt${st.t === 1 ? '' : 's'}` : 'kept for retry';
     return `<div class="card review">
       <div class="q"><span class="num">${i+1}.</span>${esc(it.q)}<span class="ptype">${esc(it.src)}</span>
         <span class="tag">${tag}</span></div>
@@ -813,10 +1059,15 @@ function renderReview(){
 /* ================= RETRY MODE (one question at a time) ================= */
 
 function startDrill(source){
+  const drawn = (source === 'mixed' || source === 'whole');
+  const undo = newFirst && drawn ? deckUndoPoint() : null;
+  const freshPass = newFirst && source === 'mixed' && unseenItems().length === 0;
   const items = sample(source);
   if(items.length === 0){
+    // The draw did not happen, so nothing was asked: keep the pass as it was.
+    if(undo) deckRollback(undo);
     alert(source === 'flagged'
-      ? 'Nothing marked yet - tick "🔖 Not sure - relook" under any question, even one you got right.'
+      ? 'Nothing marked yet - tick "☐ Retry only this one" under any question, even one you got right.'
       : (source === 'missed'
         ? 'No missed questions yet - take a normal session first.'
         : (source === 'lastmissed'
@@ -824,12 +1075,35 @@ function startDrill(source){
           : 'Nothing in this pool with the question and attempt menus set the way they are. Widen one of them.')));
     return;
   }
-  drill = { items: items, i: 0, attempts: 0, done: false, results: [], mode: source };
+  drill = { items: items, i: 0, attempts: 0, done: false, results: [], mode: source, deckUndo: undo, deckNote: '' };
   lastBatch = items.map(x => x.id);
-  if(source === 'mixed' || source === 'repeat') lastFullBatch = lastBatch.slice();
+  if(source === 'mixed' || source === 'repeat' || source === 'whole') lastFullBatch = lastBatch.slice();
+  if(undo) drill.deckNote = source === 'whole' ? wholeNoteHTML() : deckNoteHTML(freshPass);
   review = null;
   render();
   window.scrollTo(0,0);
+}
+
+/* What the draw just did to this pass through the pool, in one line: how many
+   questions are still waiting, or that a new pass has started because every one
+   had been asked. Empty when new-first is off - there is no pass then. */
+function deckNoteHTML(freshPass){
+  if(!newFirst) return '';
+  const left = unseenItems().length;
+  if(freshPass){
+    return `<span class="tag">new pass - all ${quizStats().total} of this pool had been asked</span>`;
+  }
+  if(left === 0){
+    return '<span class="tag">that was the last of this pool - the next round starts a new pass</span>';
+  }
+  return `<span class="tag">${left} still unasked after this round</span>`;
+}
+
+/* The whole-quiz retake's own line. It is not a draw, so "still unasked" would
+   be the wrong report even when it is technically true of the pass. */
+function wholeNoteHTML(){
+  const n = quizStats().total;
+  return `<span class="tag">the whole pool in one sitting - all ${n} question${n === 1 ? '' : 's'}, nothing held back</span>`;
 }
 
 function renderDrill(){
@@ -840,7 +1114,7 @@ function renderDrill(){
   const opts = item.opts.map((o, j) =>
     `<label><input type="radio" name="drill_opt" value="${j}"> <b>${String.fromCharCode(65+j)}.</b> ${esc(o)}</label>`).join('');
   r.innerHTML = `<div class="muted" style="margin:6px 0 2px">
-      🔁 Question <b>${drill.i + 1}</b> of <b>${n}</b> · ${drill.mode === 'flagged' ? 'what you marked unsure' : (drill.mode === 'missed' ? 'your missed questions' : (drill.mode === 'lastmissed' ? 'the ones you missed in that practice' : (drill.mode === 'full' ? 'that full practice again, reordered' : (drill.mode === 'repeat' ? 'the same questions, reordered' : esc(filterLabel())))))} · ${orderLabel()}
+      🔁 Question <b>${drill.i + 1}</b> of <b>${n}</b> · ${drill.mode === 'flagged' ? 'only the questions you marked' : (drill.mode === 'missed' ? 'your missed questions' : (drill.mode === 'lastmissed' ? 'the ones you missed in that practice' : (drill.mode === 'full' ? 'that full practice again, reordered' : (drill.mode === 'whole' ? 'every question in this quiz' : (drill.mode === 'repeat' ? 'the same questions, reordered' : esc(filterLabel()))))))} · ${orderLabel()} ${drill.deckNote || ''}
     </div>
     <div class="progress"><i style="width:${pct}%"></i></div>
     <div class="card" id="drillcard">
@@ -930,13 +1204,14 @@ function renderDrillSummary(){
     html += `<p class="muted">Every question right on the first attempt - outstanding. 🎉</p>`;
   } else {
     html += `<p class="muted">These took more than one try - the hint is included:</p>`;
-    html += needed.map(x => {
+    html += needed.map((x, i) => {
       const it = byId[x.id];
       return `<div class="missed-item">
         <div class="mq">${esc(it.q)}</div>
         <div class="ans">✔ <b>${esc(it.correct)}</b></div>
         <div class="muted" style="font-size:13px;margin-top:4px">Took ${x.attempts} tries <span class="tag">(${esc(it.src)})</span></div>
         ${aidHTML(it, true)}
+        ${flagButtonHTML(it.id, 'd' + i)}
       </div>`;
     }).join('');
   }
@@ -945,15 +1220,23 @@ function renderDrillSummary(){
   if(d.mode === 'lastmissed' && lastFullBatch.length > nQ){
     btns += `<button onclick="redoFullBatch()">↩ Redo the full ${lastFullBatch.length} from that practice</button>`;
   }
-  btns += `<button onclick="start('mixed')">🔁 Fresh retry session</button>`;
+  btns += `<button onclick="retakeWholeQuiz()">📝 Retake the whole quiz (${realPoolCount()})</button>`;
+  btns += `<button onclick="start('mixed')">${nextBtnLabel()}</button>`;
+  if(quizStats().flagged) btns += `<button data-retry onclick="start('flagged')">🔁 Retry only these</button>`
+    + `<button onclick="clearRetryMarks()">🧽 Clear retry marks</button>`;
   if(needed.length) btns += `<button onclick="startReview()">🧠 Missed review</button>`;
   html += `<div class="row" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">${btns}</div></div>`;
   r.innerHTML = html;
   window.scrollTo({top:0, behavior:'smooth'});
   updateBadge();
+  paintRetryButtons();   // the summary's own button is built without a number
 }
 
-function cancelDrill(){ drill = null; render(); }
+function cancelDrill(){
+  // Same rule as a round: nothing answered means nothing was asked.
+  if(drill && drill.results.length === 0) deckRollback(drill.deckUndo);
+  drill = null; render();
+}
 
 function checkRound(){
   if(!round || round.checked) return;
@@ -996,7 +1279,7 @@ function checkRound(){
       : 'Perfect - all correct! 🎉')}</p>`;
   } else {
     summary += `<p class="muted">Review these - the correct answer and the hint are included:</p>`;
-    summary += missed.map(m => {
+    summary += missed.map((m, i) => {
       const it = m.item;
       const picked = m.picked ? esc(m.picked) : 'not answered';
       return `<div class="missed-item">
@@ -1004,28 +1287,40 @@ function checkRound(){
         <div class="ans">✔ <b>${esc(it.correct)}</b></div>
         <div class="muted" style="font-size:13px;margin-top:4px">You chose: ${picked} <span class="tag">(${esc(it.src)})</span></div>
         ${aidHTML(it, true)}
+        ${flagButtonHTML(it.id, 'm' + i)}
       </div>`;
     }).join('');
   }
+  const kept = quizStats().flagged;
   let btns = `<button class="primary" onclick="repeatBatch()">🔁 These ${round.items.length} again, new order</button>`;
   if(missed.length) btns += `<button onclick="startRound('lastmissed')">🎯 Practice the ${missed.length} you missed</button>`;
+  if(kept) btns += `<button data-retry onclick="start('flagged')">🔁 Retry only these</button>`
+    + `<button onclick="clearRetryMarks()">🧽 Clear retry marks</button>`;
   if(round.mode === 'lastmissed' && lastFullBatch.length > round.items.length){
     btns += `<button onclick="redoFullBatch()">↩ Redo the full ${lastFullBatch.length} from that practice</button>`;
   }
-  btns += `<button onclick="startRound('mixed')">▶ Fresh round</button>`;
+  btns += `<button onclick="retakeWholeQuiz()">📝 Retake the whole quiz (${realPoolCount()})</button>`;
+  btns += `<button onclick="startRound('mixed')">${nextBtnLabel()}</button>`;
   if(missed.length) btns += `<button onclick="startReview()">🧠 Missed review</button>`;
   summary += `<div class="row" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">${btns}</div></div>`;
   r.insertAdjacentHTML('beforeend', summary);
-  window.scrollTo({top:0, behavior:'smooth'});
   updateBadge();
+  paintRetryButtons();   // the summary's own button is built without a number
+  window.scrollTo({top:0, behavior:'smooth'});
 }
 
 function startRound(source){
-  round = { key: current, mode: source, items: sample(source), checked: false };
+  // Taken before the draw so cancelling an untouched round can hand the
+  // questions back to the pass (see deckRollback). A whole-quiz retake touches
+  // the pass too, so it needs the same undo point.
+  const drawn = (source === 'mixed' || source === 'whole');
+  const undo = newFirst && drawn ? deckUndoPoint() : null;
+  const freshPass = newFirst && source === 'mixed' && unseenItems().length === 0;
+  round = { key: current, mode: source, items: sample(source), checked: false, deckUndo: undo, deckNote: '' };
   review = null;
   if(round.items.length === 0){
     alert(source === 'flagged'
-      ? 'Nothing marked yet - tick "🔖 Not sure - relook" under any question, even one you got right.'
+      ? 'Nothing marked yet - tick "☐ Retry only this one" under any question, even one you got right.'
       : (source === 'missed'
         ? 'No missed questions yet - take a normal round first.'
         : (source === 'lastmissed'
@@ -1035,7 +1330,8 @@ function startRound(source){
   }
   lastBatch = round.items.map(x => x.id);
   // A fresh draw, or a redo of that same draw, is "the practice" the misses came from.
-  if(source === 'mixed' || source === 'repeat') lastFullBatch = lastBatch.slice();
+  if(source === 'mixed' || source === 'repeat' || source === 'whole') lastFullBatch = lastBatch.slice();
+  if(undo) round.deckNote = source === 'whole' ? wholeNoteHTML() : deckNoteHTML(freshPass);
   render();
   window.scrollTo(0,0);
 }
@@ -1082,11 +1378,17 @@ function redoFullBatch(){
   window.scrollTo(0,0);
 }
 
-function cancelRound(){ round = null; render(); }
+function cancelRound(){
+  // A round that was never checked has not asked anything: give the questions back.
+  if(round && !round.checked) deckRollback(round.deckUndo);
+  round = null; render();
+}
 
 function clearProgress(){
   if(confirm('Erase all saved progress (missed/correct counts) for this browser?')){
     try{ localStorage.removeItem(LS_KEY); }catch(e){}
+    try{ localStorage.removeItem(DECK_KEY); }catch(e){}   // the pass through the pool starts over too
+    served = loadServed();                                // ...and the copy held in memory with it
     round = null; drill = null; review = null; render();
   }
 }
@@ -1094,7 +1396,7 @@ function clearProgress(){
 function updateBadge(){
   const st = quizStats();
   document.getElementById('badge').innerHTML =
-    `Attempted <b>${st.attempted}</b> · Shaky <b>${st.shaky}</b> · Marked <b>${st.flagged}</b>`;
+    `Attempted <b>${st.attempted}</b> · Shaky <b>${st.shaky}</b> · Kept for retry <b>${st.flagged}</b>`;
 }
 
 function esc(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -1105,6 +1407,7 @@ document.getElementById('srcfilter').value = filter;
 document.getElementById('modesel').value = mode;
 document.getElementById('sizesel').value = String(sessionSize);
 document.getElementById('aidscb').checked = aidsAlways;
+document.getElementById('newfirstcb').checked = newFirst;
 document.getElementById('shufqcb').checked = shuffleQ;
 document.getElementById('shufccb').checked = shuffleChoices;
 render();
