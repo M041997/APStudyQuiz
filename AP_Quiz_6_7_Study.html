@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>A&amp;P I — Quiz 6 &amp; 7 Multiple-Choice Study Tool</title>
+<title>A&amp;P I Study Tool</title>
 <style>
   :root{
     --bg:#f2f3f5; --card:#ffffff; --line:#d9dce1; --ink:#1a1c1f;
@@ -17,6 +17,21 @@
   h1{font-size:23px;margin:0 0 4px}
   .sub{color:var(--muted);font-size:13px;margin:0 0 16px}
   .tabs{display:flex;gap:8px;margin:16px 0 12px;flex-wrap:wrap}
+  /* Chapter picker: one card per chapter, plus the exams that pool chapters. */
+  .chapters{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin:18px 0 16px}
+  .chap{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;background:#fff;overflow:hidden;transition:.15s}
+  .chap:hover{border-color:var(--accent)}
+  .chap.active{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent)}
+  .chap-main{all:unset;box-sizing:border-box;display:block;cursor:pointer;padding:16px 16px 12px;flex:1}
+  .chap-main:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+  .chap-eyebrow{display:block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .chap-num{display:block;font-size:34px;font-weight:800;line-height:1.1;margin:2px 0 2px;color:var(--ink)}
+  .chap-name{display:block;font-size:16px;font-weight:600;color:var(--ink)}
+  .chap-counts{display:block;font-size:12.5px;color:var(--muted);margin-top:8px;font-variant-numeric:tabular-nums}
+  .chap.active .chap-num{color:var(--accent)}
+  .chap-retake{display:block;padding:9px 16px;border-top:1px solid var(--line);font-size:13px;font-weight:600;
+               color:var(--accent);text-decoration:none;background:var(--accent-soft)}
+  .chap-retake:hover,.chap-retake:focus-visible{text-decoration:underline}
   .tab{flex:1;min-width:200px;padding:12px 14px;border:1px solid var(--line);
        border-radius:12px;background:#fff;cursor:pointer;text-align:left;transition:.15s}
   .tab:hover{border-color:var(--accent)}
@@ -93,35 +108,14 @@
   .toolbar label{display:inline-flex;align-items:center;gap:6px;padding:0;margin:0;border:0;border-radius:0;
                  font-size:13px;color:var(--muted);cursor:pointer}
   .toolbar label:hover{background:none}
-  @media print{ .toolbar,.tabs,.hint-btn,.aids-btn,.flag-btn{display:none!important} .hint,.aids{display:block!important} }
+  @media print{ .toolbar,.tabs,.chapters,.hint-btn,.aids-btn,.flag-btn{display:none!important} .hint,.aids{display:block!important} }
 </style>
 </head>
 <body>
-<h1>A&amp;P I — Quiz 6 &amp; 7 Multiple-Choice Study Tool</h1>
-<p class="sub">Every question comes from the real quizzes, the HW6 / HW7 homework, or the lecture PowerPoints, and shows its source. Pick a tab and a section, then press <b>▶ Start</b>. Anything you miss comes back in <b>🧠 Missed review</b>. Progress is saved in this browser.</p>
+<h1>A&amp;P I Study Tool</h1>
+<p class="sub">Every question comes from the real quizzes, the HW6 / HW7 homework, or the lecture PowerPoints, and shows its source. Pick a chapter and a section, then press <b>▶ Start</b>. Anything you miss comes back in <b>🧠 Missed review</b>. Progress is saved in this browser.</p>
 
-<style>
-  .retakes{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:4px 0 0;font-size:14px;color:var(--muted)}
-  .retakes a{padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--accent);
-             text-decoration:none;font-weight:600}
-  .retakes a:hover,.retakes a:focus-visible{border-color:var(--accent)}
-</style>
-<div class="retakes">Full retakes, graded at the end:
-  <a href="AP_Quiz_6_Retake.html">📝 Quiz 6 retake (26)</a>
-  <a href="AP_Quiz_7_Retake.html">📝 Quiz 7 retake (20)</a>
-</div>
-
-<div class="tabs">
-  <button class="tab active" id="tab-q6" onclick="switchQuiz('q6')">
-    Quiz 6 <small>Integumentary System — 26 quiz · 45 homework · 26 PowerPoint</small>
-  </button>
-  <button class="tab" id="tab-q7" onclick="switchQuiz('q7')">
-    Quiz 7 <small>Skeletal System — 20 quiz · 42 homework · 32 PowerPoint</small>
-  </button>
-  <button class="tab" id="tab-exam2" onclick="switchQuiz('exam2')" title="Exam 2 draws on both quizzes, so this tab pools all 26 real Quiz 6 questions (both attempts) and all 20 real Quiz 7 questions into one 46-question bank. There is no attempt menu here: every one of them belongs.">
-    Exam 2 <small>Quiz 6 + 7 — 46 quiz · 87 homework · 58 PowerPoint</small>
-  </button>
-</div>
+<div class="chapters" id="chapters" aria-label="Chapters"></div>
 
 <div class="toolbar">
   <button id="btn-new" class="primary" onclick="start('mixed')">▶ Start</button>
@@ -172,7 +166,7 @@
 const DATA = {
 
 q6: {
-  label: "Quiz 6 — Integumentary System",
+  label: "Chapter 6 — Integumentary System",
   mcq: [
     /* ---------- Real Quiz 6 test bank (16 items, each attempt; 6 shared) ---------- */
     {q:"Which is not a function of the integument?", opts:["Protection","Water loss prevention","Synthesis of cholecalciferol (vitamin D precursor)","Temperature regulation","No exceptions; all are functions of the integument"], correct:"No exceptions; all are functions of the integument", hint:"Every listed item really is an integument function, so the keyed answer is the no-exceptions option.", mnem:"Every listed item is a real job: protection, water seal, vitamin D, heat control. When the exam lists only genuine functions, the answer is 'no exceptions'.", trap:"Do not hunt for a fake function. If all the listed jobs are real, the trap is assuming one of them must be wrong.", src:"Quiz 6 · Attempt 1"},
@@ -285,7 +279,7 @@ q6: {
 },
 
 q7: {
-  label: "Quiz 7 — Skeletal System",
+  label: "Chapter 7 — Osseous Tissue",
   mcq: [
     /* ---------- Real Quiz 7 test bank (20 items) ---------- */
     {q:"Which of the following is not a function of the skeletal system?", opts:["body support","protection of internal organs","hematopoiesis","energy production"], correct:"energy production", hint:"Bone supports, protects and makes blood cells; it does not make energy.", mnem:"Bone SUPPORTS, PROTECTS, MOVES, STORES minerals and MAKES blood cells. Energy production is the job of metabolism.", trap:"Hematopoiesis means blood cell production - that IS a skeletal function. Energy production is not.", src:"Quiz 7 · Bank"},
@@ -435,6 +429,39 @@ DATA.exam2 = {
     // Homework comes last and keeps its own ids ('hw6-01' ...), so it cannot collide.
     .concat(DATA.q6.mcq.filter(x => kindOf(x) === 'hw'), DATA.q7.mcq.filter(x => kindOf(x) === 'hw'))
 };
+
+/* ================= CHAPTERS =================
+   Boss, 2026-09-29: "from here on out, that's what we're going to do for each
+   quiz or homework. We'll have a big thing up top to break it up by chapter and
+   then we can click." One entry per chapter, in course order, plus the exams
+   that pool chapters. Adding a chapter is a DATA bank (q8, q9 ...) and one line
+   here; the card counts its own quiz / homework / PowerPoint questions. Keys
+   never change once used - saved progress is stored under them. */
+const CHAPTERS = [
+  { key: 'q6',    eyebrow: 'Chapter', num: '6',      name: 'Integumentary System', retake: 'AP_Quiz_6_Retake.html' },
+  { key: 'q7',    eyebrow: 'Chapter', num: '7',      name: 'Osseous Tissue',       retake: 'AP_Quiz_7_Retake.html' },
+  { key: 'exam2', eyebrow: 'Exam',    num: '2',      name: 'Chapters 6 + 7 together', exam: true }
+];
+
+function renderChapters(){
+  const box = document.getElementById('chapters');
+  if(!box) return;
+  box.innerHTML = CHAPTERS.filter(c => DATA[c.key]).map(c => {
+    const n = { real: 0, hw: 0, lecture: 0 };
+    DATA[c.key].mcq.forEach(x => { n[kindOf(x)]++; });
+    const counts = [n.real + ' quiz', n.hw + ' homework', n.lecture + ' PowerPoint'].join(' · ');
+    const retake = c.retake
+      ? `<a class="chap-retake" href="${c.retake}">📝 Full Quiz ${c.num} retake (${n.real})</a>` : '';
+    return `<div class="chap${c.exam ? ' chap-exam' : ''}${c.key === current ? ' active' : ''}" data-key="${c.key}">
+      <button class="chap-main" id="tab-${c.key}" onclick="switchQuiz('${c.key}')" aria-pressed="${c.key === current}">
+        <span class="chap-eyebrow">${c.eyebrow}</span>
+        <span class="chap-num">${c.num}</span>
+        <span class="chap-name">${c.name}</span>
+        <span class="chap-counts">${counts}</span>
+      </button>${retake}
+    </div>`;
+  }).join('');
+}
 
 /* ================= STATE & STORAGE ================= */
 
@@ -808,7 +835,11 @@ function switchQuiz(key){
   // Item ids restart at q0 in every bank, so a batch cannot be carried across a
   // tab switch: q7's q0 is a different question from q6's q0.
   lastBatch = []; lastMissed = []; lastFullBatch = [];
-  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.id === 'tab-' + key));
+  document.querySelectorAll('.chap').forEach(c => {
+    const on = c.dataset.key === key;
+    c.classList.toggle('active', on);
+    const b = c.querySelector('.chap-main'); if(b) b.setAttribute('aria-pressed', on);
+  });
   render();
 }
 
@@ -1542,6 +1573,7 @@ function esc(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').rep
 
 /* init */
 loadPrefs();
+renderChapters();
 document.getElementById('srcfilter').value = filter;
 document.getElementById('modesel').value = mode;
 document.getElementById('sizesel').value = String(sessionSize);
