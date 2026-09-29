@@ -1,0 +1,100 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>A&amp;P I — Quiz 8 Retake</title>
+<style>
+body{font-family:Arial,sans-serif;max-width:900px;margin:32px auto;padding:0 20px;line-height:1.45;background:#f7f7f8;color:#171717}
+.card{background:white;padding:20px;margin:16px 0;border-radius:12px;border:1px solid #ddd}
+label{display:block;padding:7px;margin:3px 0;border-radius:6px} label:hover{background:#f1f1f1}
+button{font-size:16px;padding:11px 18px;margin:10px 8px 10px 0;cursor:pointer}
+button:disabled{opacity:.45;cursor:not-allowed}
+#score{font-size:22px;font-weight:bold;margin:18px 0} .right{background:#dcfce7} .wrong{background:#fee2e2}
+#score small{display:block;font-size:13px;font-weight:normal}
+.keep{display:block;margin:14px 0 0;font-size:13px;padding:7px 12px;border-radius:8px;
+      border:1px dashed #9aa7b4;background:none;color:#5b6673;cursor:pointer}
+.keep:hover{border-color:#2563eb;color:#2563eb}
+.keep.on{background:#e8f0fe;border:1px solid #2563eb;color:#2563eb;font-weight:600}
+small{color:#555}
+</style></head><body>
+<p><a href="AP_Quiz_6_7_Study.html" style="color:#2563eb">← Back to the study tool</a></p>
+<h1>A&amp;P I — Quiz 8 Retake</h1>
+<p>Offline retake quiz. Select one answer per question, then click <b>Grade Quiz</b>. Tick <b>☐ Retry only this one</b> under any question — right or wrong — and <b>🔁 Retry only these</b> serves just those, reshuffled, as many times as you like.</p>
+<p><small>The 20 real Quiz 8 questions (attempt 1), with the course's own choices and keys. Nothing added.</small></p>
+<div id="bar">
+  <button onclick="grade()">✔ Grade Quiz</button>
+  <button id="retrybtn" onclick="retryOnly()">🔁 Retry only these (0)</button>
+  <button onclick="resetQuiz()">↺ Reset to the full quiz</button>
+</div>
+<div id="quiz"></div>
+<div id="score"></div>
+<script>
+const qs=[{"q": "Which cranial bone is found at the rear or posterior aspect of your skull?", "opts": ["occipital", "temporal", "parietal", "frontal"], "a": 0}, {"q": "The coroner stated that the bullet entered at the victim's glabella area of the face, that is, between the victim's eyebrows. Which cranial bone was injured first?", "opts": ["occipital bone", "frontal bone", "temporal bone", "maxillary bone"], "a": 1}, {"q": "Which bones do not contribute to the structure of the nasal cavity?", "opts": ["inferior nasal conchae", "ethmoid bone", "temporal bones", "vomer bone"], "a": 2}, {"q": "The hole or orifice through which the spinal cord connects to the brainstem is known as the", "opts": ["spinal foramen", "cribriform plate", "foramen magnum", "internal acoustic meatus"], "a": 2}, {"q": "The paired bones that form the hard palate are the _____________", "opts": ["maxillary and palatine bones", "superior and inferior nasal conchae", "the vomer and palatine bones", "palatine bone and sphenoid bones"], "a": 0}, {"q": "C-1 is a ring-shaped vertebra found at the top of the c-spine, It is known as the _______", "opts": ["atlas", "axis", "cervical prominens", "thoracic vertebra 1"], "a": 0}, {"q": "The top portion of the sternum which sits between the 2 clavicles is known as the ____________", "opts": ["sternal body", "sternal head", "manubrium", "xiphoid"], "a": 2}, {"q": "The lowest spinal region that is considered a primary spinal curve in infancy is the", "opts": ["cervical region", "thoracic region", "lumbar region", "sacral region"], "a": 3}, {"q": "The only bone with no direct connection to any other bone is the", "opts": ["atlas", "axis", "hyoid", "clavicle"], "a": 2}, {"q": "The curved suture line between the occipital and parietal bones is known as the", "opts": ["frontal suture", "squamous suture", "lambdoid suture", "sagittal suture"], "a": 2}, {"q": "The bony feature of the distal humerus in which the ulna bone's proximal end fits into is known as the ____________", "opts": ["medial malleolus", "lateral malleolus", "trochlea", "capitulum"], "a": 2}, {"q": "The distal aspect of the radius bone does not articulate with the __________________", "opts": ["capitulum", "scaphoid", "lunate", "distal ulna"], "a": 0}, {"q": "Which carpal bone is the largest?", "opts": ["hamate bone", "capitate bone", "lunate bone", "scaphoid bone"], "a": 1}, {"q": "The bony projections of the pelvis on which humans sit is known as the _____________", "opts": ["ischial crests", "ishial spines", "ishial tuberosities", "pubic bones"], "a": 2}, {"q": "Which bony feature of the femur fits into the pelvis bone's acetabulum?", "opts": ["femoral head", "greater trochanter", "lesser trochanter", "medial condyle"], "a": 0}, {"q": "Which bony process forms the medial aspect of the ankle joint?", "opts": ["lateral malleolus", "medial malleolus", "tibial tuberosity", "medial condyle"], "a": 1}, {"q": "The tibia sits directly upon which tarsal bone?", "opts": ["calcaneus", "cuboid", "talus", "navicular"], "a": 2}, {"q": "On which feature of the scapula does the humeral head articulate (connect) with?", "opts": ["Scapula spine", "infraspinous fossa", "supraspinous fossa", "glenoid fossa"], "a": 3}, {"q": "Which bony feature forms the posterior aspect of the elbow?", "opts": ["trochlear notch", "coracoid process", "radial notch", "olecranon"], "a": 3}, {"q": "The metacarpal for the ring finger is called ..................", "opts": ["metacarpal I", "metacarpal V", "metacarpal IV", "metatarsal IV"], "a": 2}];
+const root=document.getElementById('quiz');
+const scoreBox=document.getElementById('score');
+const retryBtn=document.getElementById('retrybtn');
+const allIds=qs.map((x,i)=>i);        // a question's identity is its place in the bank
+let order=allIds.slice();             // what is on screen right now, in serving order
+const keep=new Set();                 // marked for retry, by that same index
+
+function esc(t){return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function shuffled(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));const t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function paintRetry(){retryBtn.textContent=`🔁 Retry only these (${keep.size})`;retryBtn.disabled=keep.size===0;}
+
+/* One card per question on screen, and every card carries its own "Retry only
+   this one" tick, so the set to loop can be marked while answering, straight
+   after grading, or mid-retry - and it stays ticked across passes. */
+function render(){
+ const retrying=order.length<qs.length;
+ root.innerHTML='';
+ order.forEach((qi,pos)=>{
+  const x=qs[qi]; const on=keep.has(qi);
+  const d=document.createElement('div'); d.className='card'; d.id='q'+qi;
+  d.innerHTML=`<b>${pos+1}. ${esc(x.q)}</b>`
+   +x.opts.map((o,j)=>`<label><input type="radio" name="q${qi}" value="${j}"> ${String.fromCharCode(65+j)}. ${esc(o)}</label>`).join('')
+   +`<button class="keep${on?' on':''}" onclick="toggleKeep(${qi},this)">${on?'☑ Kept for retry':'☐ Retry only this one'}</button>`;
+  root.appendChild(d);
+ });
+ scoreBox.innerHTML=retrying
+  ? `<small>Showing only your ${order.length} marked question${order.length===1?'':'s'}. Grade, then hit 🔁 Retry only these again to loop the same set - the ticks stay until you untick them.</small>`
+  : '';
+ paintRetry();
+ window.scrollTo(0,0);
+}
+
+function toggleKeep(qi,btn){
+ if(keep.has(qi)) keep.delete(qi); else keep.add(qi);
+ const on=keep.has(qi);
+ btn.classList.toggle('on',on);
+ btn.textContent=on?'☑ Kept for retry':'☐ Retry only this one';
+ paintRetry();
+}
+
+function grade(){
+ let score=0;
+ order.forEach(qi=>{
+  const x=qs[qi]; const card=document.getElementById('q'+qi);
+  card.querySelectorAll('label').forEach(l=>l.classList.remove('right','wrong'));
+  const s=document.querySelector(`input[name=q${qi}]:checked`);
+  card.querySelectorAll('label')[x.a].classList.add('right');
+  if(s){ if(+s.value===x.a) score++; else s.parentElement.classList.add('wrong'); }
+ });
+ scoreBox.innerHTML=`Score: ${score} / ${order.length} (${Math.round(score/order.length*100)}%)`
+  +(order.length<qs.length?`<small>That was your marked set. Hit 🔁 Retry only these (${keep.size}) to run it again in a new order.</small>`:'');
+ window.scrollTo(0,document.body.scrollHeight);
+}
+
+/* Serve exactly the marked questions, reshuffled, with a clean slate: click it
+   again after grading to loop the same set over and over. */
+function retryOnly(){
+ if(keep.size===0){alert('Tick "☐ Retry only this one" under the questions you want to run again first.');return;}
+ order=shuffled(allIds.filter(i=>keep.has(i)));
+ render();
+}
+
+/* Full reset: clear the answers, clear the ticks, back to every question. */
+function resetQuiz(){
+ keep.clear();
+ order=allIds.slice();
+ render();
+}
+
+render();
+</script></body></html>
