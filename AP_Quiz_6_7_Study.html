@@ -22,7 +22,7 @@
   .chap{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;background:#fff;overflow:hidden;transition:.15s}
   .chap:hover{border-color:var(--accent)}
   .chap.active{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent)}
-  .chap-main{all:unset;box-sizing:border-box;display:block;cursor:pointer;padding:16px 16px 12px;flex:1}
+  .chap-main{all:unset;box-sizing:border-box;display:flex;flex-direction:column;justify-content:flex-start;cursor:pointer;padding:16px 16px 12px;flex:1}
   .chap-main:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
   .chap-eyebrow{display:block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
   .chap-num{display:block;font-size:34px;font-weight:800;line-height:1.1;margin:2px 0 2px;color:var(--ink)}
@@ -47,6 +47,18 @@
   button.primary:hover{filter:brightness(1.06)}
   button:disabled{opacity:.45;cursor:not-allowed}
   .badge{font-size:13px;font-weight:600;margin-left:auto;color:var(--muted);text-align:right}
+  /* Toolbar: what to study, then what to do, then the settings nobody changes often. */
+  .toolbar{flex-direction:column;align-items:stretch}
+  .tb-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+  .seg button{border:0;border-radius:0;border-right:1px solid var(--line);padding:9px 14px;font-weight:600;color:var(--muted)}
+  .seg button:last-child{border-right:0}
+  .seg button:hover{color:var(--accent)}
+  .seg button.on{background:var(--accent);color:#fff}
+  .seg button small{font-weight:500;opacity:.75;margin-left:4px;font-variant-numeric:tabular-nums}
+  .tb-more summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--muted);width:max-content;padding:2px 0}
+  .tb-more summary:hover{color:var(--accent)}
+  .tb-more[open] summary{margin-bottom:8px}
   .badge b{color:var(--ink)}
   .hero{background:#fff;border:1px solid var(--line);border-radius:14px;padding:26px;text-align:center;margin-top:6px}
   .hero p{color:var(--muted);max-width:520px;margin:10px auto 18px}
@@ -118,43 +130,51 @@
 <div class="chapters" id="chapters" aria-label="Chapters"></div>
 
 <div class="toolbar">
-  <button id="btn-new" class="primary" onclick="start('mixed')">▶ Start</button>
-  <button id="btn-missed" onclick="start('missed')">🎯 Practice Missed</button>
-  <button id="btn-flagged" data-retry onclick="start('flagged')" title="Run only the questions you ticked Retry only this one - a correct one included, since a guess that landed is what a score hides. The same set comes back reshuffled every time, so you can loop it.">🔁 Retry only these</button>
-  <button id="btn-whole" onclick="retakeWholeQuiz()" title="Retake this tab's real quiz bank in full - Quiz 6 is all 26 questions across both attempts, Quiz 7 all 20 - in one sitting, whatever the menus and the pass currently say. Nothing is drawn for you and nothing is held back.">📝 Retake whole quiz</button>
-  <select id="modesel" onchange="setMode(this.value)" title="How the questions are run">
-    <option value="round">Round: answer all, then check</option>
-    <option value="drill">Retry mode: repeat until correct</option>
-  </select>
-  <select id="sizesel" onchange="setSize(this.value)" title="How many questions a Start round draws. Practice missed / Retry only these always serve the whole set.">
-    <option value="5">5 at a time</option>
-    <option value="10">10 at a time</option>
-    <option value="20">20 at a time</option>
-    <option value="all">Whole pool</option>
-  </select>
-  <select id="srcfilter" onchange="setFilter(this.value)" title="Which questions to draw from">
-    <option value="all">Every question</option>
-    <option value="real">Quiz questions</option>
-    <option value="hw">Homework questions (HW6 &amp; HW7)</option>
-    <option value="lecture">PowerPoint questions (Ch 6 &amp; 7 slides)</option>
-  </select>
-  <select id="attemptsel" onchange="setAttempt(this.value)" title="Narrow the real quiz questions to one quiz attempt"></select>
-  <button onclick="clearProgress()" title="Erase saved progress">Reset progress</button>
-  <button onclick="startReview()" title="Every question you have missed, with a memory hook and the trap to watch for">🧠 Missed review</button>
-  <button onclick="startKey()" title="Every question the menus select, with all its choices and the correct one marked - nothing to answer, just read">📖 All questions + answers</button>
-  <label title="Show the memory hook and trap on every question before you answer">
-    <input type="checkbox" id="aidscb" onchange="setAidsAlways(this.checked)"> Show aids while answering
-  </label>
-  <label title="Each fresh round serves the questions this pool has not asked yet, so a 10-at-a-time round is followed by the rest - not by another random 10. Only when every question has been asked does it start a new pass. Untick for a pure random draw.">
-    <input type="checkbox" id="newfirstcb" onchange="setNewFirst(this.checked)"> 🆕 New questions first
-  </label>
-  <label title="Serve the same questions in a different order each session - applies to the next session">
-    <input type="checkbox" id="shufqcb" onchange="setShuffleQ(this.checked)"> 🔀 Shuffle questions
-  </label>
-  <label title="Move the answer choices around too, so the right answer is not always the same letter - applies to the next session">
-    <input type="checkbox" id="shufccb" onchange="setShuffleChoices(this.checked)"> 🔀 Shuffle choices
-  </label>
-  <span class="badge" id="badge"></span>
+  <div class="tb-row">
+    <div class="seg" id="srcseg" role="group" aria-label="Which questions">
+      <button type="button" data-src="real" onclick="setFilter('real')">Quiz</button>
+      <button type="button" data-src="hw" onclick="setFilter('hw')">Homework</button>
+      <button type="button" data-src="lecture" onclick="setFilter('lecture')">PowerPoint</button>
+      <button type="button" data-src="all" onclick="setFilter('all')">All</button>
+    </div>
+    <select id="attemptsel" onchange="setAttempt(this.value)" title="Narrow the quiz questions to one quiz attempt"></select>
+    <select id="sizesel" onchange="setSize(this.value)" title="How many questions a Start round draws. Practice missed and Retry marked always serve the whole set.">
+      <option value="5">5 questions</option>
+      <option value="10">10 questions</option>
+      <option value="20">20 questions</option>
+      <option value="all">All of them</option>
+    </select>
+  </div>
+  <div class="tb-row">
+    <button id="btn-new" class="primary" onclick="start('mixed')">▶ Start</button>
+    <button id="btn-missed" onclick="start('missed')">🎯 Practice missed</button>
+    <button id="btn-flagged" data-retry data-hide-empty onclick="start('flagged')" title="Run only the questions you ticked Retry only this one, reshuffled every time, so you can loop them.">🔁 Retry marked</button>
+    <button onclick="startReview()" title="Every question you have missed, with its explanation">🧠 Missed review</button>
+    <button onclick="startKey()" title="Every question in this section with the correct answer marked - nothing to answer, just read">📖 Answer key</button>
+    <span class="badge" id="badge"></span>
+  </div>
+  <details class="tb-more">
+    <summary>⚙ Options</summary>
+    <div class="tb-row">
+      <select id="modesel" onchange="setMode(this.value)" title="How the questions are run">
+        <option value="round">Answer all, then check</option>
+        <option value="drill">Retry each until correct</option>
+      </select>
+      <label title="Show the explanation on every question before you answer">
+        <input type="checkbox" id="aidscb" onchange="setAidsAlways(this.checked)"> Show aids while answering
+      </label>
+      <label title="Each fresh round serves the questions this section has not asked yet. Untick for a pure random draw.">
+        <input type="checkbox" id="newfirstcb" onchange="setNewFirst(this.checked)"> New questions first
+      </label>
+      <label title="Serve the questions in a different order each session">
+        <input type="checkbox" id="shufqcb" onchange="setShuffleQ(this.checked)"> Shuffle questions
+      </label>
+      <label title="Move the answer choices around, so the right answer is not always the same letter">
+        <input type="checkbox" id="shufccb" onchange="setShuffleChoices(this.checked)"> Shuffle choices
+      </label>
+      <button onclick="clearProgress()" title="Erase saved progress in this browser">Reset progress</button>
+    </div>
+  </details>
 </div>
 
 <div id="content"></div>
@@ -676,8 +696,9 @@ function quizStats(){
 function paintRetryButtons(){
   const n = quizStats().flagged;
   document.querySelectorAll('[data-retry]').forEach(b => {
-    b.textContent = '🔁 Retry only these (' + n + ')';
+    b.textContent = (b.hasAttribute('data-hide-empty') ? '🔁 Retry marked (' : '🔁 Retry only these (') + n + ')';
     b.disabled = n === 0;
+    if(b.hasAttribute('data-hide-empty')) b.hidden = n === 0;
   });
 }
 
@@ -945,9 +966,27 @@ function retakeWholeQuiz(){
   start('whole');
 }
 
+/* The section switch: one button per source, each with this chapter's count. */
+function paintSrc(){
+  const n = { real: 0, hw: 0, lecture: 0, all: 0 };
+  pool(current).forEach(x => { n[kindOf(x)]++; n.all++; });
+  document.querySelectorAll('#srcseg [data-src]').forEach(b => {
+    const k = b.getAttribute('data-src');
+    const on = k === filter;
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-pressed', on);
+    const label = { real: 'Quiz', hw: 'Homework', lecture: 'PowerPoint', all: 'All' }[k];
+    b.innerHTML = label + ' <small>' + n[k] + '</small>';
+  });
+}
+
 function render(){
   updateBadge();
+  paintSrc();
   refreshAttemptSelect();
+  // An attempt menu with nothing to choose is clutter, not information.
+  const att = document.getElementById('attemptsel');
+  if(att) att.hidden = att.disabled;
   if(review) renderReview();
   else if(drill) renderDrill();
   else if(!round) renderHome();
@@ -1574,7 +1613,6 @@ function esc(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').rep
 /* init */
 loadPrefs();
 renderChapters();
-document.getElementById('srcfilter').value = filter;
 document.getElementById('modesel').value = mode;
 document.getElementById('sizesel').value = String(sessionSize);
 document.getElementById('aidscb').checked = aidsAlways;
