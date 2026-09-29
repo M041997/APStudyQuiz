@@ -53,6 +53,7 @@
   .seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
   .seg button{border:0;border-radius:0;border-right:1px solid var(--line);padding:9px 14px;font-weight:600;color:var(--muted)}
   .seg button:last-child{border-right:0}
+  .seg-label{display:flex;align-items:center;padding:0 10px;font-size:12px;font-weight:600;color:var(--muted);border-right:1px solid var(--line);background:var(--bg)}
   .seg button:hover{color:var(--accent)}
   .seg button.on{background:var(--accent);color:#fff}
   .seg button small{font-weight:500;opacity:.75;margin-left:4px;font-variant-numeric:tabular-nums}
@@ -137,9 +138,10 @@
       <button type="button" data-src="lecture" onclick="setFilter('lecture')">PowerPoint</button>
       <button type="button" data-src="all" onclick="setFilter('all')">All</button>
     </div>
-    <div class="seg" id="choiceseg" role="group" aria-label="How many choices">
-      <button type="button" data-ch="2" onclick="setChoices(true)" title="The right answer and one of the question's own wrong choices">2 choices</button>
-      <button type="button" data-ch="all" onclick="setChoices(false)" title="Every choice, as the quiz asks it">All choices</button>
+    <div class="seg" id="choiceseg" role="group" aria-label="How many choices"><span class="seg-label">Choices</span>
+      <button type="button" data-ch="2" onclick="setChoices(2)" title="The right answer and one of the question's own wrong choices">2</button>
+      <button type="button" data-ch="3" onclick="setChoices(3)" title="The right answer and two of the question's own wrong choices">3</button>
+      <button type="button" data-ch="all" onclick="setChoices('all')" title="Every choice, as the quiz asks it">All</button>
     </div>
     <select id="attemptsel" onchange="setAttempt(this.value)" title="Narrow the quiz questions to one quiz attempt"></select>
     <select id="sizesel" onchange="setSize(this.value)" title="How many questions a Start round draws. Practice missed and Retry marked always serve the whole set.">
@@ -549,8 +551,11 @@ let shuffleChoices = false;
    of its own wrong choices, picked fresh each time - never an invented one. The
    switch puts every choice back, for practising the quiz as it is really asked.
    A question whose choices point at other choices by letter ("B and C are not
-   true") keeps all of them, since two would leave the letters pointing at nothing. */
-let twoChoices = true;
+   true") keeps all of them, since two would leave the letters pointing at nothing.
+   Boss, same day: "why not just make it 3 choices instead of 5". Three is the
+   default - two real wrong answers to beat, a 1-in-3 guess - with 2 and All
+   still one click away. */
+let choiceCount = 3;       // 2 | 3 | 'all'
 /* Boss, 2026-09-25: "if I do a quiz of 10 and go to next round, does it give me
    the next 10 ... or the last 6 or whatever questions remain? I don't want to
    retake the same questions over and over." It used to be an independent random
@@ -651,12 +656,12 @@ function loadPrefs(){
     if(['real','hw','lecture','all'].indexOf(p.filter) >= 0) filter = p.filter;
     if(['any','a1','a2','both'].indexOf(p.attempt) >= 0) attemptFilter = p.attempt;
     if(typeof p.newfirst === 'boolean') newFirst = p.newfirst;
-    if(typeof p.two === 'boolean') twoChoices = p.two;
+    if(p.choices === 2 || p.choices === 3 || p.choices === 'all') choiceCount = p.choices;
     if(filter === 'hw' || filter === 'lecture') attemptFilter = 'any';
   }catch(e){}
 }
 function savePrefs(){
-  try{ localStorage.setItem(PREF_KEY, JSON.stringify({ filter: filter, attempt: attemptFilter, newfirst: newFirst, two: twoChoices })); }catch(e){}
+  try{ localStorage.setItem(PREF_KEY, JSON.stringify({ filter: filter, attempt: attemptFilter, newfirst: newFirst, choices: choiceCount })); }catch(e){}
 }
 
 function bump(id, correct){
@@ -778,11 +783,10 @@ function refersToLetters(item){
 }
 
 function withChoiceOrder(item){
-  if(twoChoices && item.opts.length > 2 && !refersToLetters(item)){
-    const wrong = item.opts.filter(o => o !== item.correct);
-    const other = wrong[Math.floor(Math.random() * wrong.length)];
-    // Always a random side, or the right answer would sit in the same place every time.
-    return Object.assign({}, item, { opts: Math.random() < 0.5 ? [item.correct, other] : [other, item.correct] });
+  if(choiceCount !== 'all' && item.opts.length > choiceCount && !refersToLetters(item)){
+    const wrong = shuffled(item.opts.filter(o => o !== item.correct)).slice(0, choiceCount - 1);
+    // Always shuffled, or the right answer would sit in the same place every time.
+    return Object.assign({}, item, { opts: shuffled(wrong.concat([item.correct])) });
   }
   if(!shuffleChoices) return item;
   // A copy: the session owns its own option order, and DATA stays pristine.
@@ -991,15 +995,15 @@ function setShuffleQ(v){ shuffleQ = !!v; }
 function setShuffleChoices(v){ shuffleChoices = !!v; }
 /* Unlike the shuffle boxes this starts over at once: a round already on screen
    would otherwise keep showing the number of choices just switched away from. */
-function setChoices(two){
-  twoChoices = !!two;
+function setChoices(n){
+  choiceCount = n;
   savePrefs();
   round = null; drill = null;
   render();
 }
 function paintChoices(){
   document.querySelectorAll('#choiceseg [data-ch]').forEach(b => {
-    const on = (b.getAttribute('data-ch') === '2') === twoChoices;
+    const on = b.getAttribute('data-ch') === String(choiceCount);
     b.classList.toggle('on', on);
     b.setAttribute('aria-pressed', on);
   });
@@ -1108,8 +1112,8 @@ function nextBtnLabel(){
 }
 
 function orderLabel(){
-  const base = !shuffleQ ? 'fixed order' : (shuffleChoices && !twoChoices ? 'shuffled order + choices' : 'shuffled order');
-  return twoChoices ? base + ' · 2 choices' : base;
+  const base = !shuffleQ ? 'fixed order' : (shuffleChoices && choiceCount === 'all' ? 'shuffled order + choices' : 'shuffled order');
+  return choiceCount === 'all' ? base : base + ' · ' + choiceCount + ' choices';
 }
 
 function modeLabel(){
