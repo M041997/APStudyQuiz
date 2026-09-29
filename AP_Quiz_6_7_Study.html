@@ -137,6 +137,10 @@
       <button type="button" data-src="lecture" onclick="setFilter('lecture')">PowerPoint</button>
       <button type="button" data-src="all" onclick="setFilter('all')">All</button>
     </div>
+    <div class="seg" id="choiceseg" role="group" aria-label="How many choices">
+      <button type="button" data-ch="2" onclick="setChoices(true)" title="The right answer and one of the question's own wrong choices">2 choices</button>
+      <button type="button" data-ch="all" onclick="setChoices(false)" title="Every choice, as the quiz asks it">All choices</button>
+    </div>
     <select id="attemptsel" onchange="setAttempt(this.value)" title="Narrow the quiz questions to one quiz attempt"></select>
     <select id="sizesel" onchange="setSize(this.value)" title="How many questions a Start round draws. Practice missed and Retry marked always serve the whole set.">
       <option value="5">5 questions</option>
@@ -539,6 +543,14 @@ let review = null;         // { items:[...] } while the missed-review screen is 
    options move with it. */
 let shuffleQ = true;
 let shuffleChoices = false;
+/* Boss, 2026-09-29: "Instead of having 4 or 5 answers to choose, why don't we
+   just have a wrong answer and a correct answer so that we can quickly associate
+   question with answer". So by default a question shows its keyed answer and ONE
+   of its own wrong choices, picked fresh each time - never an invented one. The
+   switch puts every choice back, for practising the quiz as it is really asked.
+   A question whose choices point at other choices by letter ("B and C are not
+   true") keeps all of them, since two would leave the letters pointing at nothing. */
+let twoChoices = true;
 /* Boss, 2026-09-25: "if I do a quiz of 10 and go to next round, does it give me
    the next 10 ... or the last 6 or whatever questions remain? I don't want to
    retake the same questions over and over." It used to be an independent random
@@ -639,11 +651,12 @@ function loadPrefs(){
     if(['real','hw','lecture','all'].indexOf(p.filter) >= 0) filter = p.filter;
     if(['any','a1','a2','both'].indexOf(p.attempt) >= 0) attemptFilter = p.attempt;
     if(typeof p.newfirst === 'boolean') newFirst = p.newfirst;
+    if(typeof p.two === 'boolean') twoChoices = p.two;
     if(filter === 'hw' || filter === 'lecture') attemptFilter = 'any';
   }catch(e){}
 }
 function savePrefs(){
-  try{ localStorage.setItem(PREF_KEY, JSON.stringify({ filter: filter, attempt: attemptFilter, newfirst: newFirst })); }catch(e){}
+  try{ localStorage.setItem(PREF_KEY, JSON.stringify({ filter: filter, attempt: attemptFilter, newfirst: newFirst, two: twoChoices })); }catch(e){}
 }
 
 function bump(id, correct){
@@ -760,7 +773,17 @@ function clearRetryMarks(){
 
 function sizeNum(){ return sessionSize === 'all' ? Infinity : sessionSize; }
 
+function refersToLetters(item){
+  return item.opts.some(o => /\b[A-E] and [A-E]\b|of the above/.test(o));
+}
+
 function withChoiceOrder(item){
+  if(twoChoices && item.opts.length > 2 && !refersToLetters(item)){
+    const wrong = item.opts.filter(o => o !== item.correct);
+    const other = wrong[Math.floor(Math.random() * wrong.length)];
+    // Always a random side, or the right answer would sit in the same place every time.
+    return Object.assign({}, item, { opts: Math.random() < 0.5 ? [item.correct, other] : [other, item.correct] });
+  }
   if(!shuffleChoices) return item;
   // A copy: the session owns its own option order, and DATA stays pristine.
   const copy = Object.assign({}, item);
@@ -966,6 +989,21 @@ function setSize(v){
    picked in it. The checkbox is its own feedback until then. */
 function setShuffleQ(v){ shuffleQ = !!v; }
 function setShuffleChoices(v){ shuffleChoices = !!v; }
+/* Unlike the shuffle boxes this starts over at once: a round already on screen
+   would otherwise keep showing the number of choices just switched away from. */
+function setChoices(two){
+  twoChoices = !!two;
+  savePrefs();
+  round = null; drill = null;
+  render();
+}
+function paintChoices(){
+  document.querySelectorAll('#choiceseg [data-ch]').forEach(b => {
+    const on = (b.getAttribute('data-ch') === '2') === twoChoices;
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-pressed', on);
+  });
+}
 /* Like the shuffle boxes, this is its own feedback until the next draw: a round
    already on screen keeps what it has, answers included. */
 function setNewFirst(v){ newFirst = !!v; savePrefs(); }
@@ -1015,6 +1053,7 @@ function paintSrc(){
 function render(){
   updateBadge();
   paintSrc();
+  paintChoices();
   refreshAttemptSelect();
   // An attempt menu with nothing to choose is clutter, not information.
   const att = document.getElementById('attemptsel');
@@ -1069,8 +1108,8 @@ function nextBtnLabel(){
 }
 
 function orderLabel(){
-  if(!shuffleQ) return 'fixed order';
-  return shuffleChoices ? 'shuffled order + choices' : 'shuffled order';
+  const base = !shuffleQ ? 'fixed order' : (shuffleChoices && !twoChoices ? 'shuffled order + choices' : 'shuffled order');
+  return twoChoices ? base + ' · 2 choices' : base;
 }
 
 function modeLabel(){
