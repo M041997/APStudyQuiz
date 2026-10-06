@@ -1,0 +1,1439 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A&amp;P I Exam 3 Study</title>
+<style>
+  :root{
+    --bg:#f2f3f5; --card:#ffffff; --line:#d9dce1; --ink:#1a1c1f;
+    --accent:#2563eb; --accent-soft:#e8f0fe; --right:#dcfce7; --wrong:#fde2e2;
+    --right-ink:#14532d; --wrong-ink:#7f1d1d; --muted:#5c626d; --hintbg:#fff7e1; --hintline:#f5e4a8;
+  }
+  *{box-sizing:border-box}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+       max-width:860px;margin:0 auto;padding:22px 16px 90px;line-height:1.5;
+       background:var(--bg);color:var(--ink)}
+  h1{font-size:23px;margin:0 0 4px}
+  .sub{color:var(--muted);font-size:13px;margin:0 0 16px}
+  .tabs{display:flex;gap:8px;margin:16px 0 12px;flex-wrap:wrap}
+  /* Chapter picker: one card per chapter, plus the exams that pool chapters. */
+  .chapters{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin:18px 0 16px}
+  .chap{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;background:#fff;overflow:hidden;transition:.15s}
+  .chap:hover{border-color:var(--accent)}
+  .chap.active{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent)}
+  .chap-main{all:unset;box-sizing:border-box;display:flex;flex-direction:column;justify-content:flex-start;cursor:pointer;padding:16px 16px 12px;flex:1}
+  .chap-main:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+  .chap-eyebrow{display:block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .chap-num{display:block;font-size:34px;font-weight:800;line-height:1.1;margin:2px 0 2px;color:var(--ink)}
+  .chap-name{display:block;font-size:16px;font-weight:600;color:var(--ink)}
+  .chap-counts{display:block;font-size:12.5px;color:var(--muted);margin-top:8px;font-variant-numeric:tabular-nums}
+  .chap.active .chap-num{color:var(--accent)}
+  .chap-retake{display:block;padding:9px 16px;border-top:1px solid var(--line);font-size:13px;font-weight:600;
+               color:var(--accent);text-decoration:none;background:var(--accent-soft)}
+  .chap-retake:hover,.chap-retake:focus-visible{text-decoration:underline}
+  .tab{flex:1;min-width:200px;padding:12px 14px;border:1px solid var(--line);
+       border-radius:12px;background:#fff;cursor:pointer;text-align:left;transition:.15s}
+  .tab:hover{border-color:var(--accent)}
+  .tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .tab small{display:block;font-weight:normal;opacity:.75;font-size:12px}
+  .toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+           background:#fff;border:1px solid var(--line);border-radius:12px;
+           padding:10px 12px;margin-bottom:14px;position:sticky;top:8px;z-index:5}
+  button{font-family:inherit;font-size:14px;padding:9px 13px;border-radius:8px;
+         border:1px solid var(--line);background:#fff;cursor:pointer}
+  button:hover{border-color:var(--accent);color:var(--accent)}
+  button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+  button.primary:hover{filter:brightness(1.06)}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  .badge{font-size:13px;font-weight:600;margin-left:auto;color:var(--muted);text-align:right}
+  /* Toolbar: what to study, then what to do, then the settings nobody changes often. */
+  .toolbar{flex-direction:column;align-items:stretch}
+  .tb-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+  .seg button{border:0;border-radius:0;border-right:1px solid var(--line);padding:9px 14px;font-weight:600;color:var(--muted)}
+  .seg button:last-child{border-right:0}
+  .seg-label{display:flex;align-items:center;padding:0 10px;font-size:12px;font-weight:600;color:var(--muted);border-right:1px solid var(--line);background:var(--bg)}
+  .seg button:hover{color:var(--accent)}
+  .seg button.on{background:var(--accent);color:#fff}
+  .seg button small{font-weight:500;opacity:.75;margin-left:4px;font-variant-numeric:tabular-nums}
+  .tb-more summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--muted);width:max-content;padding:2px 0}
+  .tb-more summary:hover{color:var(--accent)}
+  .tb-more[open] summary{margin-bottom:8px}
+  .badge b{color:var(--ink)}
+  .hero{background:#fff;border:1px solid var(--line);border-radius:14px;padding:26px;text-align:center;margin-top:6px}
+  .hero p{color:var(--muted);max-width:520px;margin:10px auto 18px}
+  .hero .row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  .stat{display:flex;gap:16px;justify-content:center;margin-bottom:10px;flex-wrap:wrap}
+  .stat div{background:var(--accent-soft);border-radius:10px;padding:10px 16px;min-width:120px}
+  .stat b{display:block;font-size:22px;color:var(--accent)}
+  .stat span{font-size:12px;color:var(--muted)}
+  .card{background:var(--card);padding:16px 18px 14px;margin:12px 0;border-radius:12px;border:1px solid var(--line)}
+  .card .q{font-weight:600;margin-bottom:12px}
+  .q .num{color:var(--muted);font-weight:600;margin-right:6px}
+  .ptype{display:inline-block;font-size:10px;text-transform:uppercase;letter-spacing:.05em;
+         padding:2px 7px;border-radius:99px;background:#eef0f3;color:var(--muted);margin-left:8px;vertical-align:middle}
+  label{display:block;padding:8px 10px;margin:4px 0;border-radius:8px;cursor:pointer;border:1px solid transparent}
+  label:hover{background:var(--accent-soft)}
+  label.right{background:var(--right);color:var(--right-ink);border-color:#86efac}
+  label.wrong{background:var(--wrong);color:var(--wrong-ink);border-color:#fca5a5}
+  label.correct-mark{box-shadow:inset 0 0 0 2px #22c55e}
+  .hint-btn{font-size:12px;padding:5px 10px;margin-top:6px;background:none;border:1px dashed #d0b54a;color:#8a6d1d}
+  .hint-btn:hover{border-color:#8a6d1d;color:#6b540f}
+  .flag-btn{font-size:12px;padding:5px 10px;margin-top:6px;background:none;border:1px dashed #9aa7b4;color:#5b6673}
+  .flag-btn:hover{border-color:var(--accent);color:var(--accent)}
+  .flag-btn.on{background:var(--accent-soft);border:1px solid var(--accent);color:var(--accent);font-weight:600}
+  .hint{display:none;margin:8px 0 0;padding:10px 12px;border-radius:8px;
+        background:var(--hintbg);border:1px solid var(--hintline);font-size:14px;color:#6b540f}
+  .hint.shown{display:block}
+  select{font-family:inherit;font-size:14px;padding:9px 10px;border-radius:8px;
+         border:1px solid var(--line);background:#fff;cursor:pointer;color:inherit}
+  select:hover{border-color:var(--accent)}
+  .summary{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px;margin-top:14px}
+  .summary h3{margin:0 0 4px}
+  .summary .big{font-size:30px;font-weight:700;color:var(--accent)}
+  .missed-item{background:#fffaf0;border:1px solid #efe0b8;border-radius:10px;padding:12px 14px;margin:10px 0}
+  .missed-item .mq{font-weight:600}
+  .missed-item .ans{color:var(--right-ink);margin-top:6px}
+  .missed-item .ans b{color:var(--right-ink)}
+  .tag{font-size:11px;color:var(--muted);font-style:italic}
+  .muted{color:var(--muted)}
+  .fb{margin-top:12px;padding:10px 12px;border-radius:8px;font-weight:600}
+  .fb.ok{background:var(--right);color:var(--right-ink);border:1px solid #86efac}
+  .fb.bad{background:var(--wrong);color:var(--wrong-ink);border:1px solid #fca5a5}
+  .fb small{display:block;font-weight:400;margin-top:4px;opacity:.9}
+  label.locked{cursor:default;opacity:.75}
+  .progress{height:6px;background:#e3e6ea;border-radius:99px;overflow:hidden;margin:2px 0 10px}
+  .progress i{display:block;height:100%;background:var(--accent);transition:width .25s}
+  .aids{display:none;margin-top:12px;padding:10px 12px;border-radius:10px;background:#eef5ff;border:1px solid #cfe1f7}
+  .aids.shown{display:block}
+  .aids-h{font-weight:700;font-size:12px;letter-spacing:.03em;text-transform:uppercase;color:#1e40af;margin-bottom:6px}
+  .aid{display:flex;gap:8px;margin:7px 0;font-size:14px;line-height:1.45}
+  .aid-k{flex:0 0 46px;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#1e40af;padding-top:3px}
+  .aid-v{flex:1}
+  .trapbox{margin-top:10px;padding:9px 11px;border-radius:8px;background:#fff8e6;border:1px solid #efdc9f;font-size:13.5px;color:#6b540f}
+  .aids-btn{font-size:12px;padding:6px 11px;margin-top:8px;background:none;border:1px dashed #7aa7e0;color:#1e40af;border-radius:8px}
+  .aids-btn:hover{border-color:#1e40af;color:#1e40af}
+  .review .ans{color:var(--right-ink);font-weight:700;margin-top:8px}
+  .keyopt{padding:5px 10px;margin:3px 0;border-radius:8px;font-size:14px;color:var(--muted)}
+  .keyopt.ok{background:var(--right);color:var(--right-ink);font-weight:700;border:1px solid #86efac}
+  .keywhy{margin-top:8px;font-size:13px;color:var(--muted)}
+  .toolbar label{display:inline-flex;align-items:center;gap:6px;padding:0;margin:0;border:0;border-radius:0;
+                 font-size:13px;color:var(--muted);cursor:pointer}
+  .toolbar label:hover{background:none}
+  @media print{ .toolbar,.tabs,.chapters,.hint-btn,.aids-btn,.flag-btn{display:none!important} .hint,.aids{display:block!important} }
+</style>
+</head>
+<body>
+<h1>A&amp;P I Exam 3 Study</h1>
+<p class="sub">Every question and correct answer comes from the Exam 3 study deck, 50 per set. Pick a set, then press <b>▶ Start</b>. Anything you miss comes back in <b>🧠 Missed review</b>. Progress is saved in this browser.</p>
+
+<div class="chapters" id="chapters" aria-label="Chapters"></div>
+
+<div class="toolbar">
+  <div class="tb-row">
+    <div class="seg" id="choiceseg" role="group" aria-label="How many choices"><span class="seg-label">Choices</span>
+      <button type="button" data-ch="2" onclick="setChoices(2)" title="The right answer and one of the question's own wrong choices">2</button>
+      <button type="button" data-ch="3" onclick="setChoices(3)" title="The right answer and two of the question's own wrong choices">3</button>
+      <button type="button" data-ch="all" onclick="setChoices('all')" title="Every choice, as the quiz asks it">All</button>
+    </div>
+    <select id="attemptsel" onchange="setAttempt(this.value)" title="Narrow the quiz questions to one quiz attempt"></select>
+    <select id="sizesel" onchange="setSize(this.value)" title="How many questions a Start round draws. Practice missed and Retry marked always serve the whole set.">
+      <option value="5">5 questions</option>
+      <option value="10">10 questions</option>
+      <option value="20">20 questions</option>
+      <option value="all">All of them</option>
+    </select>
+  </div>
+  <div class="tb-row">
+    <button id="btn-new" class="primary" onclick="start('mixed')">▶ Start</button>
+    <button id="btn-missed" onclick="start('missed')">🎯 Practice missed</button>
+    <button id="btn-flagged" data-retry data-hide-empty onclick="start('flagged')" title="Run only the questions you ticked Retry only this one, reshuffled every time, so you can loop them.">🔁 Retry marked</button>
+    <button onclick="startReview()" title="Every question you have missed, with its explanation">🧠 Missed review</button>
+    <button onclick="startKey()" title="Every question in this section with the correct answer marked - nothing to answer, just read">📖 Answer key</button>
+    <span class="badge" id="badge"></span>
+  </div>
+  <details class="tb-more">
+    <summary>⚙ Options</summary>
+    <div class="tb-row">
+      <select id="modesel" onchange="setMode(this.value)" title="How the questions are run">
+        <option value="round">Answer all, then check</option>
+        <option value="drill">Retry each until correct</option>
+      </select>
+      <label title="Show the explanation on every question before you answer">
+        <input type="checkbox" id="aidscb" onchange="setAidsAlways(this.checked)"> Show aids while answering
+      </label>
+      <label title="Each fresh round serves the questions this section has not asked yet. Untick for a pure random draw.">
+        <input type="checkbox" id="newfirstcb" onchange="setNewFirst(this.checked)"> New questions first
+      </label>
+      <label title="Serve the questions in a different order each session">
+        <input type="checkbox" id="shufqcb" onchange="setShuffleQ(this.checked)"> Shuffle questions
+      </label>
+      <label title="Move the answer choices around, so the right answer is not always the same letter">
+        <input type="checkbox" id="shufccb" onchange="setShuffleChoices(this.checked)"> Shuffle choices
+      </label>
+      <button onclick="clearProgress()" title="Erase saved progress in this browser">Reset progress</button>
+    </div>
+  </details>
+</div>
+
+<div id="content"></div>
+
+<script>
+/* ================= DATA ================= */
+
+
+const DATA = {};
+
+/* Boss, 2026-09-25: "the exam 2 is only 50 questions so it HAS to be pulled
+   from both". Exam 2 is not a third question bank and must not become one: it
+   is the UNION of the two real banks, so it is composed from them here rather
+   than copied out of them. Copying would have to be retyped every time a
+   question is added to Quiz 6 or Quiz 7, and a study pool that silently drifts
+   from the two banks it claims to cover is worse than not having one.
+   It is its own DATA key, which is exactly what keeps the id space honest:
+   pool() names an item 'q' + its index, and both q6 and q7 start at q0, so a
+   merged pool has to be re-indexed rather than spliced - which is what a
+   separate key does for free.
+   The attempt split is switched off (noSplit). Exam 2 does not offer attempts
+   to choose between: every Quiz 6 item belongs whichever attempt it came from,
+   and the 20 Quiz 7 items carry no attempt tag at all. 26 + 20 = 46 unique
+   questions, and the two banks share none. */
+/* Boss, 2026-09-27: "Grab the chapter 6 and 7 powerpoints and find the bold or
+   important questions ... add those to either quiz 6 or 7". Those are the
+   instructor's Module Review slides, now a third kind of item - Lecture review -
+   next to the real quiz bank and the homework. They are not real quiz
+   questions, so they must not change the 26 / 20 / 46 counts or join "Retake the
+   whole quiz". Exam 2 takes them too, but AFTER all 46 real ones: its ids are
+   positions, and slotting Quiz 6's lecture items in before Quiz 7's real ones
+   would shift every saved Quiz 7 score on this tab. */
+function kindOf(x){
+  if(x.src.indexOf('HW') === 0) return 'hw';
+  if(x.src.indexOf('PowerPoint') === 0) return 'lecture';
+  return 'real';
+}
+
+/* Exam 3 (skeleton): every question and correct answer is from the pasted study deck, in its order, 50 per set.
+   Wrong choices are other answers from the same deck (or the real Quiz 8 / question-text options), never invented. */
+DATA.e3s1 = { label: "Exam 3 — Set 1 (questions 1–50)", noSplit: true, mcq: [{"id": "e3-001", "q": "What bones make up the pectoral girdle?", "opts": ["Clavicle and scapula", "Hip bone, tibia, and patella", "Zygomatic bone and temporal bone", "Greater tubercle and lesser tubercle", "Cranial bones and facial bones."], "correct": "Clavicle and scapula", "hint": "Clavicle and scapula", "src": "Exam 3 deck · Set 1"}, {"id": "e3-002", "q": "What is the shape of the clavicle when viewed from the front?", "opts": ["Straight", "S-shaped"], "correct": "Straight", "hint": "Straight", "src": "Exam 3 deck · Set 1"}, {"id": "e3-003", "q": "How does the clavicle appear when viewed from above or below?", "opts": ["S-shaped", "Straight"], "correct": "S-shaped", "hint": "S-shaped", "src": "Exam 3 deck · Set 1"}, {"id": "e3-004", "q": "Which bone of the pectoral girdle articulates directly with the axial skeleton?", "opts": ["Clavicle", "Scaphoid.", "Humerus", "Scapula", "Capitate"], "correct": "Clavicle", "hint": "Clavicle", "src": "Exam 3 deck · Set 1"}, {"id": "e3-005", "q": "What is the anatomical term for the shoulder blade?", "opts": ["Scapula", "Scaphoid.", "Capitate", "Pisiform", "Radius"], "correct": "Scapula", "hint": "Scapula", "src": "Exam 3 deck · Set 1"}, {"id": "e3-006", "q": "What articulates with the scapula at the glenohumeral joint?", "opts": ["Humerus", "Scapula", "Capitate", "Clavicle", "Radius"], "correct": "Humerus", "hint": "Humerus", "src": "Exam 3 deck · Set 1"}, {"id": "e3-007", "q": "What are the three fossae located on the scapula?", "opts": ["Subscapular fossa, supraspinous fossa, infraspinous fossa", "Cervical (C), Thoracic (T), Lumbar (L), Sacral (S), Coccygeal (Co).", "Perpendicular plate of the ethmoid and vomer.", "Nasal bones, vomer, maxilla, and palatine bones.", "Mandibular fossa, external acoustic meatus, and mastoid process."], "correct": "Subscapular fossa, supraspinous fossa, infraspinous fossa", "hint": "Subscapular fossa, supraspinous fossa, infraspinous fossa", "src": "Exam 3 deck · Set 1"}, {"id": "e3-008", "q": "What is the function of the coracoid process on the scapula?", "opts": ["Serves as an attachment point for muscles", "Scapula at the glenohumeral joint", "Olecranon, which interlocks with the humerus", "It attaches the patella to the tibia", "A sesamoid bone in the quadriceps femoris tendon"], "correct": "Serves as an attachment point for muscles", "hint": "Serves as an attachment point for muscles", "src": "Exam 3 deck · Set 1"}, {"id": "e3-009", "q": "What is the name of the joint where the acromion articulates with the clavicle?", "opts": ["Acromioclavicular joint", "Hip joint", "Sternoclavicular joint", "Glenohumeral joint"], "correct": "Acromioclavicular joint", "hint": "Acromioclavicular joint", "src": "Exam 3 deck · Set 1"}, {"id": "e3-010", "q": "What is the only bone in the brachium region?", "opts": ["Humerus", "Clavicle", "Scaphoid.", "Capitate", "Pisiform"], "correct": "Humerus", "hint": "Humerus", "src": "Exam 3 deck · Set 1"}, {"id": "e3-011", "q": "What is the proximal articulation point of the humerus?", "opts": ["Scapula at the glenohumeral joint", "Serves as an attachment point for muscles", "Olecranon, which interlocks with the humerus", "It attaches the patella to the tibia", "A ridge on the posterior surface of the femur"], "correct": "Scapula at the glenohumeral joint", "hint": "Scapula at the glenohumeral joint", "src": "Exam 3 deck · Set 1"}, {"id": "e3-012", "q": "What are the names of the two tubercles found at the proximal end of the humerus?", "opts": ["Greater tubercle and lesser tubercle", "Hip bone, tibia, and patella", "Zygomatic bone and temporal bone", "Clavicle and scapula", "Ulna and radius"], "correct": "Greater tubercle and lesser tubercle", "hint": "Greater tubercle and lesser tubercle", "src": "Exam 3 deck · Set 1"}, {"id": "e3-013", "q": "What are the two long bones of the forearm?", "opts": ["Ulna and radius", "Zygomatic bone and temporal bone", "Atlas (C1) and Axis (C2).", "Greater tubercle and lesser tubercle", "Left and right parietal bones"], "correct": "Ulna and radius", "hint": "Ulna and radius", "src": "Exam 3 deck · Set 1"}, {"id": "e3-014", "q": "What is the primary feature of the ulna?", "opts": ["Olecranon, which interlocks with the humerus", "A sesamoid bone in the quadriceps femoris tendon", "Serves as an attachment point for muscles", "The big toe, sometimes referred to as the 1st toe", "A ridge on the posterior surface of the femur"], "correct": "Olecranon, which interlocks with the humerus", "hint": "Olecranon, which interlocks with the humerus", "src": "Exam 3 deck · Set 1"}, {"id": "e3-015", "q": "What is the lateral bone of the forearm?", "opts": ["Radius", "Scaphoid.", "Capitate", "Humerus", "Scapula"], "correct": "Radius", "hint": "Radius", "src": "Exam 3 deck · Set 1"}, {"id": "e3-016", "q": "What is the largest carpal bone?", "opts": ["Capitate", "Hamate bone", "Lunate bone", "Scaphoid bone"], "correct": "Capitate", "hint": "Capitate", "src": "Exam 3 deck · Set 1"}, {"id": "e3-017", "q": "What mnemonic can help remember the carpal bones?", "opts": ["Some Lovers Try Positions That They Can't Handle", "Lumbar vertebrae appear like a moose's head in lateral view.", "The dens allows for the rotation of the skull (e.g., 'saying no')."], "correct": "Some Lovers Try Positions That They Can't Handle", "hint": "Some Lovers Try Positions That They Can't Handle", "src": "Exam 3 deck · Set 1"}, {"id": "e3-018", "q": "How many total phalanges are in the human hand?", "opts": ["14 phalanges", "About 206 bones", "14 facial bones.", "There are 12 thoracic vertebrae."], "correct": "14 phalanges", "hint": "14 phalanges", "src": "Exam 3 deck · Set 1"}, {"id": "e3-019", "q": "Which finger has only two phalanges?", "opts": ["Thumb (Pollex)", "14 phalanges", "14 in each hand (28 in both hands).", "The primary curves are thoracic and sacral.", "2."], "correct": "Thumb (Pollex)", "hint": "Thumb (Pollex)", "src": "Exam 3 deck · Set 1"}, {"id": "e3-020", "q": "What bones make up the pelvic girdle?", "opts": ["Two pelvic bones (hip or coxal bones) that each consist of three fused bones: ilium, ischium, and pubis", "A round depression on the lateral aspect of the coxal bone where the head of the femur articulates", "A large opening in each coxal bone through which nerves and blood vessels travel", "Bones of the pectoral girdle and upper limb, and pelvic girdle and lower limb.", "The joint where two pubic bones meet, separated by a fibrocartilaginous pad"], "correct": "Two pelvic bones (hip or coxal bones) that each consist of three fused bones: ilium, ischium, and pubis", "hint": "Two pelvic bones (hip or coxal bones) that each consist of three fused bones: ilium, ischium, and pubis", "src": "Exam 3 deck · Set 1"}, {"id": "e3-021", "q": "What is the pelvic outlet?", "opts": ["The channel through the bottom of the pelvis", "The superior border of the ala of the ilium", "The female pelvis has a broader subpubic angle (>100°)", "Articulates with the sacrum and femur bones", "Provides attachment points for muscles and ligaments"], "correct": "The channel through the bottom of the pelvis", "hint": "The channel through the bottom of the pelvis", "src": "Exam 3 deck · Set 1"}, {"id": "e3-022", "q": "What is the primary function of the pelvic girdle?", "opts": ["Articulates with the sacrum and femur bones", "The channel through the bottom of the pelvis", "The superior border of the ala of the ilium", "Inferior abdominal organs, such as the bladder", "Pectoral (shoulder) girdle and Pelvic (hip) girdle."], "correct": "Articulates with the sacrum and femur bones", "hint": "Articulates with the sacrum and femur bones", "src": "Exam 3 deck · Set 1"}, {"id": "e3-023", "q": "What is the anatomical term for the hip bone?", "opts": ["Coxal bone", "Navicular.", "The femur", "Talus.", "Pubis (pubic bone)."], "correct": "Coxal bone", "hint": "Coxal bone", "src": "Exam 3 deck · Set 1"}, {"id": "e3-024", "q": "What is the role of the iliac crest?", "opts": ["Provides attachment points for muscles and ligaments", "Inferior abdominal organs, such as the bladder", "A deep groove found inferior to the posterior inferior iliac spine", "The female pelvis has a broader subpubic angle (>100°)", "The superior border of the ala of the ilium"], "correct": "Provides attachment points for muscles and ligaments", "hint": "Provides attachment points for muscles and ligaments", "src": "Exam 3 deck · Set 1"}, {"id": "e3-025", "q": "What is the function of the ischium?", "opts": ["Supports weight when sitting", "The bony surface you sit on", "The channel through the bottom of the pelvis", "Inferior abdominal organs, such as the bladder", "The pelvic inlet"], "correct": "Supports weight when sitting", "hint": "Supports weight when sitting", "src": "Exam 3 deck · Set 1"}, {"id": "e3-026", "q": "What is the joint called where the pelvic girdle articulates with the femur?", "opts": ["Hip joint", "Acromioclavicular joint", "Sacroiliac joint", "Glenohumeral joint"], "correct": "Hip joint", "hint": "Hip joint", "src": "Exam 3 deck · Set 1"}, {"id": "e3-027", "q": "What marks the boundary between the true and false pelvis?", "opts": ["The pelvic inlet", "The bony surface you sit on", "The channel through the bottom of the pelvis", "Childbirth", "Right coxal bone."], "correct": "The pelvic inlet", "hint": "The pelvic inlet", "src": "Exam 3 deck · Set 1"}, {"id": "e3-028", "q": "What is the true pelvis important for?", "opts": ["Childbirth", "The pelvic inlet", "Supports weight when sitting", "The bony surface you sit on", "Right coxal bone."], "correct": "Childbirth", "hint": "Childbirth", "src": "Exam 3 deck · Set 1"}, {"id": "e3-029", "q": "What does the false pelvis house?", "opts": ["Inferior abdominal organs, such as the bladder", "The channel through the bottom of the pelvis", "The female pelvis has a broader subpubic angle (>100°)", "Provides attachment points for muscles and ligaments", "The superior border of the ala of the ilium"], "correct": "Inferior abdominal organs, such as the bladder", "hint": "Inferior abdominal organs, such as the bladder", "src": "Exam 3 deck · Set 1"}, {"id": "e3-030", "q": "What is the acetabulum?", "opts": ["A round depression on the lateral aspect of the coxal bone where the head of the femur articulates", "A large opening in each coxal bone through which nerves and blood vessels travel", "Two pelvic bones (hip or coxal bones) that each consist of three fused bones: ilium, ischium, and pubis", "A deep groove found inferior to the posterior inferior iliac spine", "The joint where two pubic bones meet, separated by a fibrocartilaginous pad"], "correct": "A round depression on the lateral aspect of the coxal bone where the head of the femur articulates", "hint": "A round depression on the lateral aspect of the coxal bone where the head of the femur articulates", "src": "Exam 3 deck · Set 1"}, {"id": "e3-031", "q": "What is the obturator foramen?", "opts": ["A large opening in each coxal bone through which nerves and blood vessels travel", "A round depression on the lateral aspect of the coxal bone where the head of the femur articulates", "A deep groove found inferior to the posterior inferior iliac spine", "Bones of the pectoral girdle and upper limb, and pelvic girdle and lower limb.", "The joint where two pubic bones meet, separated by a fibrocartilaginous pad"], "correct": "A large opening in each coxal bone through which nerves and blood vessels travel", "hint": "A large opening in each coxal bone through which nerves and blood vessels travel", "src": "Exam 3 deck · Set 1"}, {"id": "e3-032", "q": "What is the iliac crest?", "opts": ["The superior border of the ala of the ilium", "The channel through the bottom of the pelvis", "A ridge on the superior ramus of the pubis", "The female pelvis has a broader subpubic angle (>100°)", "The bony surface you sit on"], "correct": "The superior border of the ala of the ilium", "hint": "The superior border of the ala of the ilium", "src": "Exam 3 deck · Set 1"}, {"id": "e3-033", "q": "What is the anterior superior iliac spine (ASIS)?", "opts": ["A bony projection found at the anterior end of the iliac crest", "The superior border of the ala of the ilium", "The bony surface you sit on", "A deep groove found inferior to the posterior inferior iliac spine"], "correct": "A bony projection found at the anterior end of the iliac crest", "hint": "A bony projection found at the anterior end of the iliac crest", "src": "Exam 3 deck · Set 1"}, {"id": "e3-034", "q": "What is the ischial tuberosity?", "opts": ["The bony surface you sit on", "Supports weight when sitting", "The superior border of the ala of the ilium", "The channel through the bottom of the pelvis", "The pelvic inlet"], "correct": "The bony surface you sit on", "hint": "The bony surface you sit on", "src": "Exam 3 deck · Set 1"}, {"id": "e3-035", "q": "What is the pubic symphysis?", "opts": ["The joint where two pubic bones meet, separated by a fibrocartilaginous pad", "The female pelvis has a broader subpubic angle (>100°)", "Bones of the pectoral girdle and upper limb, and pelvic girdle and lower limb.", "Visible iliac fossa, auricular surface, and pubic symphysis orientation.", "A large opening in each coxal bone through which nerves and blood vessels travel"], "correct": "The joint where two pubic bones meet, separated by a fibrocartilaginous pad", "hint": "The joint where two pubic bones meet, separated by a fibrocartilaginous pad", "src": "Exam 3 deck · Set 1"}, {"id": "e3-036", "q": "What is the difference in the subpubic angle between male and female pelvises?", "opts": ["The female pelvis has a broader subpubic angle (>100°)", "The channel through the bottom of the pelvis", "The superior border of the ala of the ilium", "The joint where two pubic bones meet, separated by a fibrocartilaginous pad", "Provides attachment points for muscles and ligaments"], "correct": "The female pelvis has a broader subpubic angle (>100°)", "hint": "The female pelvis has a broader subpubic angle (>100°)", "src": "Exam 3 deck · Set 1"}, {"id": "e3-037", "q": "What is one characteristic of the female pelvis that aids childbirth?", "opts": ["Less inward curvature of the sacrum and coccyx", "Narrow pelvic tilt", "Prominent muscle markings", "Inward-projecting ischial spines"], "correct": "Less inward curvature of the sacrum and coccyx", "hint": "Less inward curvature of the sacrum and coccyx", "src": "Exam 3 deck · Set 1"}, {"id": "e3-038", "q": "What is the largest and strongest bone in the body?", "opts": ["The femur", "The tibia", "Cuboid", "Pubis (pubic bone).", "Coxal bone"], "correct": "The femur", "hint": "The femur", "src": "Exam 3 deck · Set 1"}, {"id": "e3-039", "q": "What articulates with the pelvis at the acetabulum?", "opts": ["The femoral head", "Glenoid fossa", "Trochlea", "Mandibular fossa"], "correct": "The femoral head", "hint": "The femoral head", "src": "Exam 3 deck · Set 1"}, {"id": "e3-040", "q": "What is the patella?", "opts": ["A sesamoid bone in the quadriceps femoris tendon", "A ridge on the posterior surface of the femur", "It attaches the patella to the tibia", "Olecranon, which interlocks with the humerus", "The medial projection at the ankle formed by the tibia"], "correct": "A sesamoid bone in the quadriceps femoris tendon", "hint": "A sesamoid bone in the quadriceps femoris tendon", "src": "Exam 3 deck · Set 1"}, {"id": "e3-041", "q": "What supports the majority of body weight in the leg?", "opts": ["The tibia", "The femur", "Coxal bone", "Calcaneus.", "Navicular."], "correct": "The tibia", "hint": "The tibia", "src": "Exam 3 deck · Set 1"}, {"id": "e3-042", "q": "What is the lateral malleolus?", "opts": ["The end of the fibula that forms the lateral side of the ankle joint", "The medial projection at the ankle formed by the tibia", "Seven bones that make up the ankle, including the talus and calcaneus", "The big toe, sometimes referred to as the 1st toe", "Each toe has three phalanges, except for the hallux, which has two"], "correct": "The end of the fibula that forms the lateral side of the ankle joint", "hint": "The end of the fibula that forms the lateral side of the ankle joint", "src": "Exam 3 deck · Set 1"}, {"id": "e3-043", "q": "What are the tarsal bones?", "opts": ["Seven bones that make up the ankle, including the talus and calcaneus", "The end of the fibula that forms the lateral side of the ankle joint", "The medial projection at the ankle formed by the tibia", "They provide support and distribute weight across the foot", "Each toe has three phalanges, except for the hallux, which has two"], "correct": "Seven bones that make up the ankle, including the talus and calcaneus", "hint": "Seven bones that make up the ankle, including the talus and calcaneus", "src": "Exam 3 deck · Set 1"}, {"id": "e3-044", "q": "What is the hallux?", "opts": ["The big toe, sometimes referred to as the 1st toe", "The medial projection at the ankle formed by the tibia", "Each toe has three phalanges, except for the hallux, which has two", "The end of the fibula that forms the lateral side of the ankle joint", "A sesamoid bone in the quadriceps femoris tendon"], "correct": "The big toe, sometimes referred to as the 1st toe", "hint": "The big toe, sometimes referred to as the 1st toe", "src": "Exam 3 deck · Set 1"}, {"id": "e3-045", "q": "How many phalanges are in each toe?", "opts": ["Each toe has three phalanges, except for the hallux, which has two", "The big toe, sometimes referred to as the 1st toe", "The end of the fibula that forms the lateral side of the ankle joint", "Seven bones that make up the ankle, including the talus and calcaneus", "They provide support and distribute weight across the foot"], "correct": "Each toe has three phalanges, except for the hallux, which has two", "hint": "Each toe has three phalanges, except for the hallux, which has two", "src": "Exam 3 deck · Set 1"}, {"id": "e3-046", "q": "What is the function of the three arches of the foot?", "opts": ["They provide support and distribute weight across the foot", "Each toe has three phalanges, except for the hallux, which has two", "A sesamoid bone in the quadriceps femoris tendon", "The medial projection at the ankle formed by the tibia", "The end of the fibula that forms the lateral side of the ankle joint"], "correct": "They provide support and distribute weight across the foot", "hint": "They provide support and distribute weight across the foot", "src": "Exam 3 deck · Set 1"}, {"id": "e3-047", "q": "What is the medial malleolus?", "opts": ["The medial projection at the ankle formed by the tibia", "The end of the fibula that forms the lateral side of the ankle joint", "The big toe, sometimes referred to as the 1st toe", "Seven bones that make up the ankle, including the talus and calcaneus", "It attaches the patella to the tibia"], "correct": "The medial projection at the ankle formed by the tibia", "hint": "The medial projection at the ankle formed by the tibia", "src": "Exam 3 deck · Set 1"}, {"id": "e3-048", "q": "What is the function of the patellar ligament?", "opts": ["It attaches the patella to the tibia", "The medial projection at the ankle formed by the tibia", "Scapula at the glenohumeral joint", "A ridge on the posterior surface of the femur", "The big toe, sometimes referred to as the 1st toe"], "correct": "It attaches the patella to the tibia", "hint": "It attaches the patella to the tibia", "src": "Exam 3 deck · Set 1"}, {"id": "e3-049", "q": "What is the greater sciatic notch?", "opts": ["A deep groove found inferior to the posterior inferior iliac spine", "A large opening in each coxal bone through which nerves and blood vessels travel", "A round depression on the lateral aspect of the coxal bone where the head of the femur articulates", "A ridge on the superior ramus of the pubis", "Provides attachment points for muscles and ligaments"], "correct": "A deep groove found inferior to the posterior inferior iliac spine", "hint": "A deep groove found inferior to the posterior inferior iliac spine", "src": "Exam 3 deck · Set 1"}, {"id": "e3-050", "q": "What is the linea aspera?", "opts": ["A ridge on the posterior surface of the femur", "A sesamoid bone in the quadriceps femoris tendon", "A deep hollow on the posterior distal surface of the humerus.", "Olecranon, which interlocks with the humerus", "Serves as an attachment point for muscles"], "correct": "A ridge on the posterior surface of the femur", "hint": "A ridge on the posterior surface of the femur", "src": "Exam 3 deck · Set 1"}] };
+DATA.e3s2 = { label: "Exam 3 — Set 2 (questions 51–100)", noSplit: true, mcq: [{"id": "e3-051", "q": "What is the pectineal line?", "opts": ["A ridge on the superior ramus of the pubis", "The superior border of the ala of the ilium", "A deep groove found inferior to the posterior inferior iliac spine", "The channel through the bottom of the pelvis", "Articulates with the sacrum and femur bones"], "correct": "A ridge on the superior ramus of the pubis", "hint": "A ridge on the superior ramus of the pubis", "src": "Exam 3 deck · Set 2"}, {"id": "e3-052", "q": "What is the role of the femoral neck?", "opts": ["It connects the femoral head to the femoral shaft", "It serves as an attachment point for neck muscles.", "It is the lower jawbone that holds the lower teeth.", "It forms the upper jaw and holds the upper teeth.", "It surrounds the brain and houses special sense organs."], "correct": "It connects the femoral head to the femoral shaft", "hint": "It connects the femoral head to the femoral shaft", "src": "Exam 3 deck · Set 2"}, {"id": "e3-053", "q": "How many bones are in the human skeleton?", "opts": ["About 206 bones", "14 phalanges", "There are 5 lumbar vertebrae.", "There are 12 thoracic vertebrae.", "The sacrum consists of 5 fused vertebrae."], "correct": "About 206 bones", "hint": "About 206 bones", "src": "Exam 3 deck · Set 2"}, {"id": "e3-054", "q": "What are the two basic divisions of the skeleton?", "opts": ["Axial skeleton and Appendicular skeleton", "Cranial bones and facial bones.", "Pectoral (shoulder) girdle and Pelvic (hip) girdle.", "Atlas (C1) and Axis (C2)."], "correct": "Axial skeleton and Appendicular skeleton", "hint": "Axial skeleton and Appendicular skeleton", "src": "Exam 3 deck · Set 2"}, {"id": "e3-055", "q": "What is the primary function of the Axial skeleton?", "opts": ["Forms the body's longitudinal axis, encases body cavities, supports and protects organs, and serves as attachment points for the appendicular skeleton.", "Skull (cranial and facial bones), vertebral column (vertebrae, sacrum, and coccyx), and thoracic cage (12 pairs of ribs and sternum).", "The vertebral canal is the term for the combined foramina of all vertebrae that encloses the spinal cord.", "Nucleus pulposus (inner jelly-like substance) and anulus fibrosus (outer ring of fibrocartilage).", "The vertebral body is the main section of the vertebra and is the most weight-bearing part."], "correct": "Forms the body's longitudinal axis, encases body cavities, supports and protects organs, and serves as attachment points for the appendicular skeleton.", "hint": "Forms the body's longitudinal axis, encases body cavities, supports and protects organs, and serves as attachment points for the appendicular skeleton.", "src": "Exam 3 deck · Set 2"}, {"id": "e3-056", "q": "What bones are included in the Axial skeleton?", "opts": ["Skull (cranial and facial bones), vertebral column (vertebrae, sacrum, and coccyx), and thoracic cage (12 pairs of ribs and sternum).", "The rib cage consists of the sternum, 12 pairs of ribs, and thoracic vertebrae.", "Forms the body's longitudinal axis, encases body cavities, supports and protects organs, and serves as attachment points for the appendicular skeleton.", "The vertebral canal is the term for the combined foramina of all vertebrae that encloses the spinal cord.", "The sacrum consists of 5 fused vertebrae, and the coccyx is a series of fused vertebrae."], "correct": "Skull (cranial and facial bones), vertebral column (vertebrae, sacrum, and coccyx), and thoracic cage (12 pairs of ribs and sternum).", "hint": "Skull (cranial and facial bones), vertebral column (vertebrae, sacrum, and coccyx), and thoracic cage (12 pairs of ribs and sternum).", "src": "Exam 3 deck · Set 2"}, {"id": "e3-057", "q": "What does the Appendicular skeleton include?", "opts": ["Bones of the pectoral girdle and upper limb, and pelvic girdle and lower limb.", "Pectoral girdle: Sternoclavicular joint; Pelvic girdle: Sacroiliac joint.", "A large opening in each coxal bone through which nerves and blood vessels travel", "The joint where two pubic bones meet, separated by a fibrocartilaginous pad", "Pectoral (shoulder) girdle and Pelvic (hip) girdle."], "correct": "Bones of the pectoral girdle and upper limb, and pelvic girdle and lower limb.", "hint": "Bones of the pectoral girdle and upper limb, and pelvic girdle and lower limb.", "src": "Exam 3 deck · Set 2"}, {"id": "e3-058", "q": "What are the three general categories of bone markings?", "opts": ["Depressions, openings, and projections.", "Canals, foramens, and sinuses.", "Facets, fossa, and fovea.", "Protuberance, trochanter, line, condyle, epicondyle, and malleolus."], "correct": "Depressions, openings, and projections.", "hint": "Depressions, openings, and projections.", "src": "Exam 3 deck · Set 2"}, {"id": "e3-059", "q": "What are some examples of openings in bone markings?", "opts": ["Canals, foramens, and sinuses.", "Depressions, openings, and projections.", "Protuberance, trochanter, line, condyle, epicondyle, and malleolus.", "Facets, fossa, and fovea."], "correct": "Canals, foramens, and sinuses.", "hint": "Canals, foramens, and sinuses.", "src": "Exam 3 deck · Set 2"}, {"id": "e3-060", "q": "What are some examples of depressions in bone markings?", "opts": ["Facets, fossa, and fovea.", "Depressions, openings, and projections.", "Protuberance, trochanter, line, condyle, epicondyle, and malleolus.", "Canals, foramens, and sinuses."], "correct": "Facets, fossa, and fovea.", "hint": "Facets, fossa, and fovea.", "src": "Exam 3 deck · Set 2"}, {"id": "e3-061", "q": "What are some examples of projections in bone markings?", "opts": ["Protuberance, trochanter, line, condyle, epicondyle, and malleolus.", "Depressions, openings, and projections.", "Facets, fossa, and fovea.", "Canals, foramens, and sinuses."], "correct": "Protuberance, trochanter, line, condyle, epicondyle, and malleolus.", "hint": "Protuberance, trochanter, line, condyle, epicondyle, and malleolus.", "src": "Exam 3 deck · Set 2"}, {"id": "e3-062", "q": "What is the importance of visualizing and practicing bone identification?", "opts": ["It helps in knowing what attaches to what bone and aids in memorization.", "It serves as an attachment point for neck muscles.", "It is the first part of the digestive tract.", "It connects the femoral head to the femoral shaft"], "correct": "It helps in knowing what attaches to what bone and aids in memorization.", "hint": "It helps in knowing what attaches to what bone and aids in memorization.", "src": "Exam 3 deck · Set 2"}, {"id": "e3-063", "q": "What are the two groups of the skull?", "opts": ["Cranial bones and facial bones.", "Hip bone, tibia, and patella", "Maxillary bones and palatine bones", "Zygomatic bone and temporal bone", "Atlas (C1) and Axis (C2)."], "correct": "Cranial bones and facial bones.", "hint": "Cranial bones and facial bones.", "src": "Exam 3 deck · Set 2"}, {"id": "e3-064", "q": "What are the four single cranial bones?", "opts": ["Frontal, occipital, ethmoid, and sphenoid bones.", "Perpendicular plate of the ethmoid and vomer.", "Subscapular fossa, supraspinous fossa, infraspinous fossa", "Cribriform plate, crista galli, superior and middle concha, and perpendicular plate.", "Mandibular fossa, external acoustic meatus, and mastoid process."], "correct": "Frontal, occipital, ethmoid, and sphenoid bones.", "hint": "Frontal, occipital, ethmoid, and sphenoid bones.", "src": "Exam 3 deck · Set 2"}, {"id": "e3-065", "q": "What are the two paired cranial bones?", "opts": ["Temporal and parietal bones.", "Cranial bones and facial bones.", "Clavicle and scapula", "Axial skeleton and Appendicular skeleton", "Maxillary bones and palatine bones"], "correct": "Temporal and parietal bones.", "hint": "Temporal and parietal bones.", "src": "Exam 3 deck · Set 2"}, {"id": "e3-066", "q": "What is the function of the occipital bone?", "opts": ["Articulates with the 1st cervical vertebra (atlas) and contains the foramen magnum.", "They form part of the hard palate and contribute to the floor of the nasal cavity.", "It is the opening in the occipital bone where the spinal cord passes through.", "It is considered the center bone of the skull and houses the pituitary gland.", "It has no direct connections to other bones and anchors the muscles of the tongue."], "correct": "Articulates with the 1st cervical vertebra (atlas) and contains the foramen magnum.", "hint": "Articulates with the 1st cervical vertebra (atlas) and contains the foramen magnum.", "src": "Exam 3 deck · Set 2"}, {"id": "e3-067", "q": "What does the frontal bone form?", "opts": ["The anterior cranial cavity and forehead.", "The inferior surfaces of the floor of the nasal cavity.", "They form the bridge of the nose.", "It forms part of the nasal septum.", "They support and contain the upper teeth."], "correct": "The anterior cranial cavity and forehead.", "hint": "The anterior cranial cavity and forehead.", "src": "Exam 3 deck · Set 2"}, {"id": "e3-068", "q": "What features are associated with the temporal bones?", "opts": ["Mandibular fossa, external acoustic meatus, and mastoid process.", "Perpendicular plate of the ethmoid and vomer.", "Nasal bones, vomer, maxilla, and palatine bones.", "Cribriform plate, crista galli, superior and middle concha, and perpendicular plate.", "Body, ramus, angle, condylar process, and coronoid process."], "correct": "Mandibular fossa, external acoustic meatus, and mastoid process.", "hint": "Mandibular fossa, external acoustic meatus, and mastoid process.", "src": "Exam 3 deck · Set 2"}, {"id": "e3-069", "q": "What is the significance of the sphenoid bone?", "opts": ["It is considered the center bone of the skull and houses the pituitary gland.", "It has no direct connections to other bones and anchors the muscles of the tongue.", "It is the opening in the occipital bone where the spinal cord passes through.", "It surrounds the brain and houses special sense organs.", "It is a prominent feature of the mandible, marking the chin."], "correct": "It is considered the center bone of the skull and houses the pituitary gland.", "hint": "It is considered the center bone of the skull and houses the pituitary gland.", "src": "Exam 3 deck · Set 2"}, {"id": "e3-070", "q": "What does the ethmoid bone form?", "opts": ["The roof and upper portion of the nasal cavity and the top of the nasal septum.", "They form part of the hard palate and contribute to the floor of the nasal cavity.", "The inferior surfaces of the floor of the nasal cavity.", "They support and contain the upper teeth and form the bottom of the nasal cavity and hard palate.", "To increase the surface area of the nasal cavity for filtering and humidifying air."], "correct": "The roof and upper portion of the nasal cavity and the top of the nasal septum.", "hint": "The roof and upper portion of the nasal cavity and the top of the nasal septum.", "src": "Exam 3 deck · Set 2"}, {"id": "e3-071", "q": "What are the features of the ethmoid bone?", "opts": ["Cribriform plate, crista galli, superior and middle concha, and perpendicular plate.", "Frontal, occipital, ethmoid, and sphenoid bones.", "Ethmoid bone, lacrimal bone, maxilla, and sphenoid bone.", "Perpendicular plate of the ethmoid and vomer.", "Mandibular fossa, external acoustic meatus, and mastoid process."], "correct": "Cribriform plate, crista galli, superior and middle concha, and perpendicular plate.", "hint": "Cribriform plate, crista galli, superior and middle concha, and perpendicular plate.", "src": "Exam 3 deck · Set 2"}, {"id": "e3-072", "q": "How many facial bones are there?", "opts": ["14 facial bones.", "2.", "There are 7 cervical vertebrae.", "The primary curves are thoracic and sacral.", "There are 12 thoracic vertebrae."], "correct": "14 facial bones.", "hint": "14 facial bones.", "src": "Exam 3 deck · Set 2"}, {"id": "e3-073", "q": "What are the two maxillary bones responsible for?", "opts": ["They support and contain the upper teeth and form the bottom of the nasal cavity and hard palate.", "They form part of the hard palate and contribute to the floor of the nasal cavity.", "They are paranasal sinuses that help lighten the skull and provide mucous.", "The roof and upper portion of the nasal cavity and the top of the nasal septum.", "They lighten the skull, provide mucous epithelium, and may affect voice."], "correct": "They support and contain the upper teeth and form the bottom of the nasal cavity and hard palate.", "hint": "They support and contain the upper teeth and form the bottom of the nasal cavity and hard palate.", "src": "Exam 3 deck · Set 2"}, {"id": "e3-074", "q": "What is the role of the alveolar processes in the maxilla?", "opts": ["They support and contain the upper teeth.", "They form the bridge of the nose.", "They form the cheekbones and contribute to the orbits.", "It forms the upper jaw and holds the upper teeth.", "The anterior cranial cavity and forehead."], "correct": "They support and contain the upper teeth.", "hint": "They support and contain the upper teeth.", "src": "Exam 3 deck · Set 2"}, {"id": "e3-075", "q": "What is the function of the nasal bones?", "opts": ["They form the bridge of the nose.", "It forms part of the nasal septum.", "They form the cheekbones and contribute to the orbits.", "They support and contain the upper teeth.", "They form part of the hard palate and contribute to the floor of the nasal cavity."], "correct": "They form the bridge of the nose.", "hint": "They form the bridge of the nose.", "src": "Exam 3 deck · Set 2"}, {"id": "e3-076", "q": "What is the role of the mandible?", "opts": ["It is the lower jawbone that holds the lower teeth.", "It forms the upper jaw and holds the upper teeth.", "It is a prominent feature of the mandible, marking the chin.", "It connects the femoral head to the femoral shaft", "It serves as an attachment point for neck muscles."], "correct": "It is the lower jawbone that holds the lower teeth.", "hint": "It is the lower jawbone that holds the lower teeth.", "src": "Exam 3 deck · Set 2"}, {"id": "e3-077", "q": "What is the significance of the zygomatic bones?", "opts": ["They form the cheekbones and contribute to the orbits.", "They are involved in the formation of the medial wall of the orbit.", "They form part of the hard palate and contribute to the floor of the nasal cavity.", "They form the bridge of the nose.", "They support and contain the upper teeth."], "correct": "They form the cheekbones and contribute to the orbits.", "hint": "They form the cheekbones and contribute to the orbits.", "src": "Exam 3 deck · Set 2"}, {"id": "e3-078", "q": "What is the function of the lacrimal bones?", "opts": ["They are involved in the formation of the medial wall of the orbit.", "They form the cheekbones and contribute to the orbits.", "They lighten the skull, provide mucous epithelium, and may affect voice.", "They form part of the hard palate and contribute to the floor of the nasal cavity.", "They are paranasal sinuses that help lighten the skull and provide mucous."], "correct": "They are involved in the formation of the medial wall of the orbit.", "hint": "They are involved in the formation of the medial wall of the orbit.", "src": "Exam 3 deck · Set 2"}, {"id": "e3-079", "q": "What is the role of the vomer bone?", "opts": ["It forms part of the nasal septum.", "It is the first part of the digestive tract.", "It forms the upper jaw and holds the upper teeth.", "They form the bridge of the nose.", "It is the lower jawbone that holds the lower teeth."], "correct": "It forms part of the nasal septum.", "hint": "It forms part of the nasal septum.", "src": "Exam 3 deck · Set 2"}, {"id": "e3-080", "q": "What are the two palatine bones responsible for?", "opts": ["They form part of the hard palate and contribute to the floor of the nasal cavity.", "They support and contain the upper teeth and form the bottom of the nasal cavity and hard palate.", "They form the cheekbones and contribute to the orbits.", "They are paranasal sinuses that help lighten the skull and provide mucous.", "They are involved in the formation of the medial wall of the orbit."], "correct": "They form part of the hard palate and contribute to the floor of the nasal cavity.", "hint": "They form part of the hard palate and contribute to the floor of the nasal cavity.", "src": "Exam 3 deck · Set 2"}, {"id": "e3-081", "q": "What bones form the hard palate?", "opts": ["Maxillary bones and palatine bones", "Superior and inferior nasal conchae", "The vomer and palatine bones", "Palatine bone and sphenoid bones"], "correct": "Maxillary bones and palatine bones", "hint": "Maxillary bones and palatine bones", "src": "Exam 3 deck · Set 2"}, {"id": "e3-082", "q": "What is the function of the external acoustic meatus?", "opts": ["Conducts sound to the eardrum", "They form the bridge of the nose.", "Houses sensory receptors for smell.", "Cranial Nerve II (Optic Nerve).", "It forms part of the nasal septum."], "correct": "Conducts sound to the eardrum", "hint": "Conducts sound to the eardrum", "src": "Exam 3 deck · Set 2"}, {"id": "e3-083", "q": "Which bone forms the inferior portion of the nasal septum?", "opts": ["Vomer", "Occipital bone", "Frontal bone", "Zygomatic bones", "Hyoid bone"], "correct": "Vomer", "hint": "Vomer", "src": "Exam 3 deck · Set 2"}, {"id": "e3-084", "q": "What are the cheek bones called?", "opts": ["Zygomatic bones", "Atlas", "Frontal bone", "Hyoid bone", "Vertebra prominens"], "correct": "Zygomatic bones", "hint": "Zygomatic bones", "src": "Exam 3 deck · Set 2"}, {"id": "e3-085", "q": "What is the significance of the foramen magnum?", "opts": ["It is the opening in the occipital bone where the spinal cord passes through.", "It is considered the center bone of the skull and houses the pituitary gland.", "It has no direct connections to other bones and anchors the muscles of the tongue.", "Articulates with the 1st cervical vertebra (atlas) and contains the foramen magnum.", "It is a prominent feature of the mandible, marking the chin."], "correct": "It is the opening in the occipital bone where the spinal cord passes through.", "hint": "It is the opening in the occipital bone where the spinal cord passes through.", "src": "Exam 3 deck · Set 2"}, {"id": "e3-086", "q": "What are the major sutures of the skull?", "opts": ["Coronal, sagittal, lambdoid, and squamous sutures", "Wide, soft areas where unfused sutures meet in an infant's skull.", "It serves as an attachment point for neck muscles.", "The inferior surfaces of the floor of the nasal cavity.", "It forms the upper jaw and holds the upper teeth."], "correct": "Coronal, sagittal, lambdoid, and squamous sutures", "hint": "Coronal, sagittal, lambdoid, and squamous sutures", "src": "Exam 3 deck · Set 2"}, {"id": "e3-087", "q": "What is the role of the paranasal sinuses?", "opts": ["They lighten the skull, provide mucous epithelium, and may affect voice.", "They are paranasal sinuses that help lighten the skull and provide mucous.", "They are involved in the formation of the medial wall of the orbit.", "They form part of the hard palate and contribute to the floor of the nasal cavity.", "They support and contain the upper teeth and form the bottom of the nasal cavity and hard palate."], "correct": "They lighten the skull, provide mucous epithelium, and may affect voice.", "hint": "They lighten the skull, provide mucous epithelium, and may affect voice.", "src": "Exam 3 deck · Set 2"}, {"id": "e3-088", "q": "What bones make up the zygomatic arches?", "opts": ["Zygomatic bone and temporal bone", "Axial skeleton and Appendicular skeleton", "Greater tubercle and lesser tubercle", "Cranial bones and facial bones.", "Temporal and parietal bones."], "correct": "Zygomatic bone and temporal bone", "hint": "Zygomatic bone and temporal bone", "src": "Exam 3 deck · Set 2"}, {"id": "e3-089", "q": "What is unique about the hyoid bone?", "opts": ["It has no direct connections to other bones and anchors the muscles of the tongue.", "It is the opening in the occipital bone where the spinal cord passes through.", "It is considered the center bone of the skull and houses the pituitary gland.", "It is a prominent feature of the mandible, marking the chin.", "They form part of the hard palate and contribute to the floor of the nasal cavity."], "correct": "It has no direct connections to other bones and anchors the muscles of the tongue.", "hint": "It has no direct connections to other bones and anchors the muscles of the tongue.", "src": "Exam 3 deck · Set 2"}, {"id": "e3-090", "q": "What is the primary function of the pectoral girdle?", "opts": ["Supports bones of the upper limb and joins the upper limbs to the trunk", "They are paranasal sinuses that help lighten the skull and provide mucous.", "It is the opening in the occipital bone where the spinal cord passes through.", "The roof and upper portion of the nasal cavity and the top of the nasal septum.", "They lighten the skull, provide mucous epithelium, and may affect voice."], "correct": "Supports bones of the upper limb and joins the upper limbs to the trunk", "hint": "Supports bones of the upper limb and joins the upper limbs to the trunk", "src": "Exam 3 deck · Set 2"}, {"id": "e3-091", "q": "What is the function of the nasal cavity?", "opts": ["Houses sensory receptors for smell.", "It forms part of the nasal septum.", "The anterior cranial cavity and forehead.", "The inferior surfaces of the floor of the nasal cavity.", "They form the bridge of the nose."], "correct": "Houses sensory receptors for smell.", "hint": "Houses sensory receptors for smell.", "src": "Exam 3 deck · Set 2"}, {"id": "e3-092", "q": "What is the anterior view of the fetal skull characterized by?", "opts": ["Unfused sutures and fontanelles that allow for skull molding during childbirth.", "Wide, soft areas where unfused sutures meet in an infant's skull.", "They lighten the skull, provide mucous epithelium, and may affect voice.", "It is considered the center bone of the skull and houses the pituitary gland.", "To increase the surface area of the nasal cavity for filtering and humidifying air."], "correct": "Unfused sutures and fontanelles that allow for skull molding during childbirth.", "hint": "Unfused sutures and fontanelles that allow for skull molding during childbirth.", "src": "Exam 3 deck · Set 2"}, {"id": "e3-093", "q": "What are fontanelles?", "opts": ["Wide, soft areas where unfused sutures meet in an infant's skull.", "Unfused sutures and fontanelles that allow for skull molding during childbirth.", "They lighten the skull, provide mucous epithelium, and may affect voice.", "It is a prominent feature of the mandible, marking the chin.", "They are paranasal sinuses that help lighten the skull and provide mucous."], "correct": "Wide, soft areas where unfused sutures meet in an infant's skull.", "hint": "Wide, soft areas where unfused sutures meet in an infant's skull.", "src": "Exam 3 deck · Set 2"}, {"id": "e3-094", "q": "What is the significance of the mental protuberance?", "opts": ["It is a prominent feature of the mandible, marking the chin.", "It surrounds the brain and houses special sense organs.", "It forms the upper jaw and holds the upper teeth.", "It is the lower jawbone that holds the lower teeth.", "It is the first part of the digestive tract."], "correct": "It is a prominent feature of the mandible, marking the chin.", "hint": "It is a prominent feature of the mandible, marking the chin.", "src": "Exam 3 deck · Set 2"}, {"id": "e3-095", "q": "What bones form the roof of the oral cavity?", "opts": ["The inferior surfaces of the floor of the nasal cavity.", "The roof and upper portion of the nasal cavity and the top of the nasal septum.", "They form part of the hard palate and contribute to the floor of the nasal cavity.", "The anterior cranial cavity and forehead.", "To increase the surface area of the nasal cavity for filtering and humidifying air."], "correct": "The inferior surfaces of the floor of the nasal cavity.", "hint": "The inferior surfaces of the floor of the nasal cavity.", "src": "Exam 3 deck · Set 2"}, {"id": "e3-096", "q": "What bones are included in the nasal complex?", "opts": ["Nasal bones, vomer, maxilla, and palatine bones.", "Palatine bones, vomer bones, inferior nasal conchae, and lacrimal bones.", "Ethmoid bone, lacrimal bone, maxilla, and sphenoid bone.", "Body, ramus, angle, condylar process, and coronoid process.", "Frontal, occipital, ethmoid, and sphenoid bones."], "correct": "Nasal bones, vomer, maxilla, and palatine bones.", "hint": "Nasal bones, vomer, maxilla, and palatine bones.", "src": "Exam 3 deck · Set 2"}, {"id": "e3-097", "q": "Which cranial bone articulates with the first cervical vertebra?", "opts": ["Occipital bone", "Cervical vertebrae.", "Vertebra prominens", "Atlas", "Manubrium"], "correct": "Occipital bone", "hint": "Occipital bone", "src": "Exam 3 deck · Set 2"}, {"id": "e3-098", "q": "What are the components of the mandible?", "opts": ["Body, ramus, angle, condylar process, and coronoid process.", "Palatine bones, vomer bones, inferior nasal conchae, and lacrimal bones.", "Cervical (C), Thoracic (T), Lumbar (L), Sacral (S), Coccygeal (Co).", "Vertebral body, spinous process, transverse process, and vertebral foramina.", "Ethmoid bone, lacrimal bone, maxilla, and sphenoid bone."], "correct": "Body, ramus, angle, condylar process, and coronoid process.", "hint": "Body, ramus, angle, condylar process, and coronoid process.", "src": "Exam 3 deck · Set 2"}, {"id": "e3-099", "q": "What is the purpose of the nasal conchae?", "opts": ["To increase the surface area of the nasal cavity for filtering and humidifying air.", "The roof and upper portion of the nasal cavity and the top of the nasal septum.", "The inferior surfaces of the floor of the nasal cavity.", "They form part of the hard palate and contribute to the floor of the nasal cavity.", "Unfused sutures and fontanelles that allow for skull molding during childbirth."], "correct": "To increase the surface area of the nasal cavity for filtering and humidifying air.", "hint": "To increase the surface area of the nasal cavity for filtering and humidifying air.", "src": "Exam 3 deck · Set 2"}, {"id": "e3-100", "q": "What bones are involved in the formation of the bony nasal septum?", "opts": ["Perpendicular plate of the ethmoid and vomer.", "Palatine bones, vomer bones, inferior nasal conchae, and lacrimal bones.", "Nasal bones, vomer, maxilla, and palatine bones.", "Frontal bone, parietal bones, and occipital bone.", "Ethmoid bone, lacrimal bone, maxilla, and sphenoid bone."], "correct": "Perpendicular plate of the ethmoid and vomer.", "hint": "Perpendicular plate of the ethmoid and vomer.", "src": "Exam 3 deck · Set 2"}] };
+DATA.e3s3 = { label: "Exam 3 — Set 3 (questions 101–150)", noSplit: true, mcq: [{"id": "e3-101", "q": "What is the function of the maxilla?", "opts": ["It forms the upper jaw and holds the upper teeth.", "It is the lower jawbone that holds the lower teeth.", "It surrounds the brain and houses special sense organs.", "It forms part of the nasal septum.", "It serves as an attachment point for neck muscles."], "correct": "It forms the upper jaw and holds the upper teeth.", "hint": "It forms the upper jaw and holds the upper teeth.", "src": "Exam 3 deck · Set 3"}, {"id": "e3-102", "q": "What is the significance of the mastoid process?", "opts": ["It serves as an attachment point for neck muscles.", "It forms the upper jaw and holds the upper teeth.", "It is the lower jawbone that holds the lower teeth.", "It is the first part of the digestive tract.", "It surrounds the brain and houses special sense organs."], "correct": "It serves as an attachment point for neck muscles.", "hint": "It serves as an attachment point for neck muscles.", "src": "Exam 3 deck · Set 3"}, {"id": "e3-103", "q": "What are the characteristics of the cranial cavity?", "opts": ["It surrounds the brain and houses special sense organs.", "It serves as an attachment point for neck muscles.", "It forms the upper jaw and holds the upper teeth.", "The inferior surfaces of the floor of the nasal cavity.", "It is a prominent feature of the mandible, marking the chin."], "correct": "It surrounds the brain and houses special sense organs.", "hint": "It surrounds the brain and houses special sense organs.", "src": "Exam 3 deck · Set 3"}, {"id": "e3-104", "q": "What bones are part of the facial skeleton?", "opts": ["Maxilla, zygomatic, nasal, vomer, palatine, lacrimal, and mandible.", "Mandibular fossa, external acoustic meatus, and mastoid process.", "Palatine bones, vomer bones, inferior nasal conchae, and lacrimal bones.", "Body, ramus, angle, condylar process, and coronoid process.", "Frontal bone, parietal bones, and occipital bone."], "correct": "Maxilla, zygomatic, nasal, vomer, palatine, lacrimal, and mandible.", "hint": "Maxilla, zygomatic, nasal, vomer, palatine, lacrimal, and mandible.", "src": "Exam 3 deck · Set 3"}, {"id": "e3-105", "q": "What is the primary function of the oral cavity?", "opts": ["It is the first part of the digestive tract.", "It forms part of the nasal septum.", "It forms the upper jaw and holds the upper teeth.", "It serves as an attachment point for neck muscles.", "It connects the femoral head to the femoral shaft"], "correct": "It is the first part of the digestive tract.", "hint": "It is the first part of the digestive tract.", "src": "Exam 3 deck · Set 3"}, {"id": "e3-106", "q": "What is the role of the maxillary sinuses?", "opts": ["They are paranasal sinuses that help lighten the skull and provide mucous.", "They lighten the skull, provide mucous epithelium, and may affect voice.", "They form part of the hard palate and contribute to the floor of the nasal cavity.", "They are involved in the formation of the medial wall of the orbit.", "They support and contain the upper teeth and form the bottom of the nasal cavity and hard palate."], "correct": "They are paranasal sinuses that help lighten the skull and provide mucous.", "hint": "They are paranasal sinuses that help lighten the skull and provide mucous.", "src": "Exam 3 deck · Set 3"}, {"id": "e3-107", "q": "What are the main components of the vertebral column?", "opts": ["The vertebral column is composed of vertebrae bones.", "The xiphoid process is the inferior segment of the sternum.", "The rib cage consists of the sternum, 12 pairs of ribs, and thoracic vertebrae.", "The vertebral body is the main section of the vertebra and is the most weight-bearing part.", "Lumbar vertebrae have the largest bodies and the smallest vertebral canal."], "correct": "The vertebral column is composed of vertebrae bones.", "hint": "The vertebral column is composed of vertebrae bones.", "src": "Exam 3 deck · Set 3"}, {"id": "e3-108", "q": "How are individual vertebrae classified?", "opts": ["Each vertebra is classified by a letter indicating its region and a number indicating its position.", "Cervical vertebrae have smaller bodies, larger vertebral foramina, and bifid spinous processes.", "The vertebral body is the main section of the vertebra and is the most weight-bearing part.", "Nucleus pulposus (inner jelly-like substance) and anulus fibrosus (outer ring of fibrocartilage).", "The vertebral canal is the term for the combined foramina of all vertebrae that encloses the spinal cord."], "correct": "Each vertebra is classified by a letter indicating its region and a number indicating its position.", "hint": "Each vertebra is classified by a letter indicating its region and a number indicating its position.", "src": "Exam 3 deck · Set 3"}, {"id": "e3-109", "q": "What are the abbreviations for the vertebral regions?", "opts": ["Cervical (C), Thoracic (T), Lumbar (L), Sacral (S), Coccygeal (Co).", "Vertebral body, spinous process, transverse process, and vertebral foramina.", "Cribriform plate, crista galli, superior and middle concha, and perpendicular plate.", "Frontal, occipital, ethmoid, and sphenoid bones.", "Body, ramus, angle, condylar process, and coronoid process."], "correct": "Cervical (C), Thoracic (T), Lumbar (L), Sacral (S), Coccygeal (Co).", "hint": "Cervical (C), Thoracic (T), Lumbar (L), Sacral (S), Coccygeal (Co).", "src": "Exam 3 deck · Set 3"}, {"id": "e3-110", "q": "How many cervical vertebrae are there?", "opts": ["There are 7 cervical vertebrae.", "There are 12 thoracic vertebrae.", "There are 5 lumbar vertebrae.", "The sacrum consists of 5 fused vertebrae.", "14 facial bones."], "correct": "There are 7 cervical vertebrae.", "hint": "There are 7 cervical vertebrae.", "src": "Exam 3 deck · Set 3"}, {"id": "e3-111", "q": "How many thoracic vertebrae are there?", "opts": ["There are 12 thoracic vertebrae.", "The primary curves are thoracic and sacral.", "There are 7 cervical vertebrae.", "There are 5 lumbar vertebrae.", "The sacrum consists of 5 fused vertebrae."], "correct": "There are 12 thoracic vertebrae.", "hint": "There are 12 thoracic vertebrae.", "src": "Exam 3 deck · Set 3"}, {"id": "e3-112", "q": "How many lumbar vertebrae are there?", "opts": ["There are 5 lumbar vertebrae.", "The sacrum consists of 5 fused vertebrae.", "There are 7 cervical vertebrae.", "There are 12 thoracic vertebrae.", "About 206 bones"], "correct": "There are 5 lumbar vertebrae.", "hint": "There are 5 lumbar vertebrae.", "src": "Exam 3 deck · Set 3"}, {"id": "e3-113", "q": "What is the composition of the sacrum and coccyx?", "opts": ["The sacrum consists of 5 fused vertebrae, and the coccyx is a series of fused vertebrae.", "The rib cage consists of the sternum, 12 pairs of ribs, and thoracic vertebrae.", "The vertebral body is the main section of the vertebra and is the most weight-bearing part.", "The vertebral canal is the term for the combined foramina of all vertebrae that encloses the spinal cord.", "Intervertebral foramina are holes between vertebrae through which spinal roots exit."], "correct": "The sacrum consists of 5 fused vertebrae, and the coccyx is a series of fused vertebrae.", "hint": "The sacrum consists of 5 fused vertebrae, and the coccyx is a series of fused vertebrae.", "src": "Exam 3 deck · Set 3"}, {"id": "e3-114", "q": "What are the primary spinal curves present at birth?", "opts": ["The primary curves are thoracic and sacral.", "2.", "About 206 bones", "There are 5 lumbar vertebrae.", "14 in each hand (28 in both hands)."], "correct": "The primary curves are thoracic and sacral.", "hint": "The primary curves are thoracic and sacral.", "src": "Exam 3 deck · Set 3"}, {"id": "e3-115", "q": "What are secondary spinal curves and when do they develop?", "opts": ["Secondary curves are cervical and lumbar, developing within the first 2 years of age.", "Cervical vertebrae have smaller bodies, larger vertebral foramina, and bifid spinous processes.", "Thoracic vertebrae articulate with ribs at their transverse processes and bodies.", "The rib cage consists of the sternum, 12 pairs of ribs, and thoracic vertebrae.", "Intervertebral foramina are holes between vertebrae through which spinal roots exit."], "correct": "Secondary curves are cervical and lumbar, developing within the first 2 years of age.", "hint": "Secondary curves are cervical and lumbar, developing within the first 2 years of age.", "src": "Exam 3 deck · Set 3"}, {"id": "e3-116", "q": "What is the function of intervertebral discs?", "opts": ["Intervertebral discs absorb shock and bind vertebrae together.", "Intervertebral foramina are holes between vertebrae through which spinal roots exit.", "Lumbar vertebrae appear like a moose's head in lateral view.", "True ribs are ribs that directly attach to the sternum (ribs 1-7).", "The xiphoid process is the inferior segment of the sternum."], "correct": "Intervertebral discs absorb shock and bind vertebrae together.", "hint": "Intervertebral discs absorb shock and bind vertebrae together.", "src": "Exam 3 deck · Set 3"}, {"id": "e3-117", "q": "What are the two main parts of an intervertebral disc?", "opts": ["Nucleus pulposus (inner jelly-like substance) and anulus fibrosus (outer ring of fibrocartilage).", "The vertebral body is the main section of the vertebra and is the most weight-bearing part.", "Cervical vertebrae have smaller bodies, larger vertebral foramina, and bifid spinous processes.", "Each vertebra is classified by a letter indicating its region and a number indicating its position.", "Secondary curves are cervical and lumbar, developing within the first 2 years of age."], "correct": "Nucleus pulposus (inner jelly-like substance) and anulus fibrosus (outer ring of fibrocartilage).", "hint": "Nucleus pulposus (inner jelly-like substance) and anulus fibrosus (outer ring of fibrocartilage).", "src": "Exam 3 deck · Set 3"}, {"id": "e3-118", "q": "What is the vertebral canal?", "opts": ["The vertebral canal is the term for the combined foramina of all vertebrae that encloses the spinal cord.", "The vertebral body is the main section of the vertebra and is the most weight-bearing part.", "The sacrum consists of 5 fused vertebrae, and the coccyx is a series of fused vertebrae.", "Cervical vertebrae have smaller bodies, larger vertebral foramina, and bifid spinous processes.", "The rib cage consists of the sternum, 12 pairs of ribs, and thoracic vertebrae."], "correct": "The vertebral canal is the term for the combined foramina of all vertebrae that encloses the spinal cord.", "hint": "The vertebral canal is the term for the combined foramina of all vertebrae that encloses the spinal cord.", "src": "Exam 3 deck · Set 3"}, {"id": "e3-119", "q": "What are the common parts of most vertebrae?", "opts": ["Vertebral body, spinous process, transverse process, and vertebral foramina.", "Perpendicular plate of the ethmoid and vomer.", "Nasal bones, vomer, maxilla, and palatine bones.", "Subscapular fossa, supraspinous fossa, infraspinous fossa", "Palatine bones, vomer bones, inferior nasal conchae, and lacrimal bones."], "correct": "Vertebral body, spinous process, transverse process, and vertebral foramina.", "hint": "Vertebral body, spinous process, transverse process, and vertebral foramina.", "src": "Exam 3 deck · Set 3"}, {"id": "e3-120", "q": "What is unique about the cervical vertebrae?", "opts": ["Cervical vertebrae have smaller bodies, larger vertebral foramina, and bifid spinous processes.", "Lumbar vertebrae have the largest bodies and the smallest vertebral canal.", "Thoracic vertebrae articulate with ribs at their transverse processes and bodies.", "The vertebral canal is the term for the combined foramina of all vertebrae that encloses the spinal cord.", "The vertebral body is the main section of the vertebra and is the most weight-bearing part."], "correct": "Cervical vertebrae have smaller bodies, larger vertebral foramina, and bifid spinous processes.", "hint": "Cervical vertebrae have smaller bodies, larger vertebral foramina, and bifid spinous processes.", "src": "Exam 3 deck · Set 3"}, {"id": "e3-121", "q": "What are the names of the first two cervical vertebrae?", "opts": ["Atlas (C1) and Axis (C2).", "Clavicle and scapula", "Greater tubercle and lesser tubercle", "Hip bone, tibia, and patella", "Maxillary bones and palatine bones"], "correct": "Atlas (C1) and Axis (C2).", "hint": "Atlas (C1) and Axis (C2).", "src": "Exam 3 deck · Set 3"}, {"id": "e3-122", "q": "What is the function of the dens in the axis (C2)?", "opts": ["The dens allows for the rotation of the skull (e.g., 'saying no').", "The xiphoid process is the inferior segment of the sternum.", "The rib cage consists of the sternum, 12 pairs of ribs, and thoracic vertebrae.", "The manubrium is the handle of the sternum, which has a suprasternal notch.", "The sacrum consists of 5 fused vertebrae, and the coccyx is a series of fused vertebrae."], "correct": "The dens allows for the rotation of the skull (e.g., 'saying no').", "hint": "The dens allows for the rotation of the skull (e.g., 'saying no').", "src": "Exam 3 deck · Set 3"}, {"id": "e3-123", "q": "What distinguishes thoracic vertebrae from other vertebrae?", "opts": ["Thoracic vertebrae articulate with ribs at their transverse processes and bodies.", "The rib cage consists of the sternum, 12 pairs of ribs, and thoracic vertebrae.", "Cervical vertebrae have smaller bodies, larger vertebral foramina, and bifid spinous processes.", "Lumbar vertebrae have the largest bodies and the smallest vertebral canal.", "False ribs are ribs that are indirectly attached to the sternum (ribs 8-12)."], "correct": "Thoracic vertebrae articulate with ribs at their transverse processes and bodies.", "hint": "Thoracic vertebrae articulate with ribs at their transverse processes and bodies.", "src": "Exam 3 deck · Set 3"}, {"id": "e3-124", "q": "How do lumbar vertebrae differ from cervical and thoracic vertebrae?", "opts": ["Lumbar vertebrae have the largest bodies and the smallest vertebral canal.", "Lumbar vertebrae appear like a moose's head in lateral view.", "Cervical vertebrae have smaller bodies, larger vertebral foramina, and bifid spinous processes.", "Thoracic vertebrae articulate with ribs at their transverse processes and bodies.", "The rib cage consists of the sternum, 12 pairs of ribs, and thoracic vertebrae."], "correct": "Lumbar vertebrae have the largest bodies and the smallest vertebral canal.", "hint": "Lumbar vertebrae have the largest bodies and the smallest vertebral canal.", "src": "Exam 3 deck · Set 3"}, {"id": "e3-125", "q": "What is the structure of the sacrum?", "opts": ["The sacrum consists of 5 fused vertebrae.", "Thumb (Pollex)", "There are 5 lumbar vertebrae.", "14 phalanges", "There are 12 thoracic vertebrae."], "correct": "The sacrum consists of 5 fused vertebrae.", "hint": "The sacrum consists of 5 fused vertebrae.", "src": "Exam 3 deck · Set 3"}, {"id": "e3-126", "q": "What are true ribs?", "opts": ["True ribs are ribs that directly attach to the sternum (ribs 1-7).", "Floating ribs are ribs that are not attached to the sternum.", "False ribs are ribs that are indirectly attached to the sternum (ribs 8-12).", "The rib cage consists of the sternum, 12 pairs of ribs, and thoracic vertebrae.", "The manubrium is the handle of the sternum, which has a suprasternal notch."], "correct": "True ribs are ribs that directly attach to the sternum (ribs 1-7).", "hint": "True ribs are ribs that directly attach to the sternum (ribs 1-7).", "src": "Exam 3 deck · Set 3"}, {"id": "e3-127", "q": "What are false ribs?", "opts": ["False ribs are ribs that are indirectly attached to the sternum (ribs 8-12).", "The rib cage consists of the sternum, 12 pairs of ribs, and thoracic vertebrae.", "Floating ribs are ribs that are not attached to the sternum.", "The manubrium is the handle of the sternum, which has a suprasternal notch.", "True ribs are ribs that directly attach to the sternum (ribs 1-7)."], "correct": "False ribs are ribs that are indirectly attached to the sternum (ribs 8-12).", "hint": "False ribs are ribs that are indirectly attached to the sternum (ribs 8-12).", "src": "Exam 3 deck · Set 3"}, {"id": "e3-128", "q": "What are floating ribs?", "opts": ["Floating ribs are ribs that are not attached to the sternum.", "False ribs are ribs that are indirectly attached to the sternum (ribs 8-12).", "True ribs are ribs that directly attach to the sternum (ribs 1-7).", "The xiphoid process is the inferior segment of the sternum.", "The rib cage consists of the sternum, 12 pairs of ribs, and thoracic vertebrae."], "correct": "Floating ribs are ribs that are not attached to the sternum.", "hint": "Floating ribs are ribs that are not attached to the sternum.", "src": "Exam 3 deck · Set 3"}, {"id": "e3-129", "q": "What is the manubrium?", "opts": ["The manubrium is the handle of the sternum, which has a suprasternal notch.", "The rib cage consists of the sternum, 12 pairs of ribs, and thoracic vertebrae.", "The xiphoid process is the inferior segment of the sternum.", "The dens allows for the rotation of the skull (e.g., 'saying no').", "False ribs are ribs that are indirectly attached to the sternum (ribs 8-12)."], "correct": "The manubrium is the handle of the sternum, which has a suprasternal notch.", "hint": "The manubrium is the handle of the sternum, which has a suprasternal notch.", "src": "Exam 3 deck · Set 3"}, {"id": "e3-130", "q": "What is the xiphoid process?", "opts": ["The xiphoid process is the inferior segment of the sternum.", "The manubrium is the handle of the sternum, which has a suprasternal notch.", "The rib cage consists of the sternum, 12 pairs of ribs, and thoracic vertebrae.", "Floating ribs are ribs that are not attached to the sternum.", "The vertebral column is composed of vertebrae bones."], "correct": "The xiphoid process is the inferior segment of the sternum.", "hint": "The xiphoid process is the inferior segment of the sternum.", "src": "Exam 3 deck · Set 3"}, {"id": "e3-131", "q": "What are the parts of the rib cage?", "opts": ["The rib cage consists of the sternum, 12 pairs of ribs, and thoracic vertebrae.", "False ribs are ribs that are indirectly attached to the sternum (ribs 8-12).", "The manubrium is the handle of the sternum, which has a suprasternal notch.", "The sacrum consists of 5 fused vertebrae, and the coccyx is a series of fused vertebrae.", "Thoracic vertebrae articulate with ribs at their transverse processes and bodies."], "correct": "The rib cage consists of the sternum, 12 pairs of ribs, and thoracic vertebrae.", "hint": "The rib cage consists of the sternum, 12 pairs of ribs, and thoracic vertebrae.", "src": "Exam 3 deck · Set 3"}, {"id": "e3-132", "q": "What is the typical appearance of lumbar vertebrae in lateral view?", "opts": ["Lumbar vertebrae appear like a moose's head in lateral view.", "Lumbar vertebrae have the largest bodies and the smallest vertebral canal.", "Intervertebral discs absorb shock and bind vertebrae together.", "The vertebral column is composed of vertebrae bones.", "Floating ribs are ribs that are not attached to the sternum."], "correct": "Lumbar vertebrae appear like a moose's head in lateral view.", "hint": "Lumbar vertebrae appear like a moose's head in lateral view.", "src": "Exam 3 deck · Set 3"}, {"id": "e3-133", "q": "What is the significance of the intervertebral foramina?", "opts": ["Intervertebral foramina are holes between vertebrae through which spinal roots exit.", "Intervertebral discs absorb shock and bind vertebrae together.", "Cervical vertebrae have smaller bodies, larger vertebral foramina, and bifid spinous processes.", "The vertebral canal is the term for the combined foramina of all vertebrae that encloses the spinal cord.", "The sacrum consists of 5 fused vertebrae, and the coccyx is a series of fused vertebrae."], "correct": "Intervertebral foramina are holes between vertebrae through which spinal roots exit.", "hint": "Intervertebral foramina are holes between vertebrae through which spinal roots exit.", "src": "Exam 3 deck · Set 3"}, {"id": "e3-134", "q": "What is the role of the vertebral body?", "opts": ["The vertebral body is the main section of the vertebra and is the most weight-bearing part.", "The vertebral canal is the term for the combined foramina of all vertebrae that encloses the spinal cord.", "The sacrum consists of 5 fused vertebrae, and the coccyx is a series of fused vertebrae.", "The manubrium is the handle of the sternum, which has a suprasternal notch.", "The rib cage consists of the sternum, 12 pairs of ribs, and thoracic vertebrae."], "correct": "The vertebral body is the main section of the vertebra and is the most weight-bearing part.", "hint": "The vertebral body is the main section of the vertebra and is the most weight-bearing part.", "src": "Exam 3 deck · Set 3"}, {"id": "e3-135", "q": "What feature of the temporal bone articulates with the mandible?", "opts": ["Mandibular fossa", "Dens (odontoid process)", "Glenoid fossa", "Deltoid tuberosity", "Cribriform plate."], "correct": "Mandibular fossa", "hint": "Mandibular fossa", "src": "Exam 3 deck · Set 3"}, {"id": "e3-136", "q": "What is C7 commonly called due to its long, non-bifid spinous process?", "opts": ["Vertebra prominens", "Manubrium", "Frontal bone", "Vomer", "Occipital bone"], "correct": "Vertebra prominens", "hint": "Vertebra prominens", "src": "Exam 3 deck · Set 3"}, {"id": "e3-137", "q": "What physical sign on infant fontanelle palpation indicates dehydration?", "opts": ["A sunken fontanelle", "Anterior fontanelle.", "Wide, soft areas where unfused sutures meet in an infant's skull.", "Unfused sutures and fontanelles that allow for skull molding during childbirth."], "correct": "A sunken fontanelle", "hint": "A sunken fontanelle", "src": "Exam 3 deck · Set 3"}, {"id": "e3-138", "q": "What injury is strongly indicated by a fracture of the hyoid bone?", "opts": ["Strangulation", "Mastoid sinus", "Occipital bone", "A sunken fontanelle", "Cranial Nerve II (Optic Nerve)."], "correct": "Strangulation", "hint": "Strangulation", "src": "Exam 3 deck · Set 3"}, {"id": "e3-139", "q": "What is the function of the crista galli on the ethmoid bone?", "opts": ["Serves as an attachment site for brain coverings (dura mater)", "It serves as an attachment point for neck muscles.", "It surrounds the brain and houses special sense organs.", "Wide, soft areas where unfused sutures meet in an infant's skull.", "It is a prominent feature of the mandible, marking the chin."], "correct": "Serves as an attachment site for brain coverings (dura mater)", "hint": "Serves as an attachment site for brain coverings (dura mater)", "src": "Exam 3 deck · Set 3"}, {"id": "e3-140", "q": "Which four skull bones contain paranasal sinuses?", "opts": ["Frontal, maxilla, ethmoid, and sphenoid bones", "Palatine bones, vomer bones, inferior nasal conchae, and lacrimal bones.", "Nasal bones, vomer, maxilla, and palatine bones.", "Perpendicular plate of the ethmoid and vomer.", "Body, ramus, angle, condylar process, and coronoid process."], "correct": "Frontal, maxilla, ethmoid, and sphenoid bones", "hint": "Frontal, maxilla, ethmoid, and sphenoid bones", "src": "Exam 3 deck · Set 3"}, {"id": "e3-141", "q": "Which facial bones cannot be easily touched without gagging, producing a bloody nose, or poking an eye out?", "opts": ["Palatine bones, vomer bones, inferior nasal conchae, and lacrimal bones.", "Cribriform plate, crista galli, superior and middle concha, and perpendicular plate.", "Frontal, occipital, ethmoid, and sphenoid bones.", "Subscapular fossa, supraspinous fossa, infraspinous fossa", "Body, ramus, angle, condylar process, and coronoid process."], "correct": "Palatine bones, vomer bones, inferior nasal conchae, and lacrimal bones.", "hint": "Palatine bones, vomer bones, inferior nasal conchae, and lacrimal bones.", "src": "Exam 3 deck · Set 3"}, {"id": "e3-142", "q": "Which three cranial bones form the calvaria (skull bowl)?", "opts": ["Frontal bone, parietal bones, and occipital bone.", "Subscapular fossa, supraspinous fossa, infraspinous fossa", "Mandibular fossa, external acoustic meatus, and mastoid process.", "Perpendicular plate of the ethmoid and vomer.", "Body, ramus, angle, condylar process, and coronoid process."], "correct": "Frontal bone, parietal bones, and occipital bone.", "hint": "Frontal bone, parietal bones, and occipital bone.", "src": "Exam 3 deck · Set 3"}, {"id": "e3-143", "q": "What feature on the occipital bone articulates with the Atlas (C1)?", "opts": ["Occipital condyles.", "Glenoid fossa", "Petrous portion.", "The femoral head", "Olecranon"], "correct": "Occipital condyles.", "hint": "Occipital condyles.", "src": "Exam 3 deck · Set 3"}, {"id": "e3-144", "q": "Which specific portion of the temporal bone houses the inner ear complex?", "opts": ["Petrous portion.", "Glenoid cavity", "Occipital condyles.", "Mandibular fossa", "Metacarpal IV"], "correct": "Petrous portion.", "hint": "Petrous portion.", "src": "Exam 3 deck · Set 3"}, {"id": "e3-145", "q": "What structure in the sphenoid bone is named for resembling a Turkish saddle and houses the pituitary gland?", "opts": ["Sella turcica.", "Ischial tuberosity.", "The spine of the scapula.", "Glenoid cavity", "Petrous portion."], "correct": "Sella turcica.", "hint": "Sella turcica.", "src": "Exam 3 deck · Set 3"}, {"id": "e3-146", "q": "What feature of the ethmoid bone contains tiny holes for the olfactory nerves to pass through?", "opts": ["Cribriform plate.", "Capitulum", "Ischial tuberosities", "Foramen magnum", "Condylar process."], "correct": "Cribriform plate.", "hint": "Cribriform plate.", "src": "Exam 3 deck · Set 3"}, {"id": "e3-147", "q": "Which process of the mandible articulates with the temporal bone?", "opts": ["Condylar process.", "Spinous process", "Dens (odontoid process)", "Ulnar notch", "Medial malleolus of the tibia."], "correct": "Condylar process.", "hint": "Condylar process.", "src": "Exam 3 deck · Set 3"}, {"id": "e3-148", "q": "What suture is located between the temporal bone and the parietal bone?", "opts": ["Squamous suture.", "Lambdoid suture.", "Anterior fontanelle."], "correct": "Squamous suture.", "hint": "Squamous suture.", "src": "Exam 3 deck · Set 3"}, {"id": "e3-149", "q": "What suture is located between the parietal bones and the occipital bone?", "opts": ["Lambdoid suture.", "Squamous suture.", "Anterior fontanelle."], "correct": "Lambdoid suture.", "hint": "Lambdoid suture.", "src": "Exam 3 deck · Set 3"}, {"id": "e3-150", "q": "Which fontanelle is located at the intersection of the coronal and sagittal sutures in an infant?", "opts": ["Anterior fontanelle.", "Squamous suture.", "Lambdoid suture."], "correct": "Anterior fontanelle.", "hint": "Anterior fontanelle.", "src": "Exam 3 deck · Set 3"}] };
+DATA.e3s4 = { label: "Exam 3 — Set 4 (questions 151–200)", noSplit: true, mcq: [{"id": "e3-151", "q": "Which four bones contribute to the orbital complex?", "opts": ["Ethmoid bone, lacrimal bone, maxilla, and sphenoid bone.", "Frontal, occipital, ethmoid, and sphenoid bones.", "Vertebral body, spinous process, transverse process, and vertebral foramina.", "Frontal bone, parietal bones, and occipital bone.", "Palatine bones, vomer bones, inferior nasal conchae, and lacrimal bones."], "correct": "Ethmoid bone, lacrimal bone, maxilla, and sphenoid bone.", "hint": "Ethmoid bone, lacrimal bone, maxilla, and sphenoid bone.", "src": "Exam 3 deck · Set 4"}, {"id": "e3-152", "q": "Which cranial nerve passes through the optic canal?", "opts": ["Cranial Nerve II (Optic Nerve).", "The anterior cranial cavity and forehead.", "Conducts sound to the eardrum", "It forms part of the nasal septum.", "They form the bridge of the nose."], "correct": "Cranial Nerve II (Optic Nerve).", "hint": "Cranial Nerve II (Optic Nerve).", "src": "Exam 3 deck · Set 4"}, {"id": "e3-153", "q": "Moving inferiorly down the vertebral column, what happens to the size of the vertebral bodies?", "opts": ["They become larger to support more body weight.", "They become smaller."], "correct": "They become larger to support more body weight.", "hint": "They become larger to support more body weight.", "src": "Exam 3 deck · Set 4"}, {"id": "e3-154", "q": "Moving inferiorly down the vertebral column, what happens to the size of the vertebral foramina?", "opts": ["They become smaller.", "They become larger to support more body weight."], "correct": "They become smaller.", "hint": "They become smaller.", "src": "Exam 3 deck · Set 4"}, {"id": "e3-155", "q": "Which type of vertebrae are characterized by bifid spinous processes and transverse foramina?", "opts": ["Cervical vertebrae.", "Temporal bones", "Vertebra prominens", "Manubrium", "Frontal bone"], "correct": "Cervical vertebrae.", "hint": "Cervical vertebrae.", "src": "Exam 3 deck · Set 4"}, {"id": "e3-156", "q": "What anatomical term describes a large, smooth, rounded articulating oval structure on a bone?", "opts": ["Condyle.", "Petrous portion.", "Ischial tuberosities", "Trochlea", "The spine of the scapula."], "correct": "Condyle.", "hint": "Condyle.", "src": "Exam 3 deck · Set 4"}, {"id": "e3-157", "q": "What prominent bony process do you feel when palpating the medial side of your ankle?", "opts": ["Medial malleolus of the tibia.", "Condylar process.", "Spinous process", "Dens (odontoid process)", "Metacarpal IV"], "correct": "Medial malleolus of the tibia.", "hint": "Medial malleolus of the tibia.", "src": "Exam 3 deck · Set 4"}, {"id": "e3-158", "q": "What are four distinct anatomical features of a female pelvis compared to a male pelvis?", "opts": ["Wide sacrum, wide/flared ilia, subpubic angle > 100°, long/rectangular pubic body.", "Visible iliac fossa, auricular surface, and pubic symphysis orientation.", "The female pelvis has a broader subpubic angle (>100°)", "Pectoral girdle: Sternoclavicular joint; Pelvic girdle: Sacroiliac joint.", "Bones of the pectoral girdle and upper limb, and pelvic girdle and lower limb."], "correct": "Wide sacrum, wide/flared ilia, subpubic angle > 100°, long/rectangular pubic body.", "hint": "Wide sacrum, wide/flared ilia, subpubic angle > 100°, long/rectangular pubic body.", "src": "Exam 3 deck · Set 4"}, {"id": "e3-159", "q": "What are four distinct anatomical features of a male pelvis compared to a female pelvis?", "opts": ["Narrow pelvic tilt, large oval obturator foramen, prominent muscle markings, inward-projecting ischial spines.", "Wide sacrum, wide/flared ilia, subpubic angle > 100°, long/rectangular pubic body.", "Two pelvic bones (hip or coxal bones) that each consist of three fused bones: ilium, ischium, and pubis", "Visible iliac fossa, auricular surface, and pubic symphysis orientation.", "A round depression on the lateral aspect of the coxal bone where the head of the femur articulates"], "correct": "Narrow pelvic tilt, large oval obturator foramen, prominent muscle markings, inward-projecting ischial spines.", "hint": "Narrow pelvic tilt, large oval obturator foramen, prominent muscle markings, inward-projecting ischial spines.", "src": "Exam 3 deck · Set 4"}, {"id": "e3-160", "q": "Is the sacrum categorized as part of the axial or appendicular skeleton?", "opts": ["Axial skeleton.", "Appendicular skeleton."], "correct": "Axial skeleton.", "hint": "Axial skeleton.", "src": "Exam 3 deck · Set 4"}, {"id": "e3-161", "q": "What are the two appendicular skeleton girdles?", "opts": ["Pectoral (shoulder) girdle and Pelvic (hip) girdle.", "Axial skeleton and Appendicular skeleton", "Cranial bones and facial bones.", "Clavicle and scapula"], "correct": "Pectoral (shoulder) girdle and Pelvic (hip) girdle.", "hint": "Pectoral (shoulder) girdle and Pelvic (hip) girdle.", "src": "Exam 3 deck · Set 4"}, {"id": "e3-162", "q": "At which joints of the axial skeleton do the pectoral and pelvic girdles articulate?", "opts": ["Pectoral girdle: Sternoclavicular joint; Pelvic girdle: Sacroiliac joint.", "Pectoral (shoulder) girdle and Pelvic (hip) girdle.", "Bones of the pectoral girdle and upper limb, and pelvic girdle and lower limb.", "Visible iliac fossa, auricular surface, and pubic symphysis orientation.", "Wide sacrum, wide/flared ilia, subpubic angle > 100°, long/rectangular pubic body."], "correct": "Pectoral girdle: Sternoclavicular joint; Pelvic girdle: Sacroiliac joint.", "hint": "Pectoral girdle: Sternoclavicular joint; Pelvic girdle: Sacroiliac joint.", "src": "Exam 3 deck · Set 4"}, {"id": "e3-163", "q": "Name the two bones the clavicle articulates with.", "opts": ["Sternum (manubrium) and Scapula (acromion).", "Clavicle and scapula", "Temporal and parietal bones.", "Axial skeleton and Appendicular skeleton", "Ulna and radius"], "correct": "Sternum (manubrium) and Scapula (acromion).", "hint": "Sternum (manubrium) and Scapula (acromion).", "src": "Exam 3 deck · Set 4"}, {"id": "e3-164", "q": "What fin-like bony process distinguishes the back of the scapula from the front?", "opts": ["The spine of the scapula.", "Spinous process", "Dens (odontoid process)", "Condylar process.", "Ulnar notch"], "correct": "The spine of the scapula.", "hint": "The spine of the scapula.", "src": "Exam 3 deck · Set 4"}, {"id": "e3-165", "q": "What bone articulates with the scapula at the glenoid cavity?", "opts": ["Humerus (its head).", "Scapula", "Pisiform", "Capitate", "Scaphoid."], "correct": "Humerus (its head).", "hint": "Humerus (its head).", "src": "Exam 3 deck · Set 4"}, {"id": "e3-166", "q": "How many phalangeal bones are in each hand?", "opts": ["14 in each hand (28 in both hands).", "Thumb (Pollex)", "About 206 bones", "The primary curves are thoracic and sacral.", "There are 12 thoracic vertebrae."], "correct": "14 in each hand (28 in both hands).", "hint": "14 in each hand (28 in both hands).", "src": "Exam 3 deck · Set 4"}, {"id": "e3-167", "q": "In a lateral view of a coxal bone with the pubis on the right, is it right or left?", "opts": ["Right coxal bone.", "The pelvic inlet", "The bony surface you sit on", "Supports weight when sitting", "Childbirth"], "correct": "Right coxal bone.", "hint": "Right coxal bone.", "src": "Exam 3 deck · Set 4"}, {"id": "e3-168", "q": "Which pelvic bone process is irritated from sitting too much on a hard surface?", "opts": ["Ischial tuberosity.", "Condylar process.", "Spinous process", "Dens (odontoid process)", "Ulnar notch"], "correct": "Ischial tuberosity.", "hint": "Ischial tuberosity.", "src": "Exam 3 deck · Set 4"}, {"id": "e3-169", "q": "Which pelvic bone sits just above the external genitalia?", "opts": ["Pubis (pubic bone).", "Coxal bone", "Calcaneus.", "Talus.", "The tibia"], "correct": "Pubis (pubic bone).", "hint": "Pubis (pubic bone).", "src": "Exam 3 deck · Set 4"}, {"id": "e3-170", "q": "What determines if a medial view of a pelvic bone is right or left?", "opts": ["Visible iliac fossa, auricular surface, and pubic symphysis orientation.", "Pectoral girdle: Sternoclavicular joint; Pelvic girdle: Sacroiliac joint.", "Wide sacrum, wide/flared ilia, subpubic angle > 100°, long/rectangular pubic body.", "A deep groove found inferior to the posterior inferior iliac spine", "Pectoral (shoulder) girdle and Pelvic (hip) girdle."], "correct": "Visible iliac fossa, auricular surface, and pubic symphysis orientation.", "hint": "Visible iliac fossa, auricular surface, and pubic symphysis orientation.", "src": "Exam 3 deck · Set 4"}, {"id": "e3-171", "q": "The full body's weight is borne on which leg bone?", "opts": ["Tibia.", "Pubis (pubic bone).", "Coxal bone", "Cuboid", "Talus."], "correct": "Tibia.", "hint": "Tibia.", "src": "Exam 3 deck · Set 4"}, {"id": "e3-172", "q": "The full body weight is transferred to which bone of the ankle?", "opts": ["Talus.", "Cuboid", "The tibia", "Coxal bone", "Navicular."], "correct": "Talus.", "hint": "Talus.", "src": "Exam 3 deck · Set 4"}, {"id": "e3-173", "q": "The anatomical name for the heel bone is the:", "opts": ["Calcaneus.", "Pubis (pubic bone).", "Cuboid", "Talus.", "Coxal bone"], "correct": "Calcaneus.", "hint": "Calcaneus.", "src": "Exam 3 deck · Set 4"}, {"id": "e3-174", "q": "The hallux consists of how many phalanges?", "opts": ["2.", "The sacrum consists of 5 fused vertebrae.", "14 phalanges", "About 206 bones", "There are 5 lumbar vertebrae."], "correct": "2.", "hint": "2.", "src": "Exam 3 deck · Set 4"}, {"id": "e3-175", "q": "Which carpal bone sits on the radius at the thumb side of the proximal row?", "opts": ["Scaphoid.", "Capitate", "Pisiform", "Hamate bone", "Lunate bone"], "correct": "Scaphoid.", "hint": "Scaphoid.", "src": "Exam 3 deck · Set 4"}, {"id": "e3-176", "q": "Which tarsal bone sits directly in front of the talus on the medial side of the foot?", "opts": ["Navicular.", "Talus.", "The femur", "Pubis (pubic bone).", "Coxal bone"], "correct": "Navicular.", "hint": "Navicular.", "src": "Exam 3 deck · Set 4"}, {"id": "e3-177", "q": "Which cranial bone is found at the rear or posterior aspect of your skull?", "opts": ["Occipital bone", "Temporal", "Parietal", "Frontal"], "correct": "Occipital bone", "hint": "Occipital bone", "src": "Exam 3 deck · Set 4"}, {"id": "e3-178", "q": "Which cranial bone is injured if a bullet enters between the eyebrows (glabella area)?", "opts": ["Frontal bone", "Temporal bones", "Zygomatic bones", "Vomer", "Vertebra prominens"], "correct": "Frontal bone", "hint": "Frontal bone", "src": "Exam 3 deck · Set 4"}, {"id": "e3-179", "q": "Which bones do not contribute to the structure of the nasal cavity?", "opts": ["Temporal bones", "Inferior nasal conchae", "Ethmoid bone", "Vomer bone"], "correct": "Temporal bones", "hint": "Temporal bones", "src": "Exam 3 deck · Set 4"}, {"id": "e3-180", "q": "What is the orifice through which the spinal cord connects to the brainstem?", "opts": ["Foramen magnum", "Spinal foramen", "Cribriform plate", "Internal acoustic meatus"], "correct": "Foramen magnum", "hint": "Foramen magnum", "src": "Exam 3 deck · Set 4"}, {"id": "e3-181", "q": "Which paired bones form the hard palate?", "opts": ["Maxillary and palatine bones", "Superior and inferior nasal conchae", "The vomer and palatine bones", "Palatine bone and sphenoid bones"], "correct": "Maxillary and palatine bones", "hint": "Maxillary and palatine bones", "src": "Exam 3 deck · Set 4"}, {"id": "e3-182", "q": "What is C-1, the ring-shaped vertebra at the top of the cervical spine, known as?", "opts": ["Atlas", "Axis", "Cervical prominens", "Thoracic vertebra 1"], "correct": "Atlas", "hint": "Atlas", "src": "Exam 3 deck · Set 4"}, {"id": "e3-183", "q": "What is the top portion of the sternum located between the clavicles?", "opts": ["Manubrium", "Sternal body", "Sternal head", "Xiphoid"], "correct": "Manubrium", "hint": "Manubrium", "src": "Exam 3 deck · Set 4"}, {"id": "e3-184", "q": "What is the lowest spinal region considered a primary curve in infancy?", "opts": ["Sacral region", "Cervical region", "Thoracic region", "Lumbar region"], "correct": "Sacral region", "hint": "Sacral region", "src": "Exam 3 deck · Set 4"}, {"id": "e3-185", "q": "What is the only bone with no direct connection to any other bone?", "opts": ["Hyoid bone", "Atlas", "Axis", "Clavicle"], "correct": "Hyoid bone", "hint": "Hyoid bone", "src": "Exam 3 deck · Set 4"}, {"id": "e3-186", "q": "What curved suture line lies between the occipital and parietal bones?", "opts": ["Lambdoid suture", "Frontal suture", "Squamous suture", "Sagittal suture"], "correct": "Lambdoid suture", "hint": "Lambdoid suture", "src": "Exam 3 deck · Set 4"}, {"id": "e3-187", "q": "Which distal humerus feature fits the proximal end of the ulna?", "opts": ["Trochlea", "Medial malleolus", "Lateral malleolus", "Capitulum"], "correct": "Trochlea", "hint": "Trochlea", "src": "Exam 3 deck · Set 4"}, {"id": "e3-188", "q": "Which structure does the distal aspect of the radius bone NOT articulate with?", "opts": ["Capitulum", "Scaphoid", "Lunate", "Distal ulna"], "correct": "Capitulum", "hint": "Capitulum", "src": "Exam 3 deck · Set 4"}, {"id": "e3-189", "q": "Which carpal bone is the largest?", "opts": ["Capitate bone", "Hamate bone", "Lunate bone", "Scaphoid bone"], "correct": "Capitate bone", "hint": "Capitate bone", "src": "Exam 3 deck · Set 4"}, {"id": "e3-190", "q": "What are the bony projections of the pelvis on which humans sit?", "opts": ["Ischial tuberosities", "Ischial crests", "Ishial spines", "Pubic bones"], "correct": "Ischial tuberosities", "hint": "Ischial tuberosities", "src": "Exam 3 deck · Set 4"}, {"id": "e3-191", "q": "Which feature of the femur fits into the acetabulum of the pelvis?", "opts": ["Femoral head", "Greater trochanter", "Lesser trochanter", "Medial condyle"], "correct": "Femoral head", "hint": "Femoral head", "src": "Exam 3 deck · Set 4"}, {"id": "e3-192", "q": "Which bony process forms the medial aspect of the ankle joint?", "opts": ["Medial malleolus", "Lateral malleolus", "Tibial tuberosity", "Medial condyle"], "correct": "Medial malleolus", "hint": "Medial malleolus", "src": "Exam 3 deck · Set 4"}, {"id": "e3-193", "q": "Which tarsal bone does the tibia sit directly upon?", "opts": ["Talus", "Calcaneus", "Cuboid", "Navicular"], "correct": "Talus", "hint": "Talus", "src": "Exam 3 deck · Set 4"}, {"id": "e3-194", "q": "On which feature of the scapula does the humeral head articulate?", "opts": ["Glenoid fossa", "Scapula spine", "Infraspinous fossa", "Supraspinous fossa"], "correct": "Glenoid fossa", "hint": "Glenoid fossa", "src": "Exam 3 deck · Set 4"}, {"id": "e3-195", "q": "Which bony feature forms the posterior aspect of the elbow?", "opts": ["Olecranon", "Trochlear notch", "Coracoid process", "Radial notch"], "correct": "Olecranon", "hint": "Olecranon", "src": "Exam 3 deck · Set 4"}, {"id": "e3-196", "q": "What is the metacarpal for the ring finger named?", "opts": ["Metacarpal IV", "Metacarpal I", "Metacarpal V", "Metatarsal IV"], "correct": "Metacarpal IV", "hint": "Metacarpal IV", "src": "Exam 3 deck · Set 4"}, {"id": "e3-197", "q": "True or False: The calvaria is made up of cranial bones and is part of the skull.", "opts": ["True", "False"], "correct": "True", "hint": "True", "src": "Exam 3 deck · Set 4"}, {"id": "e3-198", "q": "Which bones does the sagittal suture join?", "opts": ["Left and right parietal bones", "Zygomatic bone and temporal bone", "Axial skeleton and Appendicular skeleton", "Greater tubercle and lesser tubercle", "Clavicle and scapula"], "correct": "Left and right parietal bones", "hint": "Left and right parietal bones", "src": "Exam 3 deck · Set 4"}, {"id": "e3-199", "q": "Which of the following is NOT a facial bone: Temporal, Mandible, Zygomatic, Maxilla, or Nasal?", "opts": ["Temporal bone", "Mandible", "Zygomatic bone", "Maxilla", "Nasal bone"], "correct": "Temporal bone", "hint": "Temporal bone", "src": "Exam 3 deck · Set 4"}, {"id": "e3-200", "q": "Which of the following is NOT a paranasal sinus: Maxillary, Ethmoid, Sphenoid, Mastoid, or Frontal?", "opts": ["Mastoid sinus", "Maxillary sinus", "Ethmoid sinus", "Sphenoid sinus", "Frontal sinus"], "correct": "Mastoid sinus", "hint": "Mastoid sinus", "src": "Exam 3 deck · Set 4"}] };
+DATA.e3s5 = { label: "Exam 3 — Set 5 (questions 201–222)", noSplit: true, mcq: [{"id": "e3-201", "q": "What is the correct order of vertebral regions from superior to inferior?", "opts": ["Cervical - thoracic - lumbar - sacral - coccygeal", "They become larger to support more body weight.", "The xiphoid process is the inferior segment of the sternum.", "The vertebral column is composed of vertebrae bones.", "Lumbar vertebrae appear like a moose's head in lateral view."], "correct": "Cervical - thoracic - lumbar - sacral - coccygeal", "hint": "Cervical - thoracic - lumbar - sacral - coccygeal", "src": "Exam 3 deck · Set 5"}, {"id": "e3-202", "q": "Which vertebral process is most easily palpated along the midline of the back?", "opts": ["Spinous process", "Dens (odontoid process)", "Condylar process.", "The femoral head", "Olecranon"], "correct": "Spinous process", "hint": "Spinous process", "src": "Exam 3 deck · Set 5"}, {"id": "e3-203", "q": "What type of curves are the cervical and lumbar curvatures, and how do they arch?", "opts": ["Secondary curves; arch anteriorly", "The primary curves are thoracic and sacral."], "correct": "Secondary curves; arch anteriorly", "hint": "Secondary curves; arch anteriorly", "src": "Exam 3 deck · Set 5"}, {"id": "e3-204", "q": "Which structure do the occipital condyles articulate with?", "opts": ["Atlas (C1)", "Occipital bone", "Hyoid bone", "Cervical vertebrae.", "Temporal bones"], "correct": "Atlas (C1)", "hint": "Atlas (C1)", "src": "Exam 3 deck · Set 5"}, {"id": "e3-205", "q": "Which anatomical feature is unique to the axis (C2) vertebra?", "opts": ["Dens (odontoid process)", "The femoral head", "The spine of the scapula.", "Sella turcica.", "Petrous portion."], "correct": "Dens (odontoid process)", "hint": "Dens (odontoid process)", "src": "Exam 3 deck · Set 5"}, {"id": "e3-206", "q": "What is the superior portion of the sternum called?", "opts": ["Manubrium", "Sternal body", "Sternal head", "Xiphoid"], "correct": "Manubrium", "hint": "Manubrium", "src": "Exam 3 deck · Set 5"}, {"id": "e3-207", "q": "True or False: The tubercle of rib 4 articulates with the transverse costal facet of T3.", "opts": ["False", "True"], "correct": "False", "hint": "False", "src": "Exam 3 deck · Set 5"}, {"id": "e3-208", "q": "With which feature of the scapula does the head of the humerus articulate?", "opts": ["Glenoid cavity", "Scapula spine", "Infraspinous fossa", "Supraspinous fossa"], "correct": "Glenoid cavity", "hint": "Glenoid cavity", "src": "Exam 3 deck · Set 5"}, {"id": "e3-209", "q": "Which feature is NOT part of the ulna: Trochlear notch, Ulnar notch, Coronoid process, Head, or Styloid process?", "opts": ["Ulnar notch", "Trochlear notch", "Coronoid process", "Head", "Styloid process"], "correct": "Ulnar notch", "hint": "Ulnar notch", "src": "Exam 3 deck · Set 5"}, {"id": "e3-210", "q": "Which of the following is NOT a carpal bone: Hamate, Trapezium, Capitulum, Scaphoid, or Trapezoid?", "opts": ["Capitulum", "Hamate", "Trapezium", "Scaphoid", "Trapezoid"], "correct": "Capitulum", "hint": "Capitulum", "src": "Exam 3 deck · Set 5"}, {"id": "e3-211", "q": "Which characteristic does NOT belong to a male-like pelvis?", "opts": ["Coccyx tilted posteriorly", "Large oval obturator foramen", "Prominent muscle markings", "Inward-projecting ischial spines"], "correct": "Coccyx tilted posteriorly", "hint": "Coccyx tilted posteriorly", "src": "Exam 3 deck · Set 5"}, {"id": "e3-212", "q": "Which bones articulate directly with the femur?", "opts": ["Hip bone, tibia, and patella", "Zygomatic bone and temporal bone", "Axial skeleton and Appendicular skeleton", "Temporal and parietal bones.", "Maxillary bones and palatine bones"], "correct": "Hip bone, tibia, and patella", "hint": "Hip bone, tibia, and patella", "src": "Exam 3 deck · Set 5"}, {"id": "e3-213", "q": "True or False: The posterior 'bump' of the elbow is the olecranon of the ulna.", "opts": ["True", "False"], "correct": "True", "hint": "True", "src": "Exam 3 deck · Set 5"}, {"id": "e3-214", "q": "Which leg bone bears the most weight?", "opts": ["Tibia", "Pubis (pubic bone).", "Navicular.", "Talus.", "Coxal bone"], "correct": "Tibia", "hint": "Tibia", "src": "Exam 3 deck · Set 5"}, {"id": "e3-215", "q": "What is the anterior crest of the tibia?", "opts": ["The sharp ridge running down the front of the tibia, commonly called the shin.", "A groove running between the greater and lesser tubercles on the proximal humerus.", "The end of the fibula that forms the lateral side of the ankle joint", "A large C-shaped joint surface at the proximal end of the ulna.", "On the broad, smooth hollow anterior surface of the scapula."], "correct": "The sharp ridge running down the front of the tibia, commonly called the shin.", "hint": "The sharp ridge running down the front of the tibia, commonly called the shin.", "src": "Exam 3 deck · Set 5"}, {"id": "e3-216", "q": "Where is the subscapular fossa located?", "opts": ["On the broad, smooth hollow anterior surface of the scapula.", "A deep hollow on the posterior distal surface of the humerus.", "A large C-shaped joint surface at the proximal end of the ulna.", "The sharp ridge running down the front of the tibia, commonly called the shin.", "A groove running between the greater and lesser tubercles on the proximal humerus."], "correct": "On the broad, smooth hollow anterior surface of the scapula.", "hint": "On the broad, smooth hollow anterior surface of the scapula.", "src": "Exam 3 deck · Set 5"}, {"id": "e3-217", "q": "What is the intertubercular groove of the humerus?", "opts": ["A groove running between the greater and lesser tubercles on the proximal humerus.", "A large C-shaped joint surface at the proximal end of the ulna.", "A deep hollow on the posterior distal surface of the humerus.", "The sharp ridge running down the front of the tibia, commonly called the shin.", "On the broad, smooth hollow anterior surface of the scapula."], "correct": "A groove running between the greater and lesser tubercles on the proximal humerus.", "hint": "A groove running between the greater and lesser tubercles on the proximal humerus.", "src": "Exam 3 deck · Set 5"}, {"id": "e3-218", "q": "What feature is located about halfway down the lateral shaft of the humerus?", "opts": ["Deltoid tuberosity", "Mandibular fossa", "The femoral head", "Occipital condyles.", "Medial malleolus of the tibia."], "correct": "Deltoid tuberosity", "hint": "Deltoid tuberosity", "src": "Exam 3 deck · Set 5"}, {"id": "e3-219", "q": "What is the trochlear notch of the ulna?", "opts": ["A large C-shaped joint surface at the proximal end of the ulna.", "A deep hollow on the posterior distal surface of the humerus.", "A groove running between the greater and lesser tubercles on the proximal humerus.", "On the broad, smooth hollow anterior surface of the scapula.", "The sharp ridge running down the front of the tibia, commonly called the shin."], "correct": "A large C-shaped joint surface at the proximal end of the ulna.", "hint": "A large C-shaped joint surface at the proximal end of the ulna.", "src": "Exam 3 deck · Set 5"}, {"id": "e3-220", "q": "Which carpal bone is small and pea-shaped on the palm side over the triquetrum?", "opts": ["Pisiform", "Scaphoid", "Capitate", "Hamate bone", "Lunate bone"], "correct": "Pisiform", "hint": "Pisiform", "src": "Exam 3 deck · Set 5"}, {"id": "e3-221", "q": "Where is the olecranon fossa located?", "opts": ["A deep hollow on the posterior distal surface of the humerus.", "A large C-shaped joint surface at the proximal end of the ulna.", "On the broad, smooth hollow anterior surface of the scapula.", "A groove running between the greater and lesser tubercles on the proximal humerus.", "A ridge on the posterior surface of the femur"], "correct": "A deep hollow on the posterior distal surface of the humerus.", "hint": "A deep hollow on the posterior distal surface of the humerus.", "src": "Exam 3 deck · Set 5"}, {"id": "e3-222", "q": "Which tarsal bone lies in front of the calcaneus on the lateral side of the foot?", "opts": ["Cuboid", "Calcaneus.", "The tibia", "The femur", "Navicular."], "correct": "Cuboid", "hint": "Cuboid", "src": "Exam 3 deck · Set 5"}] };
+
+/* ================= CHAPTERS =================
+   Boss, 2026-09-29: "from here on out, that's what we're going to do for each
+   quiz or homework. We'll have a big thing up top to break it up by chapter and
+   then we can click." One entry per chapter, in course order, plus the exams
+   that pool chapters. Adding a chapter is a DATA bank (q8, q9 ...) and one line
+   here; the card counts its own quiz / homework / PowerPoint questions. Keys
+   never change once used - saved progress is stored under them. */
+const CHAPTERS = [
+  { key: 'e3s1', eyebrow: 'Exam 3 · Set', num: '1', name: 'Questions 1–50', exam: true },
+  { key: 'e3s2', eyebrow: 'Exam 3 · Set', num: '2', name: 'Questions 51–100', exam: true },
+  { key: 'e3s3', eyebrow: 'Exam 3 · Set', num: '3', name: 'Questions 101–150', exam: true },
+  { key: 'e3s4', eyebrow: 'Exam 3 · Set', num: '4', name: 'Questions 151–200', exam: true },
+  { key: 'e3s5', eyebrow: 'Exam 3 · Set', num: '5', name: 'Questions 201–222', exam: true }
+];
+
+function renderChapters(){
+  const box = document.getElementById('chapters');
+  if(!box) return;
+  box.innerHTML = CHAPTERS.filter(c => DATA[c.key]).map(c => {
+    const n = { real: 0, hw: 0, lecture: 0 };
+    DATA[c.key].mcq.forEach(x => { n[kindOf(x)]++; });
+    const counts = n.real + ' questions';
+    const retake = c.retake
+      ? `<a class="chap-retake" href="${c.retake}">📝 Full Quiz ${c.num} retake (${n.real})</a>` : '';
+    return `<div class="chap${c.exam ? ' chap-exam' : ''}${c.key === current ? ' active' : ''}" data-key="${c.key}">
+      <button class="chap-main" id="tab-${c.key}" onclick="switchQuiz('${c.key}')" aria-pressed="${c.key === current}">
+        <span class="chap-eyebrow">${c.eyebrow}</span>
+        <span class="chap-num">${c.num}</span>
+        <span class="chap-name">${c.name}</span>
+        <span class="chap-counts">${counts}</span>
+      </button>${retake}
+    </div>`;
+  }).join('');
+}
+
+/* ================= STATE & STORAGE ================= */
+
+const LS_KEY = 'ap_study_stats_exam3_v1';
+const PREF_KEY = 'ap_study_prefs_exam3_v1';   // remembered menu choices, separate from progress
+const DECK_KEY = 'ap_study_served_exam3_v1';  // which questions each pass through a pool has already served
+let current = 'e3s1';
+/* Boss, 2026-09-24: "I only need quiz questions from the quiz attempt. I don't
+   need to be tested on concepts. Most of the questions on the exam come from the
+   quizzes." So 'real' is the default rather than 'all': the drills stay in the
+   bank and stay reachable, but a fresh browser opens on the questions that
+   actually get examined, and the attempt menu scopes them to one attempt. */
+let filter = 'real';       // 'all' | 'real' | 'hw' | 'lecture'
+let attemptFilter = 'any'; // 'any' | 'a1' | 'a2' | 'both' - only ever narrows real quiz items
+let mode = 'round';        // 'round' | 'drill'
+let sessionSize = 5;       // 5 | 10 | 20 | 'all'
+let round = null;          // { key, mode, items:[...], checked }
+let drill = null;          // { items, i, attempts, done, results:[...] }
+let aidsAlways = false;    // show the memory hook before answering
+let review = null;         // { items:[...] } while the missed-review screen is open
+/* Boss, 2026-09-23: "I do also want to practice the same questions in a different
+   order". Questions shuffle by default - and that is not only a preference: with
+   more shaky items than the session size, a fixed order served the same first N
+   every time and the tail of the list never came up at all. Choices shuffle
+   separately and are off by default, because the correct answer's letter is fixed
+   in the bank, so drilling the same item twice teaches "it was D" unless the
+   options move with it. */
+let shuffleQ = true;
+let shuffleChoices = false;
+/* Boss, 2026-09-29: "Instead of having 4 or 5 answers to choose, why don't we
+   just have a wrong answer and a correct answer so that we can quickly associate
+   question with answer". So by default a question shows its keyed answer and ONE
+   of its own wrong choices, picked fresh each time - never an invented one. The
+   switch puts every choice back, for practising the quiz as it is really asked.
+   A question whose choices point at other choices by letter ("B and C are not
+   true") keeps all of them, since two would leave the letters pointing at nothing.
+   Boss, same day: "why not just make it 3 choices instead of 5". Three is the
+   default - two real wrong answers to beat, a 1-in-3 guess - with 2 and All
+   still one click away. */
+let choiceCount = 3;       // 2 | 3 | 'all'
+/* Boss, 2026-09-25: "if I do a quiz of 10 and go to next round, does it give me
+   the next 10 ... or the last 6 or whatever questions remain? I don't want to
+   retake the same questions over and over." It used to be an independent random
+   slice every time: two 10-question rounds out of the 16-question attempt-1
+   bank overlapped by about half, so a question could sit unasked for many
+   rounds. Now the questions a pool has not served yet are dealt first, and only
+   when every one has been asked does the pass start over - 10, then the last 6,
+   then a fresh pass. The pass is kept per pool (bank + question menu + attempt
+   menu) in this browser, and the checkbox turns it back into a pure random draw. */
+let newFirst = true;
+let served = loadServed();   // { 'q6|real|a1': ['q3', 'q7', ...] } - asked in the current pass
+let lastBatch = [];        // the ids of the session just run, for "same questions, new order"
+/* Boss, 2026-09-25: "if I go to a 10 practice attempt and practice missed, why is
+   it giving me the full 10. It should only give me the ones I missed from THAT
+   practice and then let me redo the full quiz from the original practice until I
+   get every question." So a round now remembers its own wrong answers, and the
+   full batch they came from. "Practice missed" used to draw the worst N of the
+   whole bank, so a 10-question round with 3 wrong handed back 10 questions he
+   had never missed - the one thing the button cannot mean. */
+let lastMissed = [];       // ids answered wrong in the most recent round (or needing >1 try in retry mode)
+let lastFullBatch = [];    // the full practice those misses came from, so a misses drill can go back to it
+
+function shuffled(src){
+  const a = src.slice();
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const t=a[i]; a[i]=a[j]; a[j]=t; }
+  return a;
+}
+
+/* Every item in DATA is multiple choice - there are no fill-in-the-blank items.
+   An item's id is its position unless it carries its own. Homework items carry
+   'hw6-01' and so on, and the lecture items carry the position they had before
+   the concept drills above them were removed, so saved progress stays on them. */
+function pool(key){
+  return DATA[key].mcq.map((x,i) => Object.assign({}, x, {
+    key: key, id: x.id || ('q' + i), real: kindOf(x) === 'real', lecture: kindOf(x) === 'lecture'
+  }));
+}
+
+/* Which quiz attempt an item came from. The bank carries it in src - "Quiz 6 ·
+   Attempt 1", "Quiz 6 · Attempt 2", "Quiz 6 · Attempts 1 and 2" - and the six
+   shared items really were on both, so they count for both. An item with no
+   attempt tag is a whole-bank question (every real Quiz 7 item is "Quiz 7 ·
+   Bank"), which is why a bank with no split must ignore the attempt menu
+   entirely rather than answer it with an empty pool. */
+function attemptOf(item){
+  const s = item.src;
+  if(/Attempts 1 and 2/i.test(s)) return 'both';
+  if(/Attempt 2/i.test(s))        return 'a2';
+  if(/Attempt 1/i.test(s))        return 'a1';
+  return 'any';
+}
+
+function attemptAvailable(key){
+  /* A bank can declare that it has no attempt split to offer. Exam 2 pools both
+     quizzes, so "which attempt" is not a question it can answer - every item
+     belongs, and the menu would only be able to hide Quiz 7 from it. */
+  if(DATA[key].noSplit) return false;
+  // Only a bank with questions from two different attempts has a choice to offer:
+  // Quiz 8 so far is one attempt, and a menu of "attempt 1 (20) / attempt 2 (0)" is noise.
+  const seen = {};
+  pool(key).filter(x => x.real).forEach(x => { seen[attemptOf(x)] = true; });
+  return !!((seen.a1 || seen.both) && (seen.a2 || seen.both));
+}
+
+/* A shared item really was on both attempts, so it belongs to either one: the
+   menu counts it in both, and this has to agree with that count. Asking for
+   "in both attempts" is deliberately narrower - only those six. */
+function attemptMatch(a){
+  if(attemptFilter === 'any') return true;
+  if(attemptFilter === 'both') return a === 'both';
+  return a === attemptFilter || a === 'both';
+}
+
+function visible(key){
+  const items = pool(key);
+  const split = attemptAvailable(key);   // a bank with no attempt tags cannot answer the menu
+  const keep = x => {
+    if(!x.real) return true;                       // homework and lecture items are never attempt-scoped
+    if(!split) return true;                        // ...and neither is a bank with no split to offer
+    const a = attemptOf(x);
+    if(a === 'any') return attemptFilter === 'any' || !split;
+    return attemptMatch(a);
+  };
+  if(filter === 'real')    return items.filter(x => x.real && keep(x));
+  if(filter === 'lecture') return items.filter(x => x.lecture);
+  if(filter === 'hw')      return items.filter(x => !x.real && !x.lecture);
+  return items.filter(keep);
+}
+
+function loadStats(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)) || {}; }catch(e){ return {}; } }
+function saveStats(s){ try{ localStorage.setItem(LS_KEY, JSON.stringify(s)); }catch(e){} }
+
+/* The menu choices outlive a reload. They are kept apart from progress so
+   Reset progress erases what you got wrong, not what you were studying. */
+function loadPrefs(){
+  try{
+    const p = JSON.parse(localStorage.getItem(PREF_KEY)) || {};
+    if(['real','hw','lecture','all'].indexOf(p.filter) >= 0) filter = p.filter;
+    if(['any','a1','a2','both'].indexOf(p.attempt) >= 0) attemptFilter = p.attempt;
+    if(typeof p.newfirst === 'boolean') newFirst = p.newfirst;
+    if(p.choices === 2 || p.choices === 3 || p.choices === 'all') choiceCount = p.choices;
+    if(filter === 'hw' || filter === 'lecture') attemptFilter = 'any';
+  }catch(e){}
+}
+function savePrefs(){
+  try{ localStorage.setItem(PREF_KEY, JSON.stringify({ filter: filter, attempt: attemptFilter, newfirst: newFirst, choices: choiceCount })); }catch(e){}
+}
+
+function bump(id, correct){
+  const s = loadStats();
+  const q = s[current] = s[current] || {};
+  const e = q[id] = q[id] || {m:0,c:0,t:0};
+  e.t++;
+  if(correct) e.c++; else e.m++;
+  saveStats(s);
+  return e;
+}
+
+/* Boss, 2026-09-23: "let me mark questions I'm unsure about even if they're not
+   correct so I can go back and review". A mark cannot be derived from the score:
+   a guess that landed looks identical to knowing it, so the miss count can never
+   see it. The flag is therefore its own field, and marked items join the missed
+   pool rather than living in a separate list - one place to relook, not two.
+   Boss, 2026-09-25: "a 'Retry only these' button where I mark the questions and
+   then get retested on those and then can repeat it over and over." The single
+   mark is now named for what he reaches for - a retry selection - and the
+   button follows it everywhere a session can end. */
+function flagIds(){
+  const s = loadStats(); const q = s[current] || {};
+  return Object.keys(q).filter(id => q[id].f).sort();
+}
+
+function isFlagged(id){
+  const s = loadStats(); const q = s[current] || {};
+  return !!(q[id] && q[id].f);
+}
+
+/* Repaints just the button, never the round: re-rendering would throw away the
+   radio answers already picked in it, and the mark has to be reachable while the
+   question is still on screen. */
+function toggleFlag(id, btn){
+  const s = loadStats();
+  const q = s[current] = s[current] || {};
+  const e = q[id] = q[id] || {m:0,c:0,t:0};
+  e.f = e.f ? 0 : 1;
+  saveStats(s);
+  paintFlagBtn(btn, !!e.f);
+  updateBadge();
+  paintRetryButtons();
+}
+
+function missedIds(){
+  const s = loadStats(); const q = s[current] || {};
+  return Object.keys(q).filter(id => q[id].m > 0 || q[id].f)
+    .sort((a,b)=>(q[b].m - q[a].m) || ((q[b].t - q[b].c) - (q[a].t - q[a].c)));
+}
+
+function quizStats(){
+  const s = loadStats(); const q = s[current] || {};
+  /* The counters describe the pool on screen. They used to be bank-wide, which
+     stopped being true the moment the attempt menu could scope the pool: the
+     panel said "5 shaky" over a pool of 16 that could only serve 3, and enabled
+     "Relook at marked (1)" to land on "Nothing marked yet". A number the drill
+     cannot honour is worse than no number. */
+  const inPool = {};
+  visible(current).forEach(x => inPool[x.id] = true);
+  let attempted = 0, shaky = 0, marked = 0;
+  Object.keys(q).forEach(id => {
+    if(!inPool[id]) return;
+    const e = q[id];
+    if(e.t > 0) attempted++;
+    if(e.m > 0 || e.f) shaky++;
+    if(e.f) marked++;
+  });
+  return { attempted: attempted, total: visible(current).length, shaky: shaky,
+           flagged: marked };
+}
+
+/* Boss, 2026-09-25: "can I have a 'Retry only these' button where I mark the
+   questions and then get retested on those and then can repeat it over and
+   over." The mark was already the selection; what was missing was a button
+   that names it and a set that survives a pass, so the same handful of
+   questions can be looped instead of re-drawn from the bank. Nothing unmarks
+   itself on a right answer - the loop ends when he unticks a question or
+   clears the marks, which is the only way "over and over" can be true. The
+   button is painted from the live count rather than baked into whichever
+   screen built it, because the toolbar copy is never re-rendered. */
+function paintRetryButtons(){
+  const n = quizStats().flagged;
+  document.querySelectorAll('[data-retry]').forEach(b => {
+    b.textContent = (b.hasAttribute('data-hide-empty') ? '🔁 Retry marked (' : '🔁 Retry only these (') + n + ')';
+    b.disabled = n === 0;
+    if(b.hasAttribute('data-hide-empty')) b.hidden = n === 0;
+  });
+}
+
+function paintMarkButtons(){
+  document.querySelectorAll('[data-mark]').forEach(b =>
+    paintFlagBtn(b, isFlagged(b.getAttribute('data-mark'))));
+}
+
+/* The way out of the loop. It unticks every retry mark in this bank, not only
+   the ones the current menus show, so a hidden mark cannot keep a stale count
+   alive. It repaints in place instead of re-rendering: a result list lives in
+   the page after checkRound()/renderDrillSummary() writes it, and a render
+   would drop it out from under him. */
+function clearRetryMarks(){
+  const s = loadStats();
+  const q = s[current] = s[current] || {};
+  const ids = Object.keys(q).filter(id => q[id].f);
+  const n = ids.length;
+  if(n === 0) return;
+  if(!confirm('Untick all ' + n + ' retry mark' + (n === 1 ? '' : 's') + ' in ' + DATA[current].label + '?')) return;
+  ids.forEach(id => { q[id].f = 0; });
+  saveStats(s);
+  updateBadge();
+  paintMarkButtons();
+  paintRetryButtons();
+}
+
+function sizeNum(){ return sessionSize === 'all' ? Infinity : sessionSize; }
+
+function refersToLetters(item){
+  return item.opts.some(o => /\b[A-E] and [A-E]\b|of the above/.test(o));
+}
+
+function withChoiceOrder(item){
+  if(choiceCount !== 'all' && item.opts.length > choiceCount && !refersToLetters(item)){
+    const wrong = shuffled(item.opts.filter(o => o !== item.correct)).slice(0, choiceCount - 1);
+    // Always shuffled, or the right answer would sit in the same place every time.
+    return Object.assign({}, item, { opts: shuffled(wrong.concat([item.correct])) });
+  }
+  if(!shuffleChoices) return item;
+  // A copy: the session owns its own option order, and DATA stays pristine.
+  const copy = Object.assign({}, item);
+  copy.opts = shuffled(item.opts);
+  return copy;
+}
+
+/* ============ WHICH QUESTIONS THIS POOL HAS ALREADY ASKED ============ */
+
+/* The pass is kept per pool, because the question menu and the attempt menu
+   change what "the next ones" means: attempt 1 has 16 questions of its own and
+   attempt 2 has a different 16, so one shared list would serve the wrong six.
+   Kept in its own storage key, so Reset progress is not the only way out. */
+function loadServed(){ try{ return JSON.parse(localStorage.getItem(DECK_KEY)) || {}; }catch(e){ return {}; } }
+function saveServed(s){ try{ localStorage.setItem(DECK_KEY, JSON.stringify(s)); }catch(e){} }
+
+/* A bank with no attempt split ignores the attempt menu, so its pass has to be
+   keyed without one: otherwise the same pool would carry two separate passes
+   depending on which attempt happened to be selected when it was last visited. */
+function poolKey(){
+  const att = attemptAvailable(current) ? attemptFilter : 'any';
+  return current + '|' + filter + '|' + att;
+}
+function servedIds(){ return served[poolKey()] || []; }
+
+/* What this pool has not served yet in the current pass. */
+function unseenItems(){
+  const seen = {};
+  servedIds().forEach(id => seen[id] = true);
+  return visible(current).filter(x => !seen[x.id]);
+}
+
+function markServed(picks, freshPass){
+  const key = poolKey();
+  const ids = freshPass ? [] : (served[key] || []).slice();
+  picks.forEach(x => { if(ids.indexOf(x.id) < 0) ids.push(x.id); });
+  if(ids.length === 0) delete served[key]; else served[key] = ids;
+  saveServed(served);
+}
+
+/* A fresh draw with new-first on deals what has not been asked yet. The last
+   draw of a pass is deliberately short - 10 then the remaining 6, never 10 then
+   10 with half of it repeats - and only an empty pass wraps to a new one. */
+/* Every question in the pool, in one sitting, pass or no pass. Shared by the
+   "Whole pool" session size and by the whole-quiz retake: when the ask is "all
+   of them", nothing may be held back for a later round - and serving every one
+   of them finishes the pass by definition, so the bookkeeping is left honest
+   rather than untouched. */
+function wholePool(items){
+  const all = shuffleQ ? shuffled(items) : items.slice();
+  markServed(all, true);
+  return all;
+}
+
+function freshDraw(items){
+  if(!newFirst) return (shuffleQ ? shuffled(items) : items).slice(0, sizeNum());
+  /* "Whole pool" has to mean the whole pool. It used to slice the draw down to
+     whatever this pass had not asked yet, which is not what the menu says, and
+     left the rest of the pool for a round the session size had already promised
+     to serve in full. */
+  if(sizeNum() === Infinity) return wholePool(items);
+  let unseen = unseenItems();
+  const wrapped = unseen.length === 0;
+  if(wrapped) unseen = items;
+  const picks = (shuffleQ ? shuffled(unseen) : unseen).slice(0, sizeNum());
+  markServed(picks, wrapped);
+  return picks;
+}
+
+/* Cancelling a round he never checked hands its questions back to the pass, so
+   looking and backing out does not burn six questions he never answered. */
+function deckUndoPoint(){ return { key: poolKey(), ids: servedIds().slice() }; }
+function deckRollback(u){
+  if(!u) return;
+  if(u.ids.length === 0) delete served[u.key]; else served[u.key] = u.ids;
+  saveServed(served);
+}
+function resetDeck(){ delete served[poolKey()]; saveServed(served); render(); }
+
+/* Draws the session's questions: the missed set when asked (empty if there is
+   nothing to retry), otherwise a fresh draw from the visible pool. */
+function sample(source){
+  const items = visible(current);
+  let picks;
+  if(source === 'lastmissed'){
+    /* Exactly the wrong answers from the practice just run, mapped through the
+       bank rather than the filtered pool so the set cannot quietly shrink if a
+       menu moved - the button's count and the drill have to agree. Never cut to
+       the session size either: "the ones I missed" is a finite list he already
+       earned, not a fresh draw. */
+    const byId = {};
+    pool(current).forEach(x => byId[x.id] = x);
+    const ids = shuffleQ ? shuffled(lastMissed) : lastMissed.slice();
+    picks = ids.map(id => byId[id]).filter(Boolean);
+  } else if(source === 'missed'){
+    // Everything shaky in the pool, whole: the number on the button is served in full.
+    const byId = {};
+    items.forEach(x => byId[x.id] = x);
+    const ids = shuffleQ ? shuffled(missedIds()) : missedIds();
+    picks = ids.map(id => byId[id]).filter(Boolean);
+  } else if(source === 'flagged'){
+    // Only what he marked for retry - the correct-but-guessed ones live nowhere else.
+    const marked = {};
+    flagIds().forEach(id => marked[id] = true);
+    const only = items.filter(x => marked[x.id]);
+    picks = shuffleQ ? shuffled(only) : only;
+  } else if(source === 'whole'){
+    /* Boss, 2026-09-25: "can I get an option to retake quiz 6 with all the
+       questions". A retake is not a draw: it serves the entire pool for this
+       tab in one session - both attempts, every question - because the whole
+       point of a retake is that nothing is chosen for you and nothing is held
+       back. */
+    picks = wholePool(items);
+  } else {
+    picks = freshDraw(items);
+  }
+  return picks.map(withChoiceOrder);
+}
+
+/* ================= RENDER ================= */
+
+function switchQuiz(key){
+  current = key;
+  round = null; drill = null; review = null;
+  // Item ids restart at q0 in every bank, so a batch cannot be carried across a
+  // tab switch: q7's q0 is a different question from q6's q0.
+  lastBatch = []; lastMissed = []; lastFullBatch = [];
+  document.querySelectorAll('.chap').forEach(c => {
+    const on = c.dataset.key === key;
+    c.classList.toggle('active', on);
+    const b = c.querySelector('.chap-main'); if(b) b.setAttribute('aria-pressed', on);
+  });
+  render();
+}
+
+function setFilter(v){
+  filter = v;
+  // An attempt split is a property of the quiz items, so it cannot apply to the
+  // homework or the lecture questions: picking either clears the attempt choice
+  // rather than emptying the pool.
+  if(filter === 'hw' || filter === 'lecture') attemptFilter = 'any';
+  savePrefs();
+  round = null; drill = null; review = null;
+  render();
+}
+
+/* The attempt choices are built from the bank itself, counts included, so the
+   menu can never offer a filter that serves nothing. A quiz whose real items are
+   one bank with no attempt split (Quiz 7) says so and disables the menu. */
+function refreshAttemptSelect(){
+  const sel = document.getElementById('attemptsel');
+  if(!sel) return;
+  const real = pool(current).filter(x => x.real);
+  const c = { a1: 0, a2: 0, both: 0 };
+  real.forEach(x => {
+    const a = attemptOf(x);
+    if(a === 'both'){ c.a1++; c.a2++; c.both++; }
+    else if(a === 'a1') c.a1++;
+    else if(a === 'a2') c.a2++;
+  });
+  if(!attemptAvailable(current)){
+    sel.disabled = true;
+    const who = DATA[current].noSplit ? 'Both quizzes, no attempt split' : 'Quiz bank - no attempt split';
+    sel.innerHTML = `<option value="${attemptFilter}">${who} (${real.length})</option>`;
+    return;
+  }
+  sel.disabled = (filter === 'hw' || filter === 'lecture');
+  sel.innerHTML =
+    `<option value="any">All quiz questions (${real.length})</option>`
+    + `<option value="a1">Attempt 1 only (${c.a1})</option>`
+    + `<option value="a2">Attempt 2 only (${c.a2})</option>`
+    + `<option value="both">In both attempts (${c.both})</option>`;
+  sel.value = attemptFilter;
+}
+
+function setAttempt(v){
+  attemptFilter = v;
+  // Choosing an attempt is a statement about the quiz, so ask for the quiz.
+  if(attemptFilter !== 'any' && (filter === 'hw' || filter === 'lecture')){
+    filter = 'real';
+    const f = document.getElementById('srcfilter');
+    if(f) f.value = 'real';
+  }
+  savePrefs();
+  round = null; drill = null; review = null;
+  render();
+}
+
+function setMode(v){
+  mode = v;
+  round = null; drill = null;      // the review screen stays put: mode does not change its content
+  render();
+}
+
+function setSize(v){
+  sessionSize = (v === 'all') ? 'all' : parseInt(v, 10);
+  round = null; drill = null;      // the review screen stays put: size does not change its content
+  render();
+}
+
+/* Order settings apply to the NEXT session rather than re-rendering the current
+   one: re-rendering an in-flight round would throw away the answers already
+   picked in it. The checkbox is its own feedback until then. */
+function setShuffleQ(v){ shuffleQ = !!v; }
+function setShuffleChoices(v){ shuffleChoices = !!v; }
+/* Unlike the shuffle boxes this starts over at once: a round already on screen
+   would otherwise keep showing the number of choices just switched away from. */
+function setChoices(n){
+  choiceCount = n;
+  savePrefs();
+  round = null; drill = null;
+  render();
+}
+function paintChoices(){
+  document.querySelectorAll('#choiceseg [data-ch]').forEach(b => {
+    const on = b.getAttribute('data-ch') === String(choiceCount);
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-pressed', on);
+  });
+}
+/* Like the shuffle boxes, this is its own feedback until the next draw: a round
+   already on screen keeps what it has, answers included. */
+function setNewFirst(v){ newFirst = !!v; savePrefs(); }
+
+/* Single entry point used by the toolbar buttons; honours the selected mode. */
+function start(source){ if(mode === 'drill') startDrill(source); else startRound(source); }
+
+/* How many real quiz questions this tab holds, whatever the menus currently say. */
+function realPoolCount(){ return pool(current).filter(x => x.real).length; }
+
+/* Boss, 2026-09-25: "can I get an option to retake quiz 6 with all the
+   questions". One button instead of three menus to line up: it points the
+   question menu at the real quiz bank and the attempt menu at both attempts
+   (Quiz 6 = 26, Quiz 7 = 20), sets the session to the whole pool, and serves
+   every one of them now - no ten at a time, and no pass holding the tail back
+   for a later round. It leaves the menus showing what it did, so the next
+   session is not a surprise. Grading, the badge, the misses drill and "Redo the
+   full N from that practice" all behave exactly as after any other round, so a
+   retake can be fixed and looped. */
+function retakeWholeQuiz(){
+  if(!realPoolCount()){ alert('This tab has no real quiz questions to retake.'); return; }
+  filter = 'real';
+  attemptFilter = 'any';
+  sessionSize = 'all';
+  const f = document.getElementById('srcfilter');  if(f) f.value = filter;
+  const a = document.getElementById('attemptsel'); if(a) a.value = attemptFilter;
+  const s = document.getElementById('sizesel');     if(s) s.value = 'all';
+  savePrefs();
+  round = null; drill = null; review = null;
+  start('whole');
+}
+
+/* The section switch: one button per source, each with this chapter's count. */
+function paintSrc(){
+  const n = { real: 0, hw: 0, lecture: 0, all: 0 };
+  pool(current).forEach(x => { n[kindOf(x)]++; n.all++; });
+  document.querySelectorAll('#srcseg [data-src]').forEach(b => {
+    const k = b.getAttribute('data-src');
+    const on = k === filter;
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-pressed', on);
+    const label = { real: 'Quiz', hw: 'Homework', lecture: 'PowerPoint', all: 'All' }[k];
+    b.innerHTML = label + ' <small>' + n[k] + '</small>';
+  });
+}
+
+function render(){
+  updateBadge();
+  paintSrc();
+  paintChoices();
+  refreshAttemptSelect();
+  // An attempt menu with nothing to choose is clutter, not information.
+  const att = document.getElementById('attemptsel');
+  if(att) att.hidden = att.disabled;
+  if(review) renderReview();
+  else if(drill) renderDrill();
+  else if(!round) renderHome();
+  else renderRound();
+  // After the markup exists: the retry counts live on buttons, and the toolbar
+  // copy is never re-rendered, so it has to be painted from the live number.
+  paintRetryButtons();
+}
+
+function filterLabel(){
+  const base = filter === 'real' ? 'quiz questions only'
+    : filter === 'lecture' ? 'PowerPoint questions only'
+    : (filter === 'hw' ? 'homework questions only' : 'all questions');
+  const a = attemptLabel();
+  return a ? base + ' · ' + a : base;
+}
+
+function attemptLabel(){
+  if(attemptFilter === 'any') return '';
+  /* The attempt menu cannot narrow a bank that has no split, so it must not be
+     quoted as if it had: Exam 2 would otherwise read "attempt 1" while serving
+     all 46, and Quiz 7 has had the same silent mismatch all along. */
+  if(!attemptAvailable(current)) return '';
+  if(attemptFilter === 'both') return 'in both attempts';
+  return attemptFilter === 'a1' ? 'attempt 1' : 'attempt 2';
+}
+
+function sizeLabel(){ return sessionSize === 'all' ? 'the whole pool' : sessionSize + ' questions'; }
+
+/* The fresh-draw label says what is actually coming, which is the whole point of
+   new-first: "10 new questions", then "the last 6 unasked", then a new pass. */
+function nextDrawLabel(){
+  if(!newFirst) return sizeLabel();
+  const left = unseenItems().length;
+  if(left === 0) return 'a fresh pass of ' + sizeLabel();
+  const n = Math.min(left, sizeNum());
+  return n === left ? 'the last ' + n + ' unasked question' + (n === 1 ? '' : 's')
+                    : n + ' new questions';
+}
+
+/* The same thing for the end-of-session button. */
+function nextBtnLabel(){
+  const head = mode === 'drill' ? '🔁 Next retry set' : '▶ Next round';
+  if(!newFirst) return mode === 'drill' ? '🔁 Fresh retry session' : '▶ Fresh round';
+  const left = unseenItems().length;
+  if(left === 0) return head + ' (new pass)';
+  return head + ' - ' + Math.min(left, sizeNum()) + ' unasked';
+}
+
+function orderLabel(){
+  const base = !shuffleQ ? 'fixed order' : (shuffleChoices && choiceCount === 'all' ? 'shuffled order + choices' : 'shuffled order');
+  return choiceCount === 'all' ? base : base + ' · ' + choiceCount + ' choices';
+}
+
+function modeLabel(){
+  return mode === 'drill'
+    ? 'Retry mode: repeat each question until you get it right'
+    : 'Round: answer all, then check';
+}
+
+function renderHome(){
+  const r = document.getElementById('content');
+  const st = quizStats();
+  const missed = st.shaky;
+  const pick = Math.min(st.total, sizeNum());
+  const left = unseenItems().length;          // unasked in this pool during the current pass
+  const asked = servedIds().length;
+  const html = `<div class="hero">
+    <h2>${esc(DATA[current].label)}</h2>
+    <p>Multiple-choice only - there are no fill-in-the-blank items. Each session serves <b>${pick === Infinity ? 'every' : pick}</b> question(s) drawn from <b>${esc(filterLabel())}</b>.</p>
+    <p style="margin-top:-4px"><b>${esc(modeLabel())}</b>${mode === 'drill' ? ' - a wrong answer keeps you on that same question, so you cannot move on until you get it right.' : '.'}</p>
+    ${newFirst ? `<p style="margin-top:-4px">🆕 <b>New questions first</b> - a round serves what this pool has not asked yet, so 10 then 10 is 10 then the rest, not the same ten again. <b>${left}</b> of <b>${st.total}</b> still unasked${left === 0 ? ' - every question has been asked once, so the next round starts a new pass' : ''}.</p>` : ''}
+    <div class="stat">
+      <div><b>${st.total}</b><span>questions in this pool</span></div>
+      <div><b>${newFirst ? left : st.total}</b><span>${newFirst ? 'not asked yet this pass' : 'questions in this pool'}</span></div>
+      <div><b>${st.attempted}</b><span>attempted so far</span></div>
+      <div><b>${missed}</b><span>still shaky (missed or kept for retry)</span></div>
+      <div><b>${st.flagged}</b><span>kept for retry</span></div>
+    </div>
+    <div class="row">
+      <button class="primary" onclick="start('mixed')">${mode === 'drill' ? '🔁' : '▶'} Start - ${esc(nextDrawLabel())}</button>
+      <button onclick="retakeWholeQuiz()" title="Every real quiz question on this tab - both attempts, nothing drawn for you and nothing held back by the pass. Quiz 6 is all 26, Quiz 7 all 20.">📝 Retake the whole quiz (${realPoolCount()})</button>
+      <button onclick="start('missed')" ${missed ? '' : 'disabled'}>🎯 Practice missed (${missed})</button>
+      <button data-retry onclick="start('flagged')" ${st.flagged ? '' : 'disabled'}>🔁 Retry only these (${st.flagged})</button>
+      <button onclick="startReview()" ${missed ? '' : 'disabled'}>🧠 Memory aids (${missed})</button>
+      <button onclick="startKey()">📖 All questions + answers (${st.total})</button>
+      ${newFirst && asked ? `<button onclick="resetDeck()" title="Forget which questions this pool has asked, so the next round deals the whole pool again from the top">🔄 Start this pass over</button>` : ''}
+    </div>
+  </div>`;
+  r.innerHTML = html;
+}
+
+function renderRound(){
+  const r = document.getElementById('content');
+  const roundLabel = round.mode === 'flagged' ? '🔁 Retrying only the questions you marked'
+    : (round.mode === 'missed' ? '🎯 Practicing your missed questions'
+    : (round.mode === 'lastmissed' ? '🎯 The ones you missed in that practice'
+    : (round.mode === 'full' ? '🔁 That full practice again, reordered'
+    : (round.mode === 'whole' ? '📝 Whole quiz retake - every question'
+    : (round.mode === 'repeat' ? '🔁 The same questions again, reordered' : '▶ Random round')))));
+  let html = `<div class="muted" style="margin:4px 0 2px">${roundLabel} · ${esc(filterLabel())} · ${round.items.length} questions · ${orderLabel()} ${round.deckNote || ''}</div>`;
+  html += round.items.map((item, i) => itemHTML(item, i)).join('');
+  html += `<button class="primary" id="checkbtn" onclick="checkRound()" style="margin-top:10px">✔ Check Round</button>
+           <button onclick="cancelRound()" style="margin-top:10px">Cancel</button>`;
+  r.innerHTML = html;
+}
+
+/* The mark has to be reachable while the question is on screen - that is the
+   whole request. It sits under the item next to the hint so it reads as part of
+   the question, and it never re-renders (see toggleFlag). */
+function flagButtonHTML(id, domId){
+  const on = isFlagged(id);
+  return `<button class="flag-btn${on ? ' on' : ''}" id="flag_${domId}" data-mark="${esc(id)}"`
+    + ` onclick="toggleFlag('${id}', this)"`
+    + ` title="Mark this one for another pass even if you got it right - a guess that landed is not knowing it. It comes back with Retry only these.">`
+    + `${on ? '☑ Kept for retry' : '☐ Retry only this one'}</button>`;
+}
+
+function paintFlagBtn(btn, on){
+  try{
+    if(!btn) return;
+    btn.classList.toggle('on', !!on);
+    btn.textContent = on ? '☑ Kept for retry' : '☐ Retry only this one';
+  }catch(e){}
+}
+
+function itemHTML(item, i){
+  const num = `<span class="num">${i+1}.</span>`;
+  const opts = item.opts.map((o, j) =>
+    `<label><input type="radio" name="mcq_${i}" value="${j}"> <b>${String.fromCharCode(65+j)}.</b> ${esc(o)}</label>`).join('');
+  const hint = aidsAlways ? '' :
+    `<button class="hint-btn" onclick="toggleHint(${i})">💡 Hint</button>
+    <div class="hint" id="hint_${i}">${esc(item.hint)}</div>`;
+  return `<div class="card" id="it_${i}">
+    <div class="q">${num}${esc(item.q)}<span class="ptype">${esc(item.src)}</span></div>
+    ${opts}
+    ${hint}
+    ${flagButtonHTML(item.id, i)}
+    ${aidsAlways ? aidHTML(item, true) : ''}
+  </div>`;
+}
+
+function toggleHint(i){
+  document.getElementById('hint_' + i).classList.toggle('shown');
+}
+
+/* ================= MEMORY AIDS ================= */
+
+/* Every question carries a memory hook (mnem), the trap to watch for, and the
+   reasoning (hint). build them once here, reuse everywhere. */
+function aidHTML(item, open, id){
+  return `<div class="aids${open ? ' shown' : ''}"${id ? ` id="${id}"` : ''}>
+    <div class="aids-h">🧠 How to remember this</div>
+    ${item.mnem ? `<div class="aid"><span class="aid-k">Hook</span><span class="aid-v">${esc(item.mnem)}</span></div>` : ''}
+    ${item.trap ? `<div class="aid"><span class="aid-k">Trap</span><span class="aid-v">${esc(item.trap)}</span></div>` : ''}
+    <div class="aid"><span class="aid-k">Why</span><span class="aid-v">${esc(item.hint)}</span></div>
+  </div>`;
+}
+
+function toggleAids(id){
+  const el = document.getElementById(id);
+  if(el) el.classList.toggle('shown');
+}
+
+/* Keep the answers the user has already picked when the view is re-rendered. */
+function snapRound(){
+  const out = {};
+  if(!round) return out;
+  round.items.forEach((it, i) => {
+    const sel = document.querySelector('input[name="mcq_' + i + '"]:checked');
+    if(sel) out[i] = sel.value;
+  });
+  return out;
+}
+function restoreRound(snap){
+  Object.keys(snap).forEach(i => {
+    const el = document.querySelector('input[name="mcq_' + i + '"][value="' + snap[i] + '"]');
+    if(el) el.checked = true;
+  });
+}
+function snapDrill(){
+  const sel = document.querySelector('input[name="drill_opt"]:checked');
+  return sel ? sel.value : null;
+}
+function restoreDrill(v){
+  if(v === null) return;
+  const el = document.querySelector('input[name="drill_opt"][value="' + v + '"]');
+  if(el) el.checked = true;
+}
+function setAidsAlways(v){
+  aidsAlways = v;
+  if(round && !round.checked){ const s = snapRound(); renderRound(); restoreRound(s); }
+  else if(drill && !drill.done){ const s = snapDrill(); renderDrill(); restoreDrill(s); }
+}
+
+/* ---- missed review: every shaky question with all three aids ---- */
+function startReview(){
+  const stats = loadStats()[current] || {};
+  /* Marked counts as shaky even with no miss behind it - "marked questions join
+     the missed pool" is the tool's own rule, and renderReview already draws the
+     "marked not sure" tag for a row that has no misses. Filtering on m > 0 alone
+     dropped exactly the guessed-but-correct items the screen exists for. */
+  const items = visible(current).filter(x => stats[x.id] && (stats[x.id].m > 0 || stats[x.id].f));
+  items.sort((a, b) => (stats[b.id].m - stats[a.id].m) || (stats[b.id].t - stats[a.id].t));
+  review = { items: items };
+  round = null; drill = null;
+  render();
+  window.scrollTo(0,0);
+}
+function closeReview(){ review = null; render(); }
+
+/* Boss, 2026-09-28, after Exam 2: "give me an option where we can see all the
+   questions and correct answers. I think that's what we were missing too."
+   Nothing to answer: every question the menus select, in bank order, every
+   choice shown and the right one marked, so the wording and the answer can be
+   read straight through. It rides on the review state, which every menu and
+   session change already clears. */
+function startKey(){
+  review = { items: visible(current), key: true };
+  round = null; drill = null;
+  render();
+  window.scrollTo(0,0);
+}
+
+function renderKey(){
+  const r = document.getElementById('content');
+  const items = review.items;
+  let html = `<div class="summary"><h3>📖 ${items.length} question${items.length === 1 ? '' : 's'} with answers</h3>
+    <p class="muted">${esc(DATA[current].label)} · ${esc(filterLabel())}. Change the tab or the question and attempt menus to list a different set.</p>
+    <div class="row" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">
+      <button class="primary" onclick="closeReview(); start('mixed')">▶ Quiz me on these</button>
+      <button onclick="closeReview()">Back</button>
+    </div></div>`;
+  html += items.map((it, i) => `<div class="card">
+      <div class="q"><span class="num">${i+1}.</span>${esc(it.q)}<span class="ptype">${esc(it.src)}</span></div>
+      ${it.opts.map((o, j) => `<div class="keyopt${o === it.correct ? ' ok' : ''}">${o === it.correct ? '✔ ' : ''}${String.fromCharCode(65+j)}. ${esc(o)}</div>`).join('')}
+      <div class="keywhy">${esc(it.hint)}</div>
+    </div>`).join('');
+  r.innerHTML = html;
+}
+
+function renderReview(){
+  if(review.key){ renderKey(); return; }
+  const r = document.getElementById('content');
+  const n = review.items.length;
+  if(n === 0){
+    r.innerHTML = `<div class="summary"><h3>🧠 Nothing to remember yet</h3>
+      <p class="muted">Nothing has been missed and nothing is kept for retry in <b>${esc(DATA[current].label)}</b> with <b>${esc(filterLabel())}</b> selected. Miss a question, or tick <b>☐ Retry only this one</b> under one you guessed at, and it will land here with a memory hook, the trap to watch out for, and the reasoning.</p>
+      <div class="row" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
+        <button class="primary" onclick="start('mixed')">▶ Start a session</button>
+        <button onclick="closeReview()">Back</button>
+      </div></div>`;
+    return;
+  }
+  const stats = loadStats()[current] || {};
+  let html = `<div class="summary"><h3>🧠 ${n} question${n === 1 ? '' : 's'} to remember</h3>
+    <p class="muted">Everything missed or kept for retry in <b>${esc(DATA[current].label)}</b> (${esc(filterLabel())}), hardest first. Read the hook, then cover the answer and say it out loud before moving on.</p>
+    <div class="row" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">
+      <button class="primary" onclick="start('missed')">🎯 Drill these</button>
+      ${quizStats().flagged ? `<button data-retry onclick="start('flagged')">🔁 Retry only these</button>
+      <button onclick="clearRetryMarks()">🧽 Clear retry marks</button>` : ''}
+      <button onclick="closeReview()">Back</button>
+    </div></div>`;
+  html += review.items.map((it, i) => {
+    const st = stats[it.id] || {m:0,c:0,t:0};
+    const tag = st.m ? `missed ${st.m} of ${st.t} attempt${st.t === 1 ? '' : 's'}` : 'kept for retry';
+    return `<div class="card review">
+      <div class="q"><span class="num">${i+1}.</span>${esc(it.q)}<span class="ptype">${esc(it.src)}</span>
+        <span class="tag">${tag}</span></div>
+      <div class="ans">✔ ${esc(it.correct)}</div>
+      ${aidHTML(it, true)}
+      ${flagButtonHTML(it.id, 'r' + i)}
+    </div>`;
+  }).join('');
+  r.innerHTML = html;
+  window.scrollTo(0,0);
+}
+
+/* ================= RETRY MODE (one question at a time) ================= */
+
+function startDrill(source){
+  const drawn = (source === 'mixed' || source === 'whole');
+  const undo = newFirst && drawn ? deckUndoPoint() : null;
+  const freshPass = newFirst && source === 'mixed' && unseenItems().length === 0;
+  const items = sample(source);
+  if(items.length === 0){
+    // The draw did not happen, so nothing was asked: keep the pass as it was.
+    if(undo) deckRollback(undo);
+    alert(source === 'flagged'
+      ? 'Nothing marked yet - tick "☐ Retry only this one" under any question, even one you got right.'
+      : (source === 'missed'
+        ? 'No missed questions yet - take a normal session first.'
+        : (source === 'lastmissed'
+          ? 'Nothing outstanding from that practice - you answered all of it correctly.'
+          : 'Nothing in this pool with the question and attempt menus set the way they are. Widen one of them.')));
+    return;
+  }
+  drill = { items: items, i: 0, attempts: 0, done: false, results: [], mode: source, deckUndo: undo, deckNote: '' };
+  lastBatch = items.map(x => x.id);
+  if(source === 'mixed' || source === 'repeat' || source === 'whole') lastFullBatch = lastBatch.slice();
+  if(undo) drill.deckNote = source === 'whole' ? wholeNoteHTML() : deckNoteHTML(freshPass);
+  review = null;
+  render();
+  window.scrollTo(0,0);
+}
+
+/* What the draw just did to this pass through the pool, in one line: how many
+   questions are still waiting, or that a new pass has started because every one
+   had been asked. Empty when new-first is off - there is no pass then. */
+function deckNoteHTML(freshPass){
+  if(!newFirst) return '';
+  const left = unseenItems().length;
+  if(freshPass){
+    return `<span class="tag">new pass - all ${quizStats().total} of this pool had been asked</span>`;
+  }
+  if(left === 0){
+    return '<span class="tag">that was the last of this pool - the next round starts a new pass</span>';
+  }
+  return `<span class="tag">${left} still unasked after this round</span>`;
+}
+
+/* The whole-quiz retake's own line. It is not a draw, so "still unasked" would
+   be the wrong report even when it is technically true of the pass. */
+function wholeNoteHTML(){
+  const n = quizStats().total;
+  return `<span class="tag">the whole pool in one sitting - all ${n} question${n === 1 ? '' : 's'}, nothing held back</span>`;
+}
+
+function renderDrill(){
+  const r = document.getElementById('content');
+  const item = drill.items[drill.i];
+  const n = drill.items.length;
+  const pct = Math.round(drill.i / n * 100);
+  const opts = item.opts.map((o, j) =>
+    `<label><input type="radio" name="drill_opt" value="${j}"> <b>${String.fromCharCode(65+j)}.</b> ${esc(o)}</label>`).join('');
+  r.innerHTML = `<div class="muted" style="margin:6px 0 2px">
+      🔁 Question <b>${drill.i + 1}</b> of <b>${n}</b> · ${drill.mode === 'flagged' ? 'only the questions you marked' : (drill.mode === 'missed' ? 'your missed questions' : (drill.mode === 'lastmissed' ? 'the ones you missed in that practice' : (drill.mode === 'full' ? 'that full practice again, reordered' : (drill.mode === 'whole' ? 'every question in this quiz' : (drill.mode === 'repeat' ? 'the same questions, reordered' : esc(filterLabel()))))))} · ${orderLabel()} ${drill.deckNote || ''}
+    </div>
+    <div class="progress"><i style="width:${pct}%"></i></div>
+    <div class="card" id="drillcard">
+      <div class="q">${esc(item.q)}<span class="ptype">${esc(item.src)}</span></div>
+      ${opts}
+      ${aidsAlways ? aidHTML(item, true) : ''}
+      <div id="drillfb"></div>
+      <button class="hint-btn" onclick="toggleHint(0)">💡 Hint</button>
+      <div class="hint" id="hint_0">${esc(item.hint)}</div>
+      ${flagButtonHTML(item.id, 'drill')}
+      <div id="drillact" style="margin-top:12px"></div>
+    </div>
+    <div class="row" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
+      <button class="primary" id="drillcheck" onclick="checkDrill()">✔ Check</button>
+      <button onclick="cancelDrill()">Cancel</button>
+    </div>`;
+}
+
+/* Wrong answer -> stay on the SAME question and try again.
+   Right answer  -> lock it in, show the explanation, reveal the Next button. */
+function checkDrill(){
+  if(!drill || drill.done) return;
+  const item = drill.items[drill.i];
+  const card = document.getElementById('drillcard');
+  const labels = card.querySelectorAll('label');
+  const sel = card.querySelector('input[name="drill_opt"]:checked');
+  const fb = document.getElementById('drillfb');
+  if(!sel){
+    fb.innerHTML = '<div class="fb bad">Pick an answer first.</div>';
+    return;
+  }
+  const picked = +sel.value;
+  const cIdx = item.opts.indexOf(item.correct);
+  const got = (picked === cIdx);
+  drill.attempts++;
+  labels.forEach(l => l.classList.remove('right','wrong','correct-mark'));
+
+  if(got){
+    labels[cIdx].classList.add('right','correct-mark');
+    if(drill.attempts === 1) bump(item.id, true);   // a later success is not a first-try win
+    drill.results.push({ id: item.id, attempts: drill.attempts, firstTry: drill.attempts === 1 });
+    drill.done = true;
+    fb.innerHTML = `<div class="fb ok">✓ Correct${drill.attempts === 1 ? ' on the first try!' : ' - you got it after ' + drill.attempts + ' tries.'}</div>
+      ${aidsAlways ? '' : aidHTML(item, true)}`;
+    labels.forEach(l => { l.classList.add('locked'); const inp = l.querySelector('input'); if(inp) inp.disabled = true; });
+    document.getElementById('drillcheck').style.display = 'none';
+    document.getElementById('drillact').innerHTML =
+      `<button class="primary" onclick="nextDrill()">${drill.i + 1 < drill.items.length ? 'Next question ▶' : 'See results ▶'}</button>`;
+  } else {
+    bump(item.id, false);                           // a wrong answer makes the question shaky
+    labels[picked].classList.add('wrong');
+    fb.innerHTML = `<div class="fb bad">✗ Not quite - try again. This question stays until you get it right.
+        <small>${drill.attempts} wrong ${drill.attempts === 1 ? 'try' : 'tries'} so far. Use the Hint button if you want more.</small></div>
+      ${item.trap ? `<div class="trapbox">⚠️ <b>Watch the trap:</b> ${esc(item.trap)}</div>` : ''}
+      <button class="aids-btn" onclick="toggleAids('drillaids')">🧠 How to remember this</button>
+      ${aidHTML(item, false, 'drillaids')}`;
+  }
+  updateBadge();
+}
+
+function nextDrill(){
+  if(!drill) return;
+  drill.i++;
+  drill.attempts = 0;
+  drill.done = false;
+  if(drill.i >= drill.items.length){ renderDrillSummary(); return; }
+  renderDrill();
+  window.scrollTo(0,0);
+}
+
+function renderDrillSummary(){
+  const d = drill;
+  drill = null;
+  const r = document.getElementById('content');
+  const firstTry = d.results.filter(x => x.firstTry).length;
+  const totalTries = d.results.reduce((a, x) => a + x.attempts, 0);
+  const needed = d.results.filter(x => !x.firstTry);
+  // Only the items this retry session actually tripped on.
+  lastMissed = needed.map(x => x.id);
+  const byId = {};
+  pool(current).forEach(x => byId[x.id] = x);
+  const nQ = d.results.length;
+  let html = `<div class="summary"><h3>Retry session complete</h3>
+    <div class="big">${firstTry} / ${nQ} right on the first try</div>
+    <p class="muted">You needed ${totalTries} total attempt${totalTries === 1 ? '' : 's'} to clear all ${nQ} question${nQ === 1 ? '' : 's'}.</p>`;
+  if(needed.length === 0){
+    html += `<p class="muted">Every question right on the first attempt - outstanding. 🎉</p>`;
+  } else {
+    html += `<p class="muted">These took more than one try - the hint is included:</p>`;
+    html += needed.map((x, i) => {
+      const it = byId[x.id];
+      return `<div class="missed-item">
+        <div class="mq">${esc(it.q)}</div>
+        <div class="ans">✔ <b>${esc(it.correct)}</b></div>
+        <div class="muted" style="font-size:13px;margin-top:4px">Took ${x.attempts} tries <span class="tag">(${esc(it.src)})</span></div>
+        ${aidHTML(it, true)}
+        ${flagButtonHTML(it.id, 'd' + i)}
+      </div>`;
+    }).join('');
+  }
+  let btns = `<button class="primary" onclick="repeatBatch()">🔁 These ${nQ} again, new order</button>`;
+  if(needed.length) btns += `<button onclick="start('lastmissed')">🎯 Retry the ${needed.length} you missed</button>`;
+  if(d.mode === 'lastmissed' && lastFullBatch.length > nQ){
+    btns += `<button onclick="redoFullBatch()">↩ Redo the full ${lastFullBatch.length} from that practice</button>`;
+  }
+  btns += `<button onclick="retakeWholeQuiz()">📝 Retake the whole quiz (${realPoolCount()})</button>`;
+  btns += `<button onclick="start('mixed')">${nextBtnLabel()}</button>`;
+  if(quizStats().flagged) btns += `<button data-retry onclick="start('flagged')">🔁 Retry only these</button>`
+    + `<button onclick="clearRetryMarks()">🧽 Clear retry marks</button>`;
+  if(needed.length) btns += `<button onclick="startReview()">🧠 Missed review</button>`;
+  html += `<div class="row" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">${btns}</div></div>`;
+  r.innerHTML = html;
+  window.scrollTo({top:0, behavior:'smooth'});
+  updateBadge();
+  paintRetryButtons();   // the summary's own button is built without a number
+}
+
+function cancelDrill(){
+  // Same rule as a round: nothing answered means nothing was asked.
+  if(drill && drill.results.length === 0) deckRollback(drill.deckUndo);
+  drill = null; render();
+}
+
+function checkRound(){
+  if(!round || round.checked) return;
+
+  let correct = 0;
+  const missed = [];
+
+  round.items.forEach((item, i) => {
+    const card = document.getElementById('it_' + i);
+    const labels = card.querySelectorAll('label');
+    labels.forEach(l => l.classList.remove('right','wrong','correct-mark'));
+    const cIdx = item.opts.indexOf(item.correct);
+    if(cIdx >= 0) labels[cIdx].classList.add('right','correct-mark');
+    const sel = card.querySelector(`input[name="mcq_${i}"]:checked`);
+    const ok = !!sel && (+sel.value === cIdx);
+    if(ok){
+      correct++;
+    } else {
+      if(sel) labels[+sel.value].classList.add('wrong');
+      missed.push({item: item, picked: sel ? item.opts[+sel.value] : null});
+    }
+    bump(item.id, ok);
+  });
+
+  // What THIS round got wrong. That - and only that - is what the misses drill serves.
+  lastMissed = missed.map(m => m.item.id);
+
+  round.checked = true;
+  const btn = document.getElementById('checkbtn');
+  if(btn) btn.style.display = 'none';
+
+  const r = document.getElementById('content');
+  const pct = Math.round(correct / round.items.length * 100);
+  let summary = `<div class="summary"><h3>Round result</h3>
+    <div class="big">${correct} / ${round.items.length} correct (${pct}%)</div>`;
+  if(missed.length === 0){
+    summary += `<p class="muted">${round.mode === 'full'
+      ? 'Every question from that practice is correct now - nothing left outstanding. 🎉'
+      : (round.mode === 'lastmissed' ? 'You cleared every one you missed from that practice. 🎉'
+      : 'Perfect - all correct! 🎉')}</p>`;
+  } else {
+    summary += `<p class="muted">Review these - the correct answer and the hint are included:</p>`;
+    summary += missed.map((m, i) => {
+      const it = m.item;
+      const picked = m.picked ? esc(m.picked) : 'not answered';
+      return `<div class="missed-item">
+        <div class="mq">${esc(it.q)}</div>
+        <div class="ans">✔ <b>${esc(it.correct)}</b></div>
+        <div class="muted" style="font-size:13px;margin-top:4px">You chose: ${picked} <span class="tag">(${esc(it.src)})</span></div>
+        ${aidHTML(it, true)}
+        ${flagButtonHTML(it.id, 'm' + i)}
+      </div>`;
+    }).join('');
+  }
+  const kept = quizStats().flagged;
+  let btns = `<button class="primary" onclick="repeatBatch()">🔁 These ${round.items.length} again, new order</button>`;
+  if(missed.length) btns += `<button onclick="startRound('lastmissed')">🎯 Practice the ${missed.length} you missed</button>`;
+  if(kept) btns += `<button data-retry onclick="start('flagged')">🔁 Retry only these</button>`
+    + `<button onclick="clearRetryMarks()">🧽 Clear retry marks</button>`;
+  if(round.mode === 'lastmissed' && lastFullBatch.length > round.items.length){
+    btns += `<button onclick="redoFullBatch()">↩ Redo the full ${lastFullBatch.length} from that practice</button>`;
+  }
+  btns += `<button onclick="retakeWholeQuiz()">📝 Retake the whole quiz (${realPoolCount()})</button>`;
+  btns += `<button onclick="startRound('mixed')">${nextBtnLabel()}</button>`;
+  if(missed.length) btns += `<button onclick="startReview()">🧠 Missed review</button>`;
+  summary += `<div class="row" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">${btns}</div></div>`;
+  r.insertAdjacentHTML('beforeend', summary);
+  updateBadge();
+  paintRetryButtons();   // the summary's own button is built without a number
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function startRound(source){
+  // Taken before the draw so cancelling an untouched round can hand the
+  // questions back to the pass (see deckRollback). A whole-quiz retake touches
+  // the pass too, so it needs the same undo point.
+  const drawn = (source === 'mixed' || source === 'whole');
+  const undo = newFirst && drawn ? deckUndoPoint() : null;
+  const freshPass = newFirst && source === 'mixed' && unseenItems().length === 0;
+  round = { key: current, mode: source, items: sample(source), checked: false, deckUndo: undo, deckNote: '' };
+  review = null;
+  if(round.items.length === 0){
+    alert(source === 'flagged'
+      ? 'Nothing marked yet - tick "☐ Retry only this one" under any question, even one you got right.'
+      : (source === 'missed'
+        ? 'No missed questions yet - take a normal round first.'
+        : (source === 'lastmissed'
+          ? 'Nothing outstanding from that practice - you answered all of it correctly.'
+          : 'Nothing in this pool with the question and attempt menus set the way they are. Widen one of them.')));
+    round = null; render(); return;
+  }
+  lastBatch = round.items.map(x => x.id);
+  // A fresh draw, or a redo of that same draw, is "the practice" the misses came from.
+  if(source === 'mixed' || source === 'repeat' || source === 'whole') lastFullBatch = lastBatch.slice();
+  if(undo) round.deckNote = source === 'whole' ? wholeNoteHTML() : deckNoteHTML(freshPass);
+  render();
+  window.scrollTo(0,0);
+}
+
+/* Boss, 2026-09-23 - "practice the same questions in a different order". The
+   shuffle boxes change what the next session draws; this re-serves the exact
+   batch he just finished, reordered, which is what makes a second pass at the
+   same ten questions possible instead of a fresh draw from the pool. */
+function repeatBatch(){
+  const byId = {};
+  pool(current).forEach(x => byId[x.id] = x);
+  const ids = shuffleQ ? shuffled(lastBatch) : lastBatch;
+  const items = ids.map(id => byId[id]).filter(Boolean).map(withChoiceOrder);
+  if(items.length === 0){ start('mixed'); return; }
+  review = null;
+  if(mode === 'drill'){
+    drill = { items: items, i: 0, attempts: 0, done: false, results: [], mode: 'repeat' };
+  } else {
+    round = { key: current, mode: 'repeat', items: items, checked: false };
+  }
+  render();
+  window.scrollTo(0,0);
+}
+
+/* Boss, 2026-09-25: "then let me redo the full quiz from the original practice
+   until I get every question." A misses drill has to hand him back the batch
+   those misses came from - fix the three, then run the ten again, and loop
+   until a pass comes back clean. Distinct from repeatBatch(), which repeats
+   whatever was just served (the misses), so the two are not the same button. */
+function redoFullBatch(){
+  const byId = {};
+  pool(current).forEach(x => byId[x.id] = x);
+  const ids = shuffleQ ? shuffled(lastFullBatch) : lastFullBatch.slice();
+  const items = ids.map(id => byId[id]).filter(Boolean).map(withChoiceOrder);
+  if(items.length === 0){ start('mixed'); return; }
+  review = null;
+  lastBatch = items.map(x => x.id);
+  if(mode === 'drill'){
+    drill = { items: items, i: 0, attempts: 0, done: false, results: [], mode: 'full' };
+  } else {
+    round = { key: current, mode: 'full', items: items, checked: false };
+  }
+  render();
+  window.scrollTo(0,0);
+}
+
+function cancelRound(){
+  // A round that was never checked has not asked anything: give the questions back.
+  if(round && !round.checked) deckRollback(round.deckUndo);
+  round = null; render();
+}
+
+function clearProgress(){
+  if(confirm('Erase all saved progress (missed/correct counts) for this browser?')){
+    try{ localStorage.removeItem(LS_KEY); }catch(e){}
+    try{ localStorage.removeItem(DECK_KEY); }catch(e){}   // the pass through the pool starts over too
+    served = loadServed();                                // ...and the copy held in memory with it
+    round = null; drill = null; review = null; render();
+  }
+}
+
+function updateBadge(){
+  const st = quizStats();
+  document.getElementById('badge').innerHTML =
+    `Attempted <b>${st.attempted}</b> · Shaky <b>${st.shaky}</b> · Kept for retry <b>${st.flagged}</b>`;
+}
+
+function esc(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+/* init */
+loadPrefs();
+renderChapters();
+document.getElementById('modesel').value = mode;
+document.getElementById('sizesel').value = String(sessionSize);
+document.getElementById('aidscb').checked = aidsAlways;
+document.getElementById('newfirstcb').checked = newFirst;
+document.getElementById('shufqcb').checked = shuffleQ;
+document.getElementById('shufccb').checked = shuffleChoices;
+render();
+</script>
+</body>
+</html>
