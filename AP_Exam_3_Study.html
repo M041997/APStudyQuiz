@@ -150,7 +150,7 @@
     <button id="btn-missed" onclick="start('missed')">🎯 Practice missed</button>
     <button id="btn-flagged" data-retry data-hide-empty onclick="start('flagged')" title="Run only the questions you ticked Retry only this one, reshuffled every time, so you can loop them.">🔁 Retry marked</button>
     <button onclick="startReview()" title="Every question you have missed, with its explanation">🧠 Missed review</button>
-    <button onclick="startKey()" title="Every question in this section with the correct answer marked - nothing to answer, just read">📖 Answer key</button>
+    <button onclick="startKey()" title="The answer key for the next batch (5, 10, 20 or all, per the size menu), then quiz yourself on exactly those">📖 Answer key</button>
     <span class="badge" id="badge"></span>
   </div>
   <details class="tb-more">
@@ -1025,8 +1025,14 @@ function closeReview(){ review = null; render(); }
    choice shown and the right one marked, so the wording and the answer can be
    read straight through. It rides on the review state, which every menu and
    session change already clears. */
+/* The key follows the size menu: it draws the next batch exactly as Start would (5, 10, 20 or all),
+   so "Quiz me on these" then asks those same questions. */
 function startKey(){
-  review = { items: visible(current), key: true };
+  const undo = newFirst ? deckUndoPoint() : null;
+  const picks = freshDraw(visible(current));
+  lastBatch = picks.map(x => x.id);
+  lastFullBatch = lastBatch.slice();
+  review = { items: picks, key: true, batch: true, undo: undo };
   round = null; drill = null;
   render();
   window.scrollTo(0,0);
@@ -1035,11 +1041,11 @@ function startKey(){
 function renderKey(){
   const r = document.getElementById('content');
   const items = review.items;
-  let html = `<div class="summary"><h3>📖 ${items.length} question${items.length === 1 ? '' : 's'} with answers</h3>
-    <p class="muted">${esc(DATA[current].label)} · ${esc(filterLabel())}. Change the tab or the question and attempt menus to list a different set.</p>
+  let html = `<div class="summary"><h3>📖 Answer key for the next ${items.length} question${items.length === 1 ? '' : 's'}</h3>
+    <p class="muted">${esc(DATA[current].label)}. This is the batch the size menu picked. Read it, then press Quiz me on these to be asked exactly these questions.</p>
     <div class="row" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">
-      <button class="primary" onclick="closeReview(); start('mixed')">▶ Quiz me on these</button>
-      <button onclick="closeReview()">Back</button>
+      <button class="primary" onclick="repeatBatch()">▶ Quiz me on these</button>
+      <button onclick="deckRollback(review.undo); closeReview()">Back</button>
     </div></div>`;
   html += items.map((it, i) => `<div class="card">
       <div class="q"><span class="num">${i+1}.</span>${esc(it.q)}<span class="ptype">${esc(it.src)}</span></div>
