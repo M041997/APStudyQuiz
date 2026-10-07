@@ -292,7 +292,12 @@ document.querySelectorAll('#vidchips .chip').forEach(b => b.onclick = () => {
   const v = $('vid'); v.src = 'video/walkthrough_' + b.dataset.v + '.mp4'; $('vidbox').classList.remove('hide'); v.play().catch(() => {});
   $('vidbox').scrollIntoView({behavior:'smooth', block:'nearest'});
 });
-buildSheet(); buildPicker(); refreshSetup();
+buildSheet(); buildPicker();
+(function(){ /* AP_Figure_Flashcards.html#sets=histo,skin preselects those sets */
+  const m = location.hash.match(/sets=([\w,]+)/);
+  if(m) m[1].split(',').forEach(id => { if(SETS.some(s => s.id === id)) selected.add(id); });
+})();
+refreshSetup();
 </script>
 </body>
 </html>

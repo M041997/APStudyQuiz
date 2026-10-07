@@ -32,6 +32,11 @@
   .chap-retake{display:block;padding:9px 16px;border-top:1px solid var(--line);font-size:13px;font-weight:600;
                color:var(--accent);text-decoration:none;background:var(--accent-soft)}
   .chap-retake:hover,.chap-retake:focus-visible{text-decoration:underline}
+  .chap-learn{display:block;padding:9px 16px;border-top:1px solid var(--line);font-size:13px;font-weight:600;background:#eef5ff;color:#1e40af;text-decoration:none}
+  .chap-learn:hover,.chap-learn:focus-visible{text-decoration:underline}
+  .learnbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:4px 0 16px;padding:12px 14px;border:1px solid #cfe1f7;background:#eef5ff;border-radius:12px}
+  .learnbar a.big{font-size:16px;font-weight:700;padding:10px 16px;border-radius:10px;background:#1e40af;color:#fff;text-decoration:none}
+  .learnbar span{font-size:13px;color:#1e40af}
   .tab{flex:1;min-width:200px;padding:12px 14px;border:1px solid var(--line);
        border-radius:12px;background:#fff;cursor:pointer;text-align:left;transition:.15s}
   .tab:hover{border-color:var(--accent)}
@@ -129,6 +134,8 @@
 <h1>A&amp;P I Lab Practical Study</h1>
 <p class="sub"><a href="AP_Exam_3_Study.html">Lecture: Exam 3</a> · <b>Lab practical</b> · <a href="AP_Lab_Diagrams.html">Labeled figures</a> · <a href="AP_Figure_Flashcards.html">Figure flashcards</a></p>
 <p class="sub">Every question and correct answer comes from your Connect lab homework. Pick a chapter (or all mixed), then press <b>▶ Start</b>. Anything you miss comes back in <b>🧠 Missed review</b>. Progress is saved in this browser. The <b>Labeling</b> cards use your lab homework figures with a red arrow; the <b>Diagrams</b> cards use your lecture slides, with a red “?”; both show a figure from your slides with one line marked “?”. Chapter 8 text questions and parts of 6, 7 and 9 are not here yet.</p>
+
+<div class="learnbar"><a class="big" href="AP_Figure_Flashcards.html">🎓 Learn mode</a><span>Not a quiz: narrated videos, acronym mnemonics and hidden-label flashcards for the figures. Every chapter card below also has a <b>🎓 Learn this</b> link.</span></div>
 
 <div class="chapters" id="chapters" aria-label="Chapters"></div>
 
@@ -287,6 +294,10 @@ const CHAPTERS = [
   { key: 'diag_tissue', eyebrow: 'Diagrams', num: "Skin layers", name: "Skin layers & bone tissue" }
 ];
 
+/* which flashcard sets (AP_Figure_Flashcards.html) go with each chapter card */
+const LEARN = { lab2:'body', lab3:'scope', lab4:'cell', lab5:'histo', lab6:'skin,skin2', lab7:'bone,bone2', lab9:'upper,lower,scap',
+  label_body:'body', label_scope:'scope', label_cell:'cell', label_histo:'histo', label_skin:'skin,skin2', label_bone:'bone,bone2', label_scap:'scap',
+  diag_skull:'skull', diag_spine:'spine', diag_upper:'upper', diag_lower:'lower', diag_tissue:'skin2,bone2' };
 function renderChapters(){
   const box = document.getElementById('chapters');
   if(!box) return;
@@ -302,7 +313,7 @@ function renderChapters(){
         <span class="chap-num">${c.num}</span>
         <span class="chap-name">${c.name}</span>
         <span class="chap-counts">${counts}</span>
-      </button>${retake}
+      </button>${retake}${LEARN[c.key] ? `<a class="chap-learn" href="AP_Figure_Flashcards.html#sets=${LEARN[c.key]}">🎓 Learn this: figures, videos, mnemonics</a>` : ''}
     </div>`;
   }).join('');
 }
