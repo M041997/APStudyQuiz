@@ -39,7 +39,7 @@
   .bar>i{display:block;height:100%;background:var(--acc);width:0}
   .stat{display:flex;justify-content:space-between;font-size:13px;color:var(--mute);gap:8px;flex-wrap:wrap}
   .figbox{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px;margin:12px 0;text-align:center}
-  .figbox img{max-width:100%;max-height:48vh;height:auto}
+  .figbox img{max-width:100%;max-height:40vh;height:auto}
   .cap{font-size:13px;color:var(--mute);margin:0}
   .q{font-size:17px;font-weight:600;margin:8px 0}
   .answer{display:none;margin:10px 0;padding:12px 14px;border-radius:12px;background:var(--acc-bg);border:1px solid var(--acc)}
@@ -59,6 +59,15 @@
   .mn .x{display:block;color:var(--mute);font-size:13px}
   details.sheet summary{cursor:pointer;font-weight:700}
   details.sheet .mn{margin-top:8px}
+  .choices{display:grid;gap:8px;margin:10px 0}
+  .choice{font:inherit;font-size:16px;text-align:left;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;display:flex;gap:10px;align-items:center}
+  .choice .k{font:600 12px ui-monospace,monospace;border:1px solid var(--line);border-radius:6px;padding:1px 7px;color:var(--mute)}
+  .choice:hover:not(:disabled){border-color:var(--acc)}
+  .choice.ok{background:var(--ok-bg);border-color:var(--ok);color:var(--ok);font-weight:600}
+  .choice.bad{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+  .choice:disabled{cursor:default}
+  .verdict{font-weight:700;margin:6px 0}
+  .verdict.ok{color:var(--ok)} .verdict.bad{color:var(--bad)}
   @media (max-width:520px){ .btns .btn{flex:1 1 45%} }
 </style>
 </head>
@@ -96,6 +105,14 @@
           <select id="order">
             <option value="fig">One figure at a time</option>
             <option value="mix">Fully shuffled</option>
+          </select>
+        </label>
+        <label>Answers
+          <select id="choices">
+            <option value="3" selected>3 choices</option>
+            <option value="4">4 choices</option>
+            <option value="2">2 choices</option>
+            <option value="0">Flip card (no choices)</option>
           </select>
         </label>
         <label><input type="checkbox" id="peek" checked> Show the labeled figure first (lecture-slide sets)</label>
@@ -208,24 +225,57 @@ function showStudy(c){
 
 function renderCard(){
   const c = cur;
+  const nch = +$('choices').value;
+  curChoices = nch > 0 ? makeChoices(c, nch) : [];
+  mcOk = false;
   $('study').classList.add('hide');
   const pl = $('play'); pl.classList.remove('hide');
   pl.innerHTML = `<div class="panel">${progressHTML()}
     <p class="cap">${esc(c.src)}${c.ft ? ' · ' + esc(c.ft) : ''}</p>
     <div class="figbox"><img id="cardimg" src="${esc(c.img)}" alt="Figure with the label hidden"></div>
     <div class="q">What is marked <b>?</b> / by the arrow?</div>
+    ${curChoices.length ? `<div class="choices" id="choicebox">${curChoices.map((ch, i) => `<button type="button" class="choice" data-i="${i}"><span class="k">${i + 1}</span><span>${esc(ch)}</span></button>`).join('')}</div><div id="verdict"></div>` : ''}
     <div class="answer" id="ans"><div class="big">${esc(c.a)}</div>
       ${c.labels.length ? `<div class="others">Other labels on this figure:</div><div class="labels">${c.labels.filter(l => l !== c.a).map(l => `<span>${esc(l)}</span>`).join('')}</div>` : ''}
       ${figMnemHTML(c)}${mnemHTML(c.a)}
       ${c.full ? `<div class="btns"><button class="btn" id="peekfull" type="button">Show the full labeled figure</button></div><div class="figbox hide" id="fullbox"><img src="${esc(c.full)}" alt="Labeled figure" loading="lazy"></div><div class="hide" id="fullmn">${figMnemHTML(c, true)}</div>` : ''}
     </div>
-    <div class="btns" id="b1"><button class="btn primary" id="rev" type="button">Reveal<kbd>Space</kbd></button><button class="btn" id="stop" type="button">End session</button></div>
-    <div class="btns hide" id="b2"><button class="btn ok" id="got" type="button">Got it<kbd>G</kbd></button><button class="btn bad" id="miss" type="button">Missed<kbd>M</kbd></button></div>
+    <div class="btns" id="b1"><button class="btn${curChoices.length ? '' : ' primary'}" id="rev" type="button">${curChoices.length ? 'I don\'t know: show answer' : 'Reveal<kbd>Space</kbd>'}</button><button class="btn" id="stop" type="button">End session</button></div>
+    <div class="btns hide" id="b2">${curChoices.length
+      ? '<button class="btn primary" id="nextq" type="button">Next<kbd>Space</kbd></button>'
+      : '<button class="btn ok" id="got" type="button">Got it<kbd>G</kbd></button><button class="btn bad" id="miss" type="button">Missed<kbd>M</kbd></button>'}</div>
   </div>`;
-  $('rev').onclick = reveal; $('stop').onclick = finish;
-  $('got').onclick = () => grade(true); $('miss').onclick = () => grade(false);
+  $('rev').onclick = () => { mcOk = false; reveal(); }; $('stop').onclick = finish;
+  if(curChoices.length){
+    document.querySelectorAll('#choicebox .choice').forEach(b => b.onclick = () => pick(+b.dataset.i));
+    $('nextq').onclick = () => grade(mcOk);
+  } else {
+    $('got').onclick = () => grade(true); $('miss').onclick = () => grade(false);
+  }
 }
 
+let curChoices = [], mcOk = false;
+const GENERIC = new Set(['middle','superior','inferior','lateral','medial','proximal','distal','anterior','posterior']);
+const stem = s => s.toLowerCase().replace(/\(.*?\)/g, '').replace(/[^a-z]/g, '').replace(/s$/, '');
+function makeChoices(c, n){
+  const a = stem(c.a);
+  const ok = l => { const t = (l || '').trim(); if(!t || GENERIC.has(t.toLowerCase())) return false; const s = stem(t); if(!s || s === a) return false; return !(s.length >= 4 && a.length >= 4 && (s.includes(a) || a.includes(s))); };
+  const out = [], seen = new Set([a]);
+  const add = l => { const s = stem(l); if(seen.has(s)) return; seen.add(s); out.push(l.trim()); };
+  shuffle(c.labels.filter(ok)).forEach(l => { if(out.length < n - 1) add(l); });
+  if(out.length < n - 1) shuffle(CARDS.filter(x => x.set === c.set)).forEach(x => { if(out.length < n - 1 && ok(x.a)) add(x.a); });
+  return shuffle([c.a].concat(out));
+}
+function pick(i){
+  if(revealed) return;
+  const right = curChoices[i] === cur.a; mcOk = right;
+  document.querySelectorAll('#choicebox .choice').forEach((b, j) => {
+    b.disabled = true;
+    if(curChoices[j] === cur.a) b.classList.add('ok'); else if(j === i) b.classList.add('bad');
+  });
+  $('verdict').innerHTML = right ? '<div class="verdict ok">✓ Correct</div>' : `<div class="verdict bad">✗ Not quite. It's ${esc(cur.a)}.</div>`;
+  reveal();
+}
 function mnemFor(label){
   return MNEMS.filter(m => { try { return new RegExp(m.re, 'i').test(label); } catch(e){ return false; } }).slice(0, 3);
 }
@@ -293,10 +343,13 @@ $('start').onclick = () => startSession(chosenCards());
 document.addEventListener('keydown', e => {
   if(e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT' || e.metaKey || e.ctrlKey) return;
   const playing = !$('play').classList.contains('hide'), studying = !$('study').classList.contains('hide');
-  if(e.key === ' '){
+  if(e.key === ' ' || e.key === 'Enter'){
     if(studying){ e.preventDefault(); $('go').click(); }
+    else if(playing && curChoices.length){ if(revealed){ e.preventDefault(); grade(mcOk); } }
     else if(playing && !revealed){ e.preventDefault(); reveal(); }
-  } else if(playing && revealed){
+  } else if(playing && curChoices.length && !revealed && /^[1-9]$/.test(e.key) && +e.key <= curChoices.length){
+    pick(+e.key - 1);
+  } else if(playing && revealed && !curChoices.length){
     if(e.key === 'g' || e.key === 'G') grade(true);
     else if(e.key === 'm' || e.key === 'M') grade(false);
   }
