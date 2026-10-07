@@ -62,6 +62,13 @@
   <p class="sub"><a href="AP_Lab_Study.html">Lab practical quiz</a> · <a href="AP_Lab_Diagrams.html">Labeled figures</a> · <a href="AP_Exam_3_Study.html">Lecture: Exam 3</a>.
     Look at the figure, say the answer out loud, then flip. Be honest with Got it / Missed: misses come back until you get them.</p>
 
+  <div class="panel" id="learn">
+    <div class="grp" style="margin-top:0">Learn first: narrated walkthroughs</div>
+    <p class="cap" style="margin:4px 0 10px">Each video shows the labeled figure, then points at a few parts: you get a few seconds to guess, then the name and a memory hook. Watch one, then drill it below.</p>
+    <div class="chips" id="vidchips"></div>
+    <div id="vidbox" class="hide" style="margin-top:12px"><video id="vid" controls preload="none" style="width:100%;border-radius:12px;background:#000"></video></div>
+  </div>
+
   <div id="setup">
     <div class="panel">
       <div class="chips" style="margin-bottom:6px">
@@ -251,6 +258,12 @@ document.addEventListener('keydown', e => {
   }
 });
 
+const VIDEOS = [['skull','Skull'],['spine','Vertebrae, sacrum & coccyx'],['upper','Shoulder to hand'],['lower','Pelvis, leg & foot'],['tissue','Skin & bone tissue']];
+$('vidchips').innerHTML = VIDEOS.map(v => `<button type="button" class="chip" data-v="${v[0]}">▶ ${v[1]}</button>`).join('');
+document.querySelectorAll('#vidchips .chip').forEach(b => b.onclick = () => {
+  const v = $('vid'); v.src = 'video/walkthrough_' + b.dataset.v + '.mp4'; $('vidbox').classList.remove('hide'); v.play().catch(() => {});
+  $('vidbox').scrollIntoView({behavior:'smooth', block:'nearest'});
+});
 buildPicker(); refreshSetup();
 </script>
 </body>
