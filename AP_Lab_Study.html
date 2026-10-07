@@ -292,7 +292,7 @@ function renderChapters(){
 /* ================= STATE & STORAGE ================= */
 
 const LS_KEY = 'ap_study_stats_lab_v1';
-const PREF_KEY = 'ap_study_prefs_lab_v2';   // remembered menu choices, separate from progress
+const PREF_KEY = 'ap_study_prefs_lab_v3';   // remembered menu choices, separate from progress
 const DECK_KEY = 'ap_study_served_lab_v1';  // which questions each pass through a pool has already served
 let current = 'lab_all';
 /* Boss, 2026-09-24: "I only need quiz questions from the quiz attempt. I don't
@@ -327,7 +327,7 @@ let shuffleChoices = false;
    Boss, same day: "why not just make it 3 choices instead of 5". Three is the
    default - two real wrong answers to beat, a 1-in-3 guess - with 2 and All
    still one click away. */
-let choiceCount = 'all';       // 2 | 3 | 'all'
+let choiceCount = 2;       // 2 | 3 | 'all'
 /* Boss, 2026-09-25: "if I do a quiz of 10 and go to next round, does it give me
    the next 10 ... or the last 6 or whatever questions remain? I don't want to
    retake the same questions over and over." It used to be an independent random
